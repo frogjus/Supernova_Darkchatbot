@@ -1,6 +1,7 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import type { GameState, Message, Character, DayContent, WeeklyEvent, Choice, ConsequenceItem } from '../types';
 import { createInitialState, applyConsequences, advanceTime, loadCharacters, loadDays, loadEvents } from '../utils/helpers';
+import { generateCharacterResponse } from '../utils/aiService';
 
 export function useGameState() {
   const [state, setState] = useState<GameState>(createInitialState());
@@ -8,6 +9,8 @@ export function useGameState() {
   const [days, setDays] = useState<DayContent[]>([]);
   const [events, setEvents] = useState<WeeklyEvent[]>([]);
   const [loading, setLoading] = useState(true);
+  const [aiLoading, setAiLoading] = useState(false);
+  const messageQueueRef = useRef<string[]>([]);
 
   // Load initial data
   useEffect(() => {
@@ -39,6 +42,25 @@ export function useGameState() {
     loadData();
   }, []);
 
+  // Process AI message queue
+  useEffect(() => {
+    if (messageQueueRef.current.length > 0 && !aiLoading) {
+      const processNext = async () => {
+        const charId = messageQueueRef.current.shift();
+        if (charId) {
+          setAiLoading(true);
+          try {
+            await generateAIResponse(charId);
+          } catch (error) {
+            console.error('AI response error:', error);
+          }
+          setAiLoading(false);
+        }
+      };
+      processNext();
+    }
+  }, [aiLoading, state.messages]);
+
   const getCharacter = useCallback((id: string): Character | undefined => {
     return characters.find(c => c.id === id);
   }, [characters]);
@@ -46,6 +68,51 @@ export function useGameState() {
   const setCurrentChannel = useCallback((channel: string) => {
     setState(prev => ({ ...prev, currentChannel: channel }));
   }, []);
+
+  const generateAIResponse = useCallback(async (characterId: string) => {
+    const character = getCharacter(characterId);
+    if (!character) return;
+
+    const response = await generateCharacterResponse({
+      character,
+      gameState: state,
+      conversationHistory: state.messages,
+    });
+
+    const newMessage: Message = {
+      id: `ai_${Date.now()}`,
+      characterId,
+      content: response,
+      timestamp: Date.now(),
+    };
+
+    setState(prev => ({
+      ...prev,
+      messages: [...prev.messages, newMessage],
+    }));
+  }, [state, getCharacter]);
+
+  const sendPlayerMessage = useCallback(async (message: string) => {
+    const character = getCharacter(state.currentChannel);
+    if (!character || state.currentChannel === 'group') return;
+
+    // Add player message
+    const playerMsg: Message = {
+      id: `player_${Date.now()}`,
+      characterId: 'player',
+      content: message,
+      timestamp: Date.now(),
+      isPlayer: true,
+    };
+
+    setState(prev => ({
+      ...prev,
+      messages: [...prev.messages, playerMsg],
+    }));
+
+    // Queue AI response
+    messageQueueRef.current.push(state.currentChannel);
+  }, [state.currentChannel, getCharacter]);
 
   const makeChoice = useCallback((choice: Choice, _messageId: string) => {
     setState(prev => {
@@ -56,7 +123,13 @@ export function useGameState() {
       };
       return newState;
     });
-  }, []);
+
+    // Queue AI response for the character's channel
+    const currentChar = getCharacter(state.currentChannel);
+    if (currentChar) {
+      messageQueueRef.current.push(currentChar.id);
+    }
+  }, [state.currentChannel, getCharacter]);
 
   const advanceTimeOfDay = useCallback(() => {
     setState(prev => {
@@ -107,11 +180,13 @@ export function useGameState() {
     days,
     events,
     loading,
+    aiLoading,
     getCharacter,
     setCurrentChannel,
     makeChoice,
     advanceTimeOfDay,
     addConsequence,
     getMessagesForCurrentChannel,
+    sendPlayerMessage,
   };
 }

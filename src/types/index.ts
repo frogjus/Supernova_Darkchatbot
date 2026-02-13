@@ -2,6 +2,7 @@
 export interface Character {
   id: string;
   name: string;
+  avatar: string;
   color: string;
   accentColor: string;
   personality: string;

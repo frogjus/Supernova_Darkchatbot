@@ -32,8 +32,14 @@ export function ChatWindow({ messages, characters, onChoiceSelect }: ChatWindowP
         className={`message ${isPlayer ? 'player' : 'character'} ${character ? '' : 'system'}`}
       >
         {!isPlayer && character && (
-          <div className="message-avatar" style={{ backgroundColor: character.color }}>
-            {character.name.charAt(0)}
+          <div className="message-avatar" style={{ borderColor: character.color }}>
+            {character.avatar ? (
+              <img src={character.avatar} alt={character.name} className="avatar-image" />
+            ) : (
+              <div className="avatar-fallback" style={{ backgroundColor: character.color }}>
+                {character.name.charAt(0)}
+              </div>
+            )}
           </div>
         )}
         <div className="message-content">
