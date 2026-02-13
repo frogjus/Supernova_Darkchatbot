@@ -3,7 +3,7 @@
     {
       "id": "miho",
       "name": "Miho",
-      "avatar": "/characters/miho.svg",
+      "avatar": "/art_direction/character/Miho/miho_profile.png",
       "color": "#FF6B9D",
       "accentColor": "#FFB8D1",
       "personality": "Once the group's sunshine. Now hollow. Uses excessive energy to hide the void inside. Fast talker who never pauses anymore - because silence hurts.",
@@ -31,7 +31,7 @@
     {
       "id": "sohee",
       "name": "Sohee",
-      "avatar": "/characters/sohee.svg",
+      "avatar": "/art_direction/character/Sohhee/sohee_profile.png",
       "color": "#7C9EB2",
       "accentColor": "#A8C4D4",
       "personality": "Emotionally detached. Speaks in short, flat sentences. Seen as cold - but she was the one who watched everything fall apart and couldn't stop it.",
@@ -59,7 +59,7 @@
     {
       "id": "sujin",
       "name": "Sujin",
-      "avatar": "/characters/sujin.svg",
+      "avatar": "/art_direction/character/Sujin/sujin_profile.png",
       "color": "#8BC34A",
       "accentColor": "#C5E1A5",
       "personality": "Polite to the point of self-erasure. Says 'it's fine' to everything. Was always the one who tried to keep peace - even when it meant being used.",
@@ -87,7 +87,7 @@
     {
       "id": "hyunju",
       "name": "Hyunju",
-      "avatar": "/characters/hyunju.svg",
+      "avatar": "/art_direction/character/Hyunju/hyunju_profile.png",
       "color": "#FFD54F",
       "accentColor": "#FFE082",
       "personality": "Hyperactive. Volunteers for everything. Says she's 'totally fine' while clearly running from something. Perfectionism became self-punishment.",
