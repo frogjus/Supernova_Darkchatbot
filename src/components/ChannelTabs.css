@@ -1,0 +1,57 @@
+.channel-tabs {
+  display: flex;
+  gap: 4px;
+  padding: 8px 12px;
+  background: #0d0d1a;
+  border-bottom: 1px solid #2a2a4a;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.channel-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.channel-tab {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  background: transparent;
+  border: 1px solid #2a2a4a;
+  border-radius: 8px;
+  color: #888;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  font-size: 12px;
+  font-family: inherit;
+}
+
+.channel-tab:hover {
+  background: #1a1a2e;
+  border-color: var(--channel-color);
+  color: #fff;
+}
+
+.channel-tab.active {
+  background: linear-gradient(135deg, var(--channel-color) 0%, #2a2a4a 100%);
+  border-color: var(--channel-color);
+  color: #fff;
+  box-shadow: 0 0 12px color-mix(in srgb, var(--channel-color) 40%, transparent);
+}
+
+.channel-icon {
+  font-size: 14px;
+}
+
+.channel-name {
+  font-weight: 500;
+}
+
+.channel-tab.group .channel-icon {
+  background: linear-gradient(135deg, #6c5ce7, #a29bfe);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}

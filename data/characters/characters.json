@@ -1,0 +1,121 @@
+{
+  "characters": [
+    {
+      "id": "miho",
+      "name": "Miho",
+      "color": "#FF6B9D",
+      "accentColor": "#FFB8D1",
+      "personality": "Bright, cute, fast-talking, dramatic, lots of questions",
+      "speakingStyle": {
+        "prefix": "",
+        "suffix": " ☆",
+        "commonPhrases": [
+          "omg",
+          "wait wait wait",
+          "but what if",
+          "really??",
+          "hehe",
+          "okay so"
+        ]
+      },
+      "traits": {
+        "trustStart": 40,
+        "energyCost": 1.2,
+        "vulnerability": "relapse"
+      }
+    },
+    {
+      "id": "sohee",
+      "name": "Sohee",
+      "color": "#7C9EB2",
+      "accentColor": "#A8C4D4",
+      "personality": "Calm, minimal, piercing honesty, speaks sparingly",
+      "speakingStyle": {
+        "prefix": "",
+        "suffix": "",
+        "commonPhrases": [
+          "...",
+          "whatever",
+          "fine",
+          "sure",
+          "not my problem"
+        ]
+      },
+      "traits": {
+        "trustStart": 30,
+        "energyCost": 0.8,
+        "vulnerability": "shutdown"
+      }
+    },
+    {
+      "id": "sujin",
+      "name": "Sujin",
+      "color": "#8BC34A",
+      "accentColor": "#C5E1A5",
+      "personality": "Polite, rational, autonomy-first, shuts down if dominated",
+      "speakingStyle": {
+        "prefix": "",
+        "suffix": ".",
+        "commonPhrases": [
+          "if that's what you think",
+          "i understand",
+          "but i prefer",
+          "please don't",
+          "i'll think about it"
+        ]
+      },
+      "traits": {
+        "trustStart": 35,
+        "energyCost": 1.0,
+        "vulnerability": "stalking"
+      }
+    },
+    {
+      "id": "hyunju",
+      "name": "Hyunju",
+      "color": "#FFD54F",
+      "accentColor": "#FFE082",
+      "personality": "Friendly, restless, praise-responsive, perfectionist",
+      "speakingStyle": {
+        "prefix": "",
+        "suffix": "!",
+        "commonPhrases": [
+          "got it",
+          "on it",
+          "no problem",
+          "i can do it",
+          "please trust me",
+          "tell me what to do"
+        ]
+      },
+      "traits": {
+        "trustStart": 45,
+        "energyCost": 1.5,
+        "vulnerability": "family"
+      }
+    },
+    {
+      "id": "yuseong",
+      "name": "Yuseong",
+      "color": "#9C27B0",
+      "accentColor": "#CE93D8",
+      "personality": "Antagonist - offers shortcuts that cost freedom/selfhood",
+      "speakingStyle": {
+        "prefix": "",
+        "suffix": "...",
+        "commonPhrases": [
+          "i can help",
+          "don't you want",
+          "trust me",
+          "this is your chance",
+          "don't waste this"
+        ]
+      },
+      "traits": {
+        "trustStart": 20,
+        "energyCost": 0,
+        "vulnerability": "manipulation"
+      }
+    }
+  ]
+}

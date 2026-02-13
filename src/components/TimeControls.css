@@ -1,0 +1,93 @@
+.time-controls {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 10px 16px;
+  background: #0d0d1a;
+  border-top: 1px solid #2a2a4a;
+}
+
+.day-display {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.day-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  color: #666;
+}
+
+.day-number {
+  font-size: 24px;
+  font-weight: 700;
+  color: #fff;
+  text-shadow: 0 0 10px rgba(108, 92, 231, 0.5);
+}
+
+.time-display {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: #1a1a2e;
+  border-radius: 20px;
+  border: 1px solid #2a2a4a;
+}
+
+.time-icon {
+  font-size: 16px;
+}
+
+.time-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: #aaa;
+}
+
+.advance-button {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  background: linear-gradient(135deg, #6c5ce7 0%, #5541d7 100%);
+  border: none;
+  border-radius: 8px;
+  color: #fff;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.advance-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(108, 92, 231, 0.4);
+}
+
+.advance-button:active {
+  transform: translateY(0);
+}
+
+.advance-icon {
+  font-size: 14px;
+}
+
+@media (max-width: 480px) {
+  .time-controls {
+    padding: 8px 12px;
+    gap: 10px;
+  }
+
+  .day-number {
+    font-size: 20px;
+  }
+
+  .advance-button {
+    padding: 6px 12px;
+    font-size: 12px;
+  }
+}

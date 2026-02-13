@@ -1,0 +1,107 @@
+.meters-container {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  border-bottom: 1px solid #2a2a4a;
+  padding: 12px 16px;
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.meters-section,
+.trust-section {
+  flex: 1;
+  min-width: 280px;
+}
+
+.meters-title {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: #888;
+  margin: 0 0 8px 0;
+  text-transform: uppercase;
+}
+
+.meters-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+.meter-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.meter-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.meter-icon {
+  font-size: 12px;
+}
+
+.meter-label {
+  font-size: 10px;
+  color: #aaa;
+  flex: 1;
+}
+
+.meter-value {
+  font-size: 10px;
+  font-weight: 600;
+  color: #fff;
+}
+
+.meter-bar-bg,
+.trust-bar-bg {
+  height: 4px;
+  background: #2a2a4a;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.meter-bar-fill,
+.trust-bar-fill {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.3s ease, background-color 0.3s ease;
+}
+
+.trust-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.trust-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.trust-name {
+  font-size: 11px;
+  font-weight: 600;
+  width: 50px;
+  flex-shrink: 0;
+}
+
+.trust-bar-bg {
+  flex: 1;
+  height: 4px;
+}
+
+@media (max-width: 600px) {
+  .meters-container {
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .meters-grid {
+    grid-template-columns: 1fr;
+  }
+}
