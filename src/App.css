@@ -2,6 +2,8 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
 }
 
 :root {
@@ -14,12 +16,17 @@
   --text-muted: #666;
   --accent-primary: #6c5ce7;
   --accent-secondary: #a29bfe;
+  --safe-area-inset-top: env(safe-area-inset-top);
+  --safe-area-inset-bottom: env(safe-area-inset-bottom);
+  --safe-area-inset-left: env(safe-area-inset-left);
+  --safe-area-inset-right: env(safe-area-inset-right);
 }
 
 html, body, #root {
   height: 100%;
   width: 100%;
   overflow: hidden;
+  overscroll-behavior: none;
 }
 
 body {
@@ -27,26 +34,32 @@ body {
   background: var(--bg-primary);
   color: var(--text-primary);
   line-height: 1.5;
+  touch-action: manipulation;
 }
 
 .app {
   display: flex;
   flex-direction: column;
   height: 100vh;
+  height: 100dvh;
   background: linear-gradient(180deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+  padding-top: var(--safe-area-inset-top);
+  padding-bottom: var(--safe-area-inset-bottom);
 }
 
 .app-header {
-  padding: 16px;
+  padding: 12px 16px;
+  padding-top: max(12px, var(--safe-area-inset-top));
   text-align: center;
   background: linear-gradient(180deg, #1a1a2e 0%, transparent 100%);
   border-bottom: 1px solid var(--border-color);
+  flex-shrink: 0;
 }
 
 .app-title {
-  font-size: 24px;
+  font-size: 20px;
   font-weight: 800;
-  letter-spacing: 4px;
+  letter-spacing: 3px;
   background: linear-gradient(135deg, #ff6b9d 0%, #6c5ce7 50%, #a29bfe 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -55,9 +68,9 @@ body {
 }
 
 .app-subtitle {
-  font-size: 12px;
+  font-size: 11px;
   color: var(--text-secondary);
-  margin-top: 4px;
+  margin-top: 2px;
   letter-spacing: 1px;
 }
 
@@ -67,6 +80,7 @@ body {
   align-items: center;
   justify-content: center;
   height: 100vh;
+  height: 100dvh;
   background: var(--bg-primary);
 }
 
@@ -75,7 +89,7 @@ body {
 }
 
 .loading-glitch {
-  font-size: 32px;
+  font-size: 28px;
   font-weight: 800;
   letter-spacing: 4px;
   color: #fff;
@@ -120,8 +134,8 @@ body {
 
 /* Scrollbar styling */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 4px;
+  height: 4px;
 }
 
 ::-webkit-scrollbar-track {
@@ -130,7 +144,7 @@ body {
 
 ::-webkit-scrollbar-thumb {
   background: var(--border-color);
-  border-radius: 3px;
+  border-radius: 2px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
@@ -148,4 +162,36 @@ button:focus-visible,
 input:focus-visible {
   outline: 2px solid var(--accent-primary);
   outline-offset: 2px;
+}
+
+/* Mobile responsive adjustments */
+@media (max-width: 480px) {
+  .app-header {
+    padding: 10px 12px;
+  }
+
+  .app-title {
+    font-size: 18px;
+    letter-spacing: 2px;
+  }
+
+  .app-subtitle {
+    font-size: 10px;
+  }
+}
+
+/* Safe area padding for notched devices */
+@supports (padding: max(0px)) {
+  .app-header {
+    padding-left: max(12px, var(--safe-area-inset-left));
+    padding-right: max(12px, var(--safe-area-inset-right));
+  }
+}
+
+/* PWA standalone mode */
+@media (display-mode: standalone) {
+  body {
+    -webkit-user-select: none;
+    user-select: none;
+  }
 }

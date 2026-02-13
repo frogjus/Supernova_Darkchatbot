@@ -1,11 +1,14 @@
 .channel-tabs {
   display: flex;
   gap: 4px;
-  padding: 8px 12px;
+  padding: 8px 10px;
   background: #0d0d1a;
   border-bottom: 1px solid #2a2a4a;
   overflow-x: auto;
+  overflow-y: hidden;
   scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  flex-shrink: 0;
 }
 
 .channel-tabs::-webkit-scrollbar {
@@ -15,17 +18,18 @@
 .channel-tab {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 8px 14px;
+  gap: 5px;
+  padding: 7px 12px;
   background: transparent;
   border: 1px solid #2a2a4a;
-  border-radius: 8px;
+  border-radius: 7px;
   color: #888;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.15s ease;
   white-space: nowrap;
-  font-size: 12px;
+  font-size: 11px;
   font-family: inherit;
+  touch-action: manipulation;
 }
 
 .channel-tab:hover {
@@ -34,15 +38,19 @@
   color: #fff;
 }
 
+.channel-tab:active {
+  transform: scale(0.97);
+}
+
 .channel-tab.active {
   background: linear-gradient(135deg, var(--channel-color) 0%, #2a2a4a 100%);
   border-color: var(--channel-color);
   color: #fff;
-  box-shadow: 0 0 12px color-mix(in srgb, var(--channel-color) 40%, transparent);
+  box-shadow: 0 0 10px color-mix(in srgb, var(--channel-color) 35%, transparent);
 }
 
 .channel-icon {
-  font-size: 14px;
+  font-size: 13px;
 }
 
 .channel-name {
@@ -54,4 +62,22 @@
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+}
+
+/* Mobile adjustments */
+@media (max-width: 480px) {
+  .channel-tabs {
+    padding: 6px 8px;
+    gap: 3px;
+  }
+
+  .channel-tab {
+    padding: 6px 10px;
+    font-size: 10px;
+    border-radius: 6px;
+  }
+
+  .channel-icon {
+    font-size: 12px;
+  }
 }
