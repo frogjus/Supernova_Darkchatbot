@@ -15,6 +15,7 @@ function App() {
     makeChoice,
     advanceTimeOfDay,
     getMessagesForCurrentChannel,
+    sendPlayerMessage,
   } = useGameState();
 
   const messages = getMessagesForCurrentChannel();
@@ -55,6 +56,7 @@ function App() {
         characters={characters}
         currentChannel={state.currentChannel}
         onChoiceSelect={makeChoice}
+        onSendMessage={sendPlayerMessage}
       />
 
       <TimeControls

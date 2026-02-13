@@ -1,5 +1,7 @@
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import type { Message, Character, Choice } from '../types';
+import { CharacterPanel } from './CharacterPanel';
+import { MessageInput } from './MessageInput';
 import './ChatWindow.css';
 
 interface ChatWindowProps {
@@ -7,10 +9,18 @@ interface ChatWindowProps {
   characters: Character[];
   currentChannel: string;
   onChoiceSelect: (choice: Choice, messageId: string) => void;
+  onSendMessage: (message: string) => void;
 }
 
-export function ChatWindow({ messages, characters, onChoiceSelect }: ChatWindowProps) {
+export function ChatWindow({ messages, characters, currentChannel, onChoiceSelect, onSendMessage }: ChatWindowProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -20,6 +30,9 @@ export function ChatWindow({ messages, characters, onChoiceSelect }: ChatWindowP
     if (id === 'group') return undefined;
     return characters.find(c => c.id === id);
   };
+
+  const currentCharacter = getCharacter(currentChannel);
+  const isGroupChat = currentChannel === 'group';
 
   const renderMessage = (message: Message) => {
     const character = getCharacter(message.characterId);
@@ -81,16 +94,36 @@ export function ChatWindow({ messages, characters, onChoiceSelect }: ChatWindowP
   };
 
   return (
-    <div className="chat-window">
-      <div className="messages-container">
-        {messages.length === 0 ? (
-          <div className="empty-state">
-            <p>No messages yet. Time to start the conversation...</p>
-          </div>
-        ) : (
-          messages.map(renderMessage)
-        )}
-        <div ref={messagesEndRef} />
+    <div className={`chat-container ${isMobile ? 'mobile' : 'desktop'}`}>
+      {/* Character Panel - left on desktop, top on mobile */}
+      {!isGroupChat && currentCharacter && (
+        <div className="character-panel-container">
+          <CharacterPanel character={currentCharacter} />
+        </div>
+      )}
+
+      {/* Chat Panel */}
+      <div className="chat-panel">
+        <div className="messages-container">
+          {messages.length === 0 ? (
+            <div className="empty-state">
+              {isGroupChat ? (
+                <p>Group chat is empty. Start talking!</p>
+              ) : (
+                <p>Start a conversation with {currentCharacter?.name}...</p>
+              )}
+            </div>
+          ) : (
+            messages.map(renderMessage)
+          )}
+          <div ref={messagesEndRef} />
+        </div>
+
+        <MessageInput
+          onSend={onSendMessage}
+          disabled={isGroupChat}
+          placeholder={isGroupChat ? "Group chat - select a character first" : `Message ${currentCharacter?.name}...`}
+        />
       </div>
     </div>
   );

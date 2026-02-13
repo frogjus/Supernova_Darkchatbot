@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 400" width="200" height="400">
+  <!-- Transparent background -->
+  <!-- Miho - The fallen sunshine, pink/gold theme -->
+
+  <!-- Hair back -->
+  <path d="M50 60 Q30 80 25 150 L25 250 Q30 280 50 300 L50 150 Z" fill="#d63384"/>
+  <path d="M150 60 Q170 80 175 150 L175 250 Q170 280 150 300 L150 150 Z" fill="#d63384"/>
+  <path d="M40 50 Q20 70 30 120 L40 100 Z" fill="#d63384"/>
+  <path d="M160 50 Q180 70 170 120 L160 100 Z" fill="#d63384"/>
+
+  <!-- Neck -->
+  <rect x="85" y="130" width="30" height="30" fill="#ffdbac"/>
+
+  <!-- Outfit - sparkly top -->
+  <path d="M50 160 Q100 150 150 160 L160 280 Q100 290 40 280 Z" fill="#ff6b9d"/>
+  <path d="M60 165 L140 165 L135 180 L65 180 Z" fill="#ffb8d1"/>
+  <path d="M80 185 L120 185 L115 275 L85 275 Z" fill="#ff6b9d" opacity="0.9"/>
+
+  <!-- Sparkles on outfit -->
+  <circle cx="70" cy="200" r="2" fill="#ffd700"/>
+  <circle cx="130" cy="220" r="2" fill="#ffd700"/>
+  <circle cx="90" cy="250" r="2" fill="#ffd700"/>
+  <circle cx="110" cy="180" r="1.5" fill="#fff"/>
+
+  <!-- Arms -->
+  <path d="M50 170 Q30 200 35 260" stroke="#ffdbac" stroke-width="18" fill="none" stroke-linecap="round"/>
+  <path d="M150 170 Q170 200 165 260" stroke="#ffdbac" stroke-width="18" fill="none" stroke-linecap="round"/>
+
+  <!-- Hands -->
+  <circle cx="35" cy="265" r="12" fill="#ffdbac"/>
+  <circle cx="165" cy="265" r="12" fill="#ffdbac"/>
+
+  <!-- Face -->
+  <ellipse cx="100" cy="90" rx="45" ry="50" fill="#ffdbac"/>
+
+  <!-- Hair front -->
+  <path d="M55 45 Q100 20 145 45 Q155 60 150 80 Q140 50 100 45 Q60 50 50 80 Q45 60 55 45" fill="#d63384"/>
+  <path d="M55 50 Q50 70 55 90" stroke="#d63384" stroke-width="8" fill="none"/>
+  <path d="M145 50 Q150 70 145 90" stroke="#d63384" stroke-width="8" fill="none"/>
+
+  <!-- Hair bangs -->
+  <path d="M60 55 Q70 45 80 55 Q90 42 100 55 Q110 42 120 55 Q130 45 140 55" fill="#d63384"/>
+  <path d="M60 55 Q65 65 60 75" fill="#d63384"/>
+  <path d="M140 55 Q135 65 140 75" fill="#d63384"/>
+
+  <!-- Hair highlights -->
+  <path d="M70 40 Q80 35 90 40" stroke="#ff8fab" stroke-width="3" fill="none" opacity="0.8"/>
+  <path d="M110 40 Q120 35 130 40" stroke="#ff8fab" stroke-width="3" fill="none" opacity="0.8"/>
+
+  <!-- Eyes - big, expressive, slightly hollow -->
+  <ellipse cx="80" cy="90" rx="12" ry="14" fill="#2d2d2d"/>
+  <ellipse cx="120" cy="90" rx="12" ry="14" fill="#2d2d2d"/>
+  <ellipse cx="82" cy="87" rx="4" ry="4" fill="#fff"/>
+  <ellipse cx="122" cy="87" rx="4" ry="4" fill="#fff"/>
+  <!-- Tired shadows under eyes -->
+  <ellipse cx="80" cy="102" rx="8" ry="3" fill="#d63384" opacity="0.3"/>
+  <ellipse cx="120" cy="102" rx="8" ry="3" fill="#d63384" opacity="0.3"/>
+
+  <!-- Blush - forced brightness -->
+  <ellipse cx="70" cy="108" rx="10" ry="5" fill="#ffb6c1" opacity="0.7"/>
+  <ellipse cx="130" cy="108" rx="10" ry="5" fill="#ffb6c1" opacity="0.7"/>
+
+  <!-- Eyebrows - worried -->
+  <path d="M70 72 Q80 75 88 72" stroke="#8b4557" stroke-width="2" fill="none"/>
+  <path d="M112 72 Q120 75 130 72" stroke="#8b4557" stroke-width="2" fill="none"/>
+
+  <!-- Mouth - forced smile -->
+  <path d="M90 120 Q100 125 110 120" stroke="#c94c4c" stroke-width="3" fill="none" stroke-linecap="round"/>
+
+  <!-- Earrings -->
+  <circle cx="55" cy="100" r="3" fill="#ffd700"/>
+  <circle cx="145" cy="100" r="3" fill="#ffd700"/>
+</svg>

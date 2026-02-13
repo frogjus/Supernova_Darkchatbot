@@ -1,6 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" shape-rendering="crispEdges">
-  <!-- Background -->
-  <rect width="64" height="64" fill="#1a1a2e"/>
+  <!-- Miho - transparent background -->
 
   <!-- Hair (dark pink) -->
   <rect x="12" y="8" width="40" height="16" fill="#d63384"/>

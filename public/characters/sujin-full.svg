@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 400" width="200" height="400">
+  <!-- Sujin - The captive, cold blue theme -->
+
+  <!-- Hair back -->
+  <path d="M45 55 Q25 85 25 150 L25 230 Q30 270 50 290 L50 180 Z" fill="#2d5a27"/>
+  <path d="M155 55 Q175 85 175 150 L175 230 Q170 270 150 290 L150 180 Z" fill="#2d5a27"/>
+  <path d="M35 50 Q15 70 20 110 L30 90 Z" fill="#2d5a27"/>
+  <path d="M165 50 Q185 70 180 110 L170 90 Z" fill="#2d5a27"/>
+
+  <!-- Neck -->
+  <rect x="85" y="130" width="30" height="30" fill="#d4c4a8"/>
+
+  <!-- Outfit - dancer's outfit, pale green -->
+  <path d="M50 160 Q100 150 150 160 L155 280 Q100 295 45 280 Z" fill="#64b5f6"/>
+  <path d="M60 165 L140 165 L138 185 L62 185 Z" fill="#90caf9"/>
+  <path d="M75 190 L125 190 L122 270 L78 270 Z" fill="#64b5f6" opacity="0.9"/>
+
+  <!-- Subtle chain/contract hint -->
+  <path d="M90 160 Q90 180 85 200" stroke="#1e88e5" stroke-width="2" fill="none" opacity="0.4"/>
+  <path d="M110 160 Q110 180 115 200" stroke="#1e88e5" stroke-width="2" fill="none" opacity="0.4"/>
+
+  <!-- Arms - gentle, accommodating pose -->
+  <path d="M50 170 Q25 210 30 265" stroke="#d4c4a8" stroke-width="18" fill="none" stroke-linecap="round"/>
+  <path d="M150 170 Q175 210 170 265" stroke="#d4c4a8" stroke-width="18" fill="none" stroke-linecap="round"/>
+
+  <!-- Hands -->
+  <circle cx="30" cy="270" r="12" fill="#d4c4a8"/>
+  <circle cx="170" cy="270" r="12" fill="#d4c4a8"/>
+
+  <!-- Face -->
+  <ellipse cx="100" cy="90" rx="42" ry="48" fill="#d4c4a8"/>
+
+  <!-- Hair front -->
+  <path d="M58 45 Q100 20 142 45 Q155 65 150 85 Q135 55 100 50 Q65 55 50 85 Q45 65 58 45" fill="#2d5a27"/>
+  <path d="M55 50 Q48 75 52 100" stroke="#2d5a27" stroke-width="8" fill="none"/>
+  <path d="M145 50 Q152 75 148 100" stroke="#2d5a27" stroke-width="8" fill="none"/>
+
+  <!-- Hair bangs - straight, neat -->
+  <path d="M60 52 Q65 48 70 52 L70 70 Q65 65 60 70 Z" fill="#2d5a27"/>
+  <path d="M75 48 L75 70" stroke="#2d5a27" stroke-width="6"/>
+  <path d="M90 48 L90 70" stroke="#2d5a27" stroke-width="6"/>
+  <path d="M105 48 L105 70" stroke="#2d5a27" stroke-width="6"/>
+  <path d="M120 48 L120 70" stroke="#2d5a27" stroke-width="6"/>
+  <path d="M130 52 Q135 48 140 52 L140 70 Q135 65 130 70 Z" fill="#2d5a27"/>
+
+  <!-- Hair highlights -->
+  <path d="M70 42 Q85 35 100 38" stroke="#3d7a37" stroke-width="2" fill="none" opacity="0.6"/>
+  <path d="M115 38 Q130 35 140 42" stroke="#3d7a37" stroke-width="2" fill="none" opacity="0.6"/>
+
+  <!-- Eyes - gentle, worried, watery -->
+  <ellipse cx="82" cy="90" rx="10" ry="12" fill="#3d3d3d"/>
+  <ellipse cx="118" cy="90" rx="10" ry="12" fill="#3d3d3d"/>
+  <ellipse cx="84" cy="87" rx="3" ry="3" fill="#fff"/>
+  <ellipse cx="120" cy="87" rx="3" ry="3" fill="#fff"/>
+  <!-- Watery sheen -->
+  <ellipse cx="80" cy="93" rx="4" ry="2" fill="#90caf9" opacity="0.4"/>
+  <ellipse cx="116" cy="93" rx="4" ry="2" fill="#90caf9" opacity="0.4"/>
+
+  <!-- Eyebrows - slightly worried -->
+  <path d="M72 75 Q82 72 90 75" stroke="#5a5a4a" stroke-width="2" fill="none"/>
+  <path d="M110 75 Q118 72 128 75" stroke="#5a5a4a" stroke-width="2" fill="none"/>
+
+  <!-- Blush - faint -->
+  <ellipse cx="72" cy="105" rx="8" ry="4" fill="#e8d5c4" opacity="0.5"/>
+  <ellipse cx="128" cy="105" rx="8" ry="4" fill="#e8d5c4" opacity="0.5"/>
+
+  <!-- Mouth - polite smile, not quite reaching eyes -->
+  <path d="M92 118 Q100 122 108 118" stroke="#8b6b5b" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+
+  <!-- Small details -->
+  <circle cx="60" cy="100" r="2" fill="#90caf9" opacity="0.5"/>
+  <circle cx="140" cy="100" r="2" fill="#90caf9" opacity="0.5"/>
+</svg>

@@ -2,9 +2,15 @@
 export interface Character {
   id: string;
   name: string;
+  tagline: string;
   avatar: string;
+  fullBody: string;
   color: string;
   accentColor: string;
+  glowColor: string;
+  gradientStart: string;
+  gradientEnd: string;
+  particleColor: string;
   personality: string;
   background: string;
   speakingStyle: {
