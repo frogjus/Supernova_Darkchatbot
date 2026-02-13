@@ -1,0 +1,255 @@
+{
+  "events": [
+    {
+      "id": "audition",
+      "name": "The Audition",
+      "description": "A major entertainment company is holding open auditions. This could be a second chance—or another trap.",
+      "trigger": {
+        "day": 7,
+        "timeOfDay": "noon"
+      },
+      "choices": [
+        {
+          "id": "audition_1",
+          "text": "We should all go together. Strength in numbers.",
+          "consequences": [
+            { "target": "meter", "stat": "teamCohesion", "value": 15 },
+            { "target": "meter", "stat": "exposureRisk", "value": 20 }
+          ]
+        },
+        {
+          "id": "audition_2",
+          "text": "Only those who want to go should go. No pressure.",
+          "consequences": [
+            { "target": "meter", "stat": "teamCohesion", "value": -5 },
+            { "target": "meter", "stat": "trust", "value": 10 }
+          ]
+        },
+        {
+          "id": "audition_3",
+          "text": "This is too risky. We can't put ourselves out there like that.",
+          "consequences": [
+            { "target": "meter", "stat": "moneyPressure", "value": 15 }
+          ]
+        }
+      ],
+      "meterEffects": [
+        { "target": "meter", "stat": "energy", "value": -20 }
+      ]
+    },
+    {
+      "id": "debt_crisis",
+      "name": "Debt Crisis",
+      "description": "A notice arrives: unpaid bills from the old company are now the trainees' responsibility. The total is crushing.",
+      "trigger": {
+        "day": 14,
+        "timeOfDay": "morning"
+      },
+      "choices": [
+        {
+          "id": "debt_1",
+          "text": "We fight this legally. It's not our debt.",
+          "consequences": [
+            { "target": "meter", "stat": "exposureRisk", "value": 25 },
+            { "target": "meter", "stat": "moneyPressure", "value": 10 }
+          ]
+        },
+        {
+          "id": "debt_2",
+          "text": "We pay what we can. Try to work something out.",
+          "consequences": [
+            { "target": "meter", "stat": "moneyPressure", "value": 30 },
+            { "target": "meter", "stat": "energy", "value": -15 }
+          ]
+        },
+        {
+          "id": "debt_3",
+          "text": "Maybe Yuseong can help us with this...",
+          "consequences": [
+            { "target": "meter", "stat": "exposureRisk", "value": 20 },
+            { "target": "meter", "stat": "moneyPressure", "value": -30 }
+          ]
+        }
+      ],
+      "meterEffects": []
+    },
+    {
+      "id": "stalker_incident",
+      "name": "The Stalker",
+      "description": "Sujin's mystery harasser has escalated. They're at the apartment building.",
+      "trigger": {
+        "day": 10,
+        "timeOfDay": "night"
+      },
+      "choices": [
+        {
+          "id": "stalker_1",
+          "text": "We confront them together. No one messes with our group.",
+          "consequences": [
+            { "target": "meter", "stat": "teamCohesion", "value": 20 },
+            { "target": "meter", "stat": "exposureRisk", "value": 15 }
+          ]
+        },
+        {
+          "id": "stalker_2",
+          "text": "We call the police. This is serious.",
+          "consequences": [
+            { "target": "meter", "stat": "exposureRisk", "value": 10 },
+            { "target": "meter", "stat": "moneyPressure", "value": 5 }
+          ]
+        },
+        {
+          "id": "stalker_3",
+          "text": "Sujin, let's move you somewhere safe tonight. We'll figure out a long-term solution.",
+          "consequences": [
+            { "target": "meter", "stat": "trust", "value": 15 },
+            { "target": "meter", "stat": "energy", "value": -10 }
+          ]
+        }
+      ],
+      "meterEffects": []
+    },
+    {
+      "id": "family_pressure",
+      "name": "Family Pressure",
+      "description": "Hyunju's family has reached out. They want her to come home and give up on her dreams—for good.",
+      "trigger": {
+        "day": 12,
+        "timeOfDay": "evening"
+      },
+      "choices": [
+        {
+          "id": "family_1",
+          "text": "Your family loves you. Maybe it's worth listening to them.",
+          "consequences": [
+            { "target": "meter", "stat": "moneyPressure", "value": -20 },
+            { "target": "meter", "stat": "trust", "value": -10 }
+          ]
+        },
+        {
+          "id": "family_2",
+          "text": "This is your decision, Hyunju. We'll support whatever you choose.",
+          "consequences": [
+            { "target": "meter", "stat": "trust", "value": 20 }
+          ]
+        },
+        {
+          "id": "family_3",
+          "text": "Prove them wrong. Show them what you're capable of.",
+          "consequences": [
+            { "target": "meter", "stat": "energy", "value": -15 },
+            { "target": "meter", "stat": "exposureRisk", "value": 10 }
+          ]
+        }
+      ],
+      "meterEffects": []
+    },
+    {
+      "id": "relapse",
+      "name": "The Relapse",
+      "description": "Miho has been acting strange. She admits she's been skipping meals to save money—and her old habits are creeping back.",
+      "trigger": {
+        "day": 8,
+        "timeOfDay": "night"
+      },
+      "choices": [
+        {
+          "id": "relapse_1",
+          "text": "We get you help. Professional help. Right now.",
+          "consequences": [
+            { "target": "meter", "stat": "moneyPressure", "value": 20 },
+            { "target": "meter", "stat": "trust", "value": 15 }
+          ]
+        },
+        {
+          "id": "relapse_2",
+          "text": "Let's talk about it. What's going on?",
+          "consequences": [
+            { "target": "meter", "stat": "trust", "value": 10 },
+            { "target": "meter", "stat": "energy", "value": -10 }
+          ]
+        },
+        {
+          "id": "relapse_3",
+          "text": "You need to eat. Let's get food first, then we figure this out.",
+          "consequences": [
+            { "target": "meter", "stat": "moneyPressure", "value": 5 }
+          ]
+        }
+      ],
+      "meterEffects": []
+    },
+    {
+      "id": "shutdown",
+      "name": "The Shutdown",
+      "description": "Sohee has stopped responding. She's locked herself in her room and won't talk to anyone.",
+      "trigger": {
+        "day": 9,
+        "timeOfDay": "morning"
+      },
+      "choices": [
+        {
+          "id": "shutdown_1",
+          "text": "Give her space. She'll come around when she's ready.",
+          "consequences": [
+            { "target": "meter", "stat": "trust", "value": -5 },
+            { "target": "meter", "stat": "teamCohesion", "value": -10 }
+          ]
+        },
+        {
+          "id": "shutdown_2",
+          "text": "We stay nearby. Let her know we're here without pressure.",
+          "consequences": [
+            { "target": "meter", "stat": "trust", "value": 10 },
+            { "target": "meter", "stat": "energy", "value": -10 }
+          ]
+        },
+        {
+          "id": "shutdown_3",
+          "text": "Break down the door if we have to. This isn't healthy.",
+          "consequences": [
+            { "target": "meter", "stat": "trust", "value": -20 },
+            { "target": "meter", "stat": "teamCohesion", "value": -15 }
+          ]
+        }
+      ],
+      "meterEffects": []
+    },
+    {
+      "id": "rival_conflict",
+      "name": "Rival Group",
+      "description": "Another disbanded group reaches out. They have a proposition—and a warning about Yuseong.",
+      "trigger": {
+        "day": 15,
+        "timeOfDay": "noon"
+      },
+      "choices": [
+        {
+          "id": "rival_1",
+          "text": "We listen. Information is power.",
+          "consequences": [
+            { "target": "meter", "stat": "exposureRisk", "value": 15 },
+            { "target": "meter", "stat": "teamCohesion", "value": 5 }
+          ]
+        },
+        {
+          "id": "rival_2",
+          "text": "We join forces. There's strength in numbers.",
+          "consequences": [
+            { "target": "meter", "stat": "teamCohesion", "value": 20 },
+            { "target": "meter", "stat": "moneyPressure", "value": -10 }
+          ]
+        },
+        {
+          "id": "rival_3",
+          "text": "We don't trust them. They could be working with Yuseong.",
+          "consequences": [
+            { "target": "meter", "stat": "exposureRisk", "value": -5 },
+            { "target": "meter", "stat": "moneyPressure", "value": 10 }
+          ]
+        }
+      ],
+      "meterEffects": []
+    }
+  ]
+}
