@@ -5,23 +5,26 @@
       "name": "Miho",
       "color": "#FF6B9D",
       "accentColor": "#FFB8D1",
-      "personality": "Bright, cute, fast-talking, dramatic, lots of questions",
+      "personality": "Once the group's sunshine. Now hollow. Uses excessive energy to hide the void inside. Fast talker who never pauses anymore - because silence hurts.",
+      "background": "Ex-vocalist. Contract terminated after 'attitude problems.' Truth: she refused to lose weight further. Now bounces between questionable gigs, terrified of being 'useless' again.",
       "speakingStyle": {
         "prefix": "",
-        "suffix": " ☆",
+        "suffix": " ✨",
         "commonPhrases": [
-          "omg",
-          "wait wait wait",
-          "but what if",
-          "really??",
-          "hehe",
-          "okay so"
+          "lol",
+          "i'm fine",
+          "don't worry about me",
+          "anyway",
+          "haha yeah",
+          "wait no actually"
         ]
       },
       "traits": {
-        "trustStart": 40,
+        "trustStart": 25,
         "energyCost": 1.2,
-        "vulnerability": "relapse"
+        "vulnerability": "self-worth",
+        "darkSecret": "Skips meals when stressed. Says it's intentional.",
+        "redemptionPath": "Learn she has value beyond performance"
       }
     },
     {
@@ -29,22 +32,26 @@
       "name": "Sohee",
       "color": "#7C9EB2",
       "accentColor": "#A8C4D4",
-      "personality": "Calm, minimal, piercing honesty, speaks sparingly",
+      "personality": "Emotionally detached. Speaks in short, flat sentences. Seen as cold - but she was the one who watched everything fall apart and couldn't stop it.",
+      "background": "Ex-visual. The company kept her on thin photos because she 'photographed well even when dying inside.' She was there when the other members broke. She did nothing.",
       "speakingStyle": {
         "prefix": "",
         "suffix": "",
         "commonPhrases": [
           "...",
           "whatever",
-          "fine",
           "sure",
-          "not my problem"
+          "doesn't matter",
+          "not important",
+          "ok"
         ]
       },
       "traits": {
-        "trustStart": 30,
+        "trustStart": 15,
         "energyCost": 0.8,
-        "vulnerability": "shutdown"
+        "vulnerability": "guilt",
+        "darkSecret": "Hasn't cried in two years. Can't remember how.",
+        "redemptionPath": "Confront what she witnessed, learn to feel again"
       }
     },
     {
@@ -52,22 +59,26 @@
       "name": "Sujin",
       "color": "#8BC34A",
       "accentColor": "#C5E1A5",
-      "personality": "Polite, rational, autonomy-first, shuts down if dominated",
+      "personality": "Polite to the point of self-erasure. Says 'it's fine' to everything. Was always the one who tried to keep peace - even when it meant being used.",
+      "background": "Ex-lead dancer. Contract sold to another company without her consent. That company turned out to be a front. She's still technically owned by people who want her to do 'private performances.'",
       "speakingStyle": {
         "prefix": "",
         "suffix": ".",
         "commonPhrases": [
-          "if that's what you think",
+          "it's okay",
           "i understand",
-          "but i prefer",
-          "please don't",
-          "i'll think about it"
+          "if that's what you want",
+          "i don't mind",
+          "please don't worry",
+          "really, it's fine"
         ]
       },
       "traits": {
-        "trustStart": 35,
+        "trustStart": 20,
         "energyCost": 1.0,
-        "vulnerability": "stalking"
+        "vulnerability": "autonomy",
+        "darkSecret": "Technically still under contract. Can't legally work elsewhere.",
+        "redemptionPath": "Claim her own voice, break the contract that binds her"
       }
     },
     {
@@ -75,23 +86,26 @@
       "name": "Hyunju",
       "color": "#FFD54F",
       "accentColor": "#FFE082",
-      "personality": "Friendly, restless, praise-responsive, perfectionist",
+      "personality": "Hyperactive. Volunteers for everything. Says she's 'totally fine' while clearly running from something. Perfectionism became self-punishment.",
+      "background": "Ex-main dancer. Developed chronic pain from overtraining. Company dropped her the moment she couldn't perform at 100%. Now works three jobs, none legal, all exhausting.",
       "speakingStyle": {
         "prefix": "",
-        "suffix": "!",
+        "suffix": "!!",
         "commonPhrases": [
-          "got it",
-          "on it",
-          "no problem",
-          "i can do it",
-          "please trust me",
-          "tell me what to do"
+          "got it!!",
+          "on it!!",
+          "don't worry!!",
+          "i can handle it!!",
+          "totally fine!!",
+          "leave it to me!!"
         ]
       },
       "traits": {
-        "trustStart": 45,
+        "trustStart": 30,
         "energyCost": 1.5,
-        "vulnerability": "family"
+        "vulnerability": "self-worth",
+        "darkSecret": "Hides injuries. Can't afford to stop moving.",
+        "redemptionPath": "Rest is not failure. She deserves to take up space."
       }
     },
     {
@@ -99,22 +113,26 @@
       "name": "Yuseong",
       "color": "#9C27B0",
       "accentColor": "#CE93D8",
-      "personality": "Antagonist - offers shortcuts that cost freedom/selfhood",
+      "personality": "Charming predator. Appears helpful, offers 'solutions' that always benefit him. Speaks like he cares. The group's former manager who sold them out.",
+      "background": "Former assistant manager.orchestrated the group's downfall to cover his embezzlement. Now operates 'consulting services' for desperate ex-idols - for a price.",
       "speakingStyle": {
         "prefix": "",
         "suffix": "...",
         "commonPhrases": [
-          "i can help",
-          "don't you want",
+          "i understand",
+          "let me help",
+          "i know a way",
           "trust me",
-          "this is your chance",
-          "don't waste this"
+          "this is for your own good",
+          "don't you want this to work"
         ]
       },
       "traits": {
-        "trustStart": 20,
+        "trustStart": 5,
         "energyCost": 0,
-        "vulnerability": "manipulation"
+        "vulnerability": "exposure",
+        "darkSecret": "Has evidence of his crimes. Would do anything to keep it hidden.",
+        "redemptionPath": "NOT REDEEMABLE - he is the antagonist"
       }
     }
   ]

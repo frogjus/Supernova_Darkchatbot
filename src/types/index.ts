@@ -5,6 +5,7 @@ export interface Character {
   color: string;
   accentColor: string;
   personality: string;
+  background: string;
   speakingStyle: {
     prefix: string;
     suffix: string;
@@ -14,6 +15,8 @@ export interface Character {
     trustStart: number;
     energyCost: number;
     vulnerability: string;
+    darkSecret: string;
+    redemptionPath: string;
   };
 }
 
@@ -47,6 +50,7 @@ export interface Meters {
   moneyPressure: number;
   exposureRisk: number;
   teamCohesion: number;
+  hope: number;
 }
 
 export interface CharacterTrust {
@@ -67,12 +71,15 @@ export interface GameState {
   eventActive: boolean;
   eventType?: string;
   eventProgress?: number;
+  redemptionProgress: {
+    [characterId: string]: number;
+  };
 }
 
 // Consequence feed
 export interface ConsequenceItem {
   id: string;
-  type: 'rumor' | 'bill' | 'opportunity' | 'threat' | 'positive';
+  type: 'rumor' | 'bill' | 'opportunity' | 'threat' | 'positive' | 'breakthrough';
   content: string;
   timestamp: number;
   relatedCharacter?: string;

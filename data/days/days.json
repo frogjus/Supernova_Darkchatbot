@@ -3,29 +3,30 @@
     {
       "day": 1,
       "morning": {
-        "title": "Daybreak",
-        "description": "The first morning. Four strangers in a cramped apartment, all that remains of a dream that almost was.",
+        "title": "Aftermath",
+        "description": "The apartment is quiet. Four women who once had everything. Now they have each other, and barely that.",
         "messages": [
           {
             "id": "d1m_miho_1",
             "characterId": "miho",
-            "content": "omg is this real?? we're actually doing this?? wait wait wait - who are you?? are you like... our manager or something??",
+            "content": "hey lol. so this is it i guess. sorry it's kinda small. i mean it's fine!! totally fine!! we make it work right??",
             "timestamp": 1,
             "choices": [
               {
                 "id": "d1m_miho_c1",
-                "text": "I'm here to help. We need to figure out our next steps together.",
+                "text": "We all need to stick together. That's how we survive.",
                 "consequences": [
                   { "target": "meter", "stat": "teamCohesion", "value": 5 },
-                  { "target": "meter", "stat": "energy", "value": -5 }
+                  { "target": "meter", "stat": "hope", "value": 3 }
                 ],
                 "nextMessageId": "d1m_miho_2a"
               },
               {
                 "id": "d1m_miho_c2",
-                "text": "Something like that. Let's just get organized first.",
+                "text": "Did you eat?",
                 "consequences": [
-                  { "target": "meter", "stat": "moneyPressure", "value": 5 }
+                  { "target": "meter", "stat": "trust", "value": 5 },
+                  { "target": "meter", "stat": "hope", "value": 2 }
                 ],
                 "nextMessageId": "d1m_miho_2b"
               }
@@ -34,44 +35,44 @@
           {
             "id": "d1m_miho_2a",
             "characterId": "miho",
-            "content": "ohh okay!! that's actually really reassuring hehe~ so what's the plan?? do we have like... money?? food?? oh no do we have to cook??",
+            "content": "yeah!! definitely!! we're gonna be fine lol. we just need to like... figure some stuff out. money stuff. boring adult stuff. anyway!!",
+            "timestamp": 2
+          },
+          {
+            "id": "d1m_miho_2b",
+            "characterId": "miho",
+            "content": "oh. um. yeah i ate. don't worry about me lol i always eat haha",
             "timestamp": 2,
             "choices": [
               {
                 "id": "d1m_miho_c3",
-                "text": "We'll figure out food. Right now, let's just talk and get to know each other.",
+                "text": "Okay. But if you don't, tell me. I care.",
                 "consequences": [
-                  { "target": "meter", "stat": "energy", "value": -5 }
+                  { "target": "meter", "stat": "trust", "value": 8 },
+                  { "target": "meter", "stat": "hope", "value": 3 }
                 ]
               }
             ]
           },
           {
-            "id": "d1m_miho_2b",
-            "characterId": "miho",
-            "content": "cool cool ok that's vague but ok☆",
-            "timestamp": 2
-          },
-          {
             "id": "d1m_sohee_1",
             "characterId": "sohee",
-            "content": "...so this is it then. The great disbandment.",
+            "content": "so. this is where we're living now. cool.",
             "timestamp": 3,
             "choices": [
               {
                 "id": "d1m_sohee_c1",
-                "text": "It's not over yet. There's always another path.",
+                "text": "It won't be forever. We can build something from here.",
                 "consequences": [
-                  { "target": "meter", "stat": "teamCohesion", "value": 3 }
+                  { "target": "meter", "stat": "hope", "value": 5 }
                 ],
                 "nextMessageId": "d1m_sohee_2a"
               },
               {
                 "id": "d1m_sohee_c2",
-                "text": "Look, we're all dealing with this. No need to be pessimistic.",
+                "text": "It's not much, but it's ours.",
                 "consequences": [
-                  { "target": "meter", "stat": "trust", "value": -5 },
-                  { "target": "unlock", "targetId": "sohee" }
+                  { "target": "meter", "stat": "teamCohesion", "value": 3 }
                 ],
                 "nextMessageId": "d1m_sohee_2b"
               }
@@ -80,40 +81,41 @@
           {
             "id": "d1m_sohee_2a",
             "characterId": "sohee",
-            "content": "...optimistic. i don't hate it.",
+            "content": "...optimistic. whatever. just don't expect me to pretend everything's fine when it's not.",
             "timestamp": 4
           },
           {
             "id": "d1m_sohee_2b",
             "characterId": "sohee",
-            "content": "whatever. just don't expect me to pretend.",
+            "content": "sure. that's what we tell ourselves, right.",
             "timestamp": 4
           }
         ]
       },
       "noon": {
-        "title": "High Noon",
-        "description": "The reality sets in. Bills,饿肚子, and the weight of choices not made.",
+        "title": "Bills",
+        "description": "Reality crashes in. The phone buzzes with notifications they can't afford to ignore.",
         "messages": [
           {
             "id": "d1n_hyunju_1",
             "characterId": "hyunju",
-            "content": "okay i checked - we have exactly 47,000 won between us. that's like... two days of ramyeon. max.",
+            "content": "okay so i checked our accounts!! we have 23,000 won between all of us lol which is like... nothing!! anyway don't worry i'll figure something out!!",
             "timestamp": 1,
             "choices": [
               {
                 "id": "d1n_hyunju_c1",
-                "text": "We need to find ways to make money. Any skills we can use?",
+                "text": "We need to figure this out together, not just you.",
                 "consequences": [
-                  { "target": "meter", "stat": "moneyPressure", "value": 10 }
+                  { "target": "meter", "stat": "teamCohesion", "value": 5 },
+                  { "target": "meter", "stat": "trust", "value": 3 }
                 ],
                 "nextMessageId": "d1n_hyunju_2"
               },
               {
                 "id": "d1n_hyunju_c2",
-                "text": "Let's be careful. We'll make it work.",
+                "text": "What jobs have you been looking at?",
                 "consequences": [
-                  { "target": "meter", "stat": "energy", "value": -3 }
+                  { "target": "meter", "stat": "moneyPressure", "value": 5 }
                 ],
                 "nextMessageId": "d1n_hyunju_3"
               }
@@ -122,35 +124,35 @@
           {
             "id": "d1n_hyunju_2",
             "characterId": "hyunju",
-            "content": "i can dance - maybe teaching? sujin can sing, sohee is good at... stuff? miho can probably talk anyone into anything lol",
+            "content": "oh. um. okay yeah!! together!! got it!! i just... i don't want everyone to worry!! i can handle it!!",
             "timestamp": 2
           },
           {
             "id": "d1n_hyunju_3",
             "characterId": "hyunju",
-            "content": "on it!! tell me what to do and i'll make it happen!!",
+            "content": "um... there's like... delivery work?? and some stuff online?? i can do it!! i can do anything!!",
             "timestamp": 2
           },
           {
             "id": "d1n_sujin_1",
             "characterId": "sujin",
-            "content": "i've been thinking about our options. there are a few entertainment agencies still accepting applications for backup trainees. or we could look for part-time work.",
+            "content": "i should tell you all something. about my... situation. with the contract.",
             "timestamp": 3,
             "choices": [
               {
                 "id": "d1n_sujin_c1",
-                "text": "Backup trainees? That means starting over. Are you okay with that?",
+                "text": "You can tell us when you're ready. No pressure.",
                 "consequences": [
-                  { "target": "meter", "stat": "teamCohesion", "value": 5 },
-                  { "target": "meter", "stat": "trust", "value": 5 }
+                  { "target": "meter", "stat": "trust", "value": 10 },
+                  { "target": "meter", "stat": "hope", "value": 3 }
                 ],
                 "nextMessageId": "d1n_sujin_2a"
               },
               {
                 "id": "d1n_sujin_c2",
-            "text": "Let's look into both and decide together.",
+                "text": "We need to know. It affects all of us.",
                 "consequences": [
-                  { "target": "meter", "stat": "exposureRisk", "value": 5 }
+                  { "target": "meter", "stat": "moneyPressure", "value": 5 }
                 ],
                 "nextMessageId": "d1n_sujin_2b"
               }
@@ -159,40 +161,40 @@
           {
             "id": "d1n_sujin_2a",
             "characterId": "sujin",
-            "content": "if that's what you think is best. i just... i don't want to lose myself again.",
+            "content": "thank you. i... i'll tell you soon. i promise.",
             "timestamp": 4
           },
           {
             "id": "d1n_sujin_2b",
             "characterId": "sujin",
-            "content": "i understand. please don't make us do anything reckless though.",
+            "content": "right. okay. the contract from starlight entertainment... it was sold. without my consent. to someone who wants me to do 'private events.' i can't work legally anywhere else.",
             "timestamp": 4
           }
         ]
       },
       "night": {
-        "title": "After Dark",
-        "description": "The first night together. Secrets surface. Trust is tested.",
+        "title": "The Offer",
+        "description": "A familiar face appears. Old wounds reopen.",
         "messages": [
           {
             "id": "d1nt_yuseong_1",
             "characterId": "yuseong",
-            "content": "well, well. look at this cute little gathering. didn't expect to find you all in one place.",
+            "content": "well. what do we have here. my favorite girls, together again. how... touching.",
             "timestamp": 1,
             "choices": [
               {
                 "id": "d1nt_yuseong_c1",
-                "text": "Who are you? How did you find us?",
+                "text": "What do you want?",
                 "consequences": [
-                  { "target": "meter", "stat": "exposureRisk", "value": 10 }
+                  { "target": "meter", "stat": "exposureRisk", "value": 5 }
                 ],
                 "nextMessageId": "d1nt_yuseong_2a"
               },
               {
                 "id": "d1nt_yuseong_c2",
-                "text": "We're not interested in whatever you're selling.",
+                "text": "Leave. Now.",
                 "consequences": [
-                  { "target": "meter", "stat": "moneyPressure", "value": 5 }
+                  { "target": "meter", "stat": "moneyPressure", "value": 10 }
                 ],
                 "nextMessageId": "d1nt_yuseong_2b"
               }
@@ -201,35 +203,35 @@
           {
             "id": "d1nt_yuseong_2a",
             "characterId": "yuseong",
-            "content": "i can help you. i know people. there are ways back to the stage - easier ways than whatever fantasy you're all dreaming up... if you're interested.",
+            "content": "i'm hurt. truly. i came to offer help. but fine. be like that. you know where to find me when you're desperate. i always have... opportunities.",
             "timestamp": 2
           },
           {
             "id": "d1nt_yuseong_2b",
             "characterId": "yuseong",
-            "content": "oh but i think you are. you're all so desperate. it's almost sad. call me when you change your mind.",
+            "content": "oh sujin. you really think running from me helps? your little 'contract' problem... i could make it disappear. for the right price. think about it.",
             "timestamp": 2
           },
           {
             "id": "d1nt_miho_1",
             "characterId": "miho",
-            "content": "wait wait wait was that THE yuseong?? like from dreamwave?? omg what did he WANT??",
+            "content": "omg was that YUSEONG?? like from before?? wait why is he HERE?? i thought he got fired??",
             "timestamp": 3,
             "choices": [
               {
                 "id": "d1nt_miho_c1",
-                "text": "He wants to help, but I don't trust him. Stay away from him.",
+                "text": "He was involved in what happened to us. Don't trust him.",
                 "consequences": [
-                  { "target": "meter", "stat": "trust", "value": 3 }
+                  { "target": "meter", "stat": "trust", "value": 5 },
+                  { "target": "meter", "stat": "hope", "value": -3 }
                 ],
                 "nextMessageId": "d1nt_miho_2a"
               },
               {
                 "id": "d1nt_miho_c2",
-                "text": "He might have connections. We should think about it.",
+                "text": "Did you know what he was doing?",
                 "consequences": [
-                  { "target": "meter", "stat": "exposureRisk", "value": 5 },
-                  { "target": "meter", "stat": "moneyPressure", "value": -5 }
+                  { "target": "meter", "stat": "trust", "value": -5 }
                 ],
                 "nextMessageId": "d1nt_miho_2b"
               }
@@ -238,13 +240,13 @@
           {
             "id": "d1nt_miho_2a",
             "characterId": "miho",
-            "content": "okay fine he seemed kinda creepy anyway... but what if he could really help??",
+            "content": "i mean... i knew something was wrong. but i didn't know it was HIM. god this is such a mess. we really messed up back then.",
             "timestamp": 4
           },
           {
             "id": "d1nt_miho_2b",
             "characterId": "miho",
-            "content": "right?? like we NEED help and he's like... actually connected?? this could be our way back!!",
+            "content": "what?? no!! i didn't know anything!! i was as messed up as everyone else!! ...wasn't i?",
             "timestamp": 4
           }
         ]
@@ -253,51 +255,46 @@
     {
       "day": 2,
       "morning": {
-        "title": "Second Wind",
-        "description": "A new day brings new decisions. The group must decide on a direction.",
+        "title": "Cracks",
+        "description": "Tensions surface. Old wounds need cleaning.",
         "messages": [
           {
             "id": "d2m_group_1",
             "characterId": "group",
-            "content": "[The group chat lights up as everyone wakes up]",
+            "content": "[The group chat is quiet. Too quiet.]",
             "timestamp": 1,
             "choices": [
               {
                 "id": "d2m_group_c1",
-                "text": "Let's all talk about what we want for our future.",
+                "text": "Let's talk about what happened. All of it.",
                 "consequences": [
-                  { "target": "meter", "stat": "teamCohesion", "value": 10 },
-                  { "target": "meter", "stat": "energy", "value": -5 }
+                  { "target": "meter", "stat": "teamCohesion", "value": 5 },
+                  { "target": "meter", "stat": "hope", "value": -5 }
                 ],
-                "nextMessageId": "d2m_hyunju_1"
+                "nextMessageId": "d2m_sohee_1"
               },
               {
                 "id": "d2m_group_c2",
-                "text": "Focus on today. Let's see what we can do right now.",
+                "text": "We need to focus on moving forward. Not the past.",
                 "consequences": [
                   { "target": "meter", "stat": "moneyPressure", "value": 5 }
                 ],
-                "nextMessageId": "d2m_sohee_1"
+                "nextMessageId": "d2m_hyunju_1"
               }
             ]
           },
           {
-            "id": "d2m_hyunju_1",
-            "characterId": "hyunju",
-            "content": "okay so for me - i just want to perform!! i don't care how!! street performances, dance covers, ANYTHING!! just let me dance!!",
-            "timestamp": 2
-          },
-          {
             "id": "d2m_sohee_1",
             "characterId": "sohee",
-            "content": "...honestly i just want to disappear. disappear and not have anyone expect anything from me.",
+            "content": "fine. let's talk. i was there when it all fell apart. i watched miho get pushed out. i watched hyunju destroy her body. i watched sujin get sold. and i did... nothing.",
             "timestamp": 2,
             "choices": [
               {
                 "id": "d2m_sohee_c1",
-                "text": "That's understandable after everything. But you're not alone.",
+                "text": "You were a victim too. You couldn't stop them.",
                 "consequences": [
-                  { "target": "meter", "stat": "trust", "value": 5 }
+                  { "target": "meter", "stat": "trust", "value": 10 },
+                  { "target": "meter", "stat": "hope", "value": 5 }
                 ],
                 "nextMessageId": "d2m_sohee_2"
               }
@@ -306,35 +303,59 @@
           {
             "id": "d2m_sohee_2",
             "characterId": "sohee",
-            "content": "...thanks. i guess.",
+            "content": "...you don't understand. i COULD have done something. i chose not to. because i was scared. because i thought if i stayed quiet, they'd leave me alone. and they did. for a while.",
+            "timestamp": 3
+          },
+          {
+            "id": "d2m_hyunju_1",
+            "characterId": "hyunju",
+            "content": "right!! forward!! positive!! we can do this!! there's always a way!! we just need to try harder right??",
+            "timestamp": 2,
+            "choices": [
+              {
+                "id": "d2m_hyunju_c1",
+                "text": "Hyunju... when did you last sleep?",
+                "consequences": [
+                  { "target": "meter", "stat": "trust", "value": 8 },
+                  { "target": "meter", "stat": "energy", "value": -5 }
+                ],
+                "nextMessageId": "d2m_hyunju_2"
+              }
+            ]
+          },
+          {
+            "id": "d2m_hyunju_2",
+            "characterId": "hyunju",
+            "content": "i sleep!! i sleep fine!! i just... i have a lot to do!! if i stop then everything falls apart!! that's how it works!!",
             "timestamp": 3
           }
         ]
       },
       "noon": {
-        "title": "The Heat",
-        "description": "Tensions rise as money problems become more urgent.",
+        "title": "Choices",
+        "description": "Desperation makes monsters of everyone.",
         "messages": [
           {
             "id": "d2n_miho_1",
             "characterId": "miho",
-            "content": "hey so like... i found this ad? it's like a fan meeting thing but the money is really good?? but also like... it seems kinda weird??",
+            "content": "okay so um. i found something. this website. it's like... fans pay for messages from ex-idols. it's kinda sketchy but the money is really good and i just... we need it right??",
             "timestamp": 1,
             "choices": [
               {
                 "id": "d2n_miho_c1",
-                "text": "Show me the ad. We need to be careful about scams.",
+                "text": "No. There's got to be another way.",
                 "consequences": [
-                  { "target": "meter", "stat": "exposureRisk", "value": 5 }
+                  { "target": "meter", "stat": "trust", "value": 3 },
+                  { "target": "meter", "stat": "moneyPressure", "value": 10 }
                 ],
                 "nextMessageId": "d2n_miho_2a"
               },
               {
                 "id": "d2n_miho_c2",
-                "text": "If it seems weird, let's skip it. We'll find something safer.",
+                "text": "If you're sure. I don't like it, but I understand.",
                 "consequences": [
-                  { "target": "meter", "stat": "trust", "value": 3 },
-                  { "target": "meter", "stat": "moneyPressure", "value": 5 }
+                  { "target": "meter", "stat": "exposureRisk", "value": 15 },
+                  { "target": "meter", "stat": "moneyPressure", "value": -15 }
                 ],
                 "nextMessageId": "d2n_miho_2b"
               }
@@ -343,59 +364,38 @@
           {
             "id": "d2n_miho_2a",
             "characterId": "miho",
-            "content": "okay so basically it's like - fans pay to get messages from ex-idols?? and it's like... kind of taboo?? the company got shut down for like... reasons??",
+            "content": "yeah you're right. sorry. i just... i hate feeling useless. i hate not contributing. i just wanted to help.",
             "timestamp": 2,
             "choices": [
               {
                 "id": "d2n_miho_c3",
-                "text": "That's too risky. If our faces get out there, it could ruin future chances.",
+                "text": "You contribute in other ways. Your value isn't tied to money.",
                 "consequences": [
-                  { "target": "meter", "stat": "exposureRisk", "value": -5 }
-                ],
-                "nextMessageId": "d2n_miho_3a"
-              },
-              {
-                "id": "d2n_miho_c4",
-                "text": "We might have to consider it if things get desperate.",
-                "consequences": [
-                  { "target": "meter", "stat": "exposureRisk", "value": 10 },
-                  { "target": "meter", "stat": "moneyPressure", "value": -10 }
-                ],
-                "nextMessageId": "d2n_miho_3b"
+                  { "target": "meter", "stat": "hope", "value": 8 },
+                  { "target": "meter", "stat": "trust", "value": 5 }
+                ]
               }
             ]
           },
           {
             "id": "d2n_miho_2b",
             "characterId": "miho",
-            "content": "yeah you're probably right... it's just so hard to know what's real anymore☆",
+            "content": "okay... i'll do it. it's fine. this is fine. i can do this. i can do anything.",
             "timestamp": 2
-          },
-          {
-            "id": "d2n_miho_3a",
-            "characterId": "miho",
-            "content": "ugh FINE but like... we're really running out of options tho...",
-            "timestamp": 3
-          },
-          {
-            "id": "d2n_miho_3b",
-            "characterId": "miho",
-            "content": "WAIT really?? you mean we might actually DO it?? ohmigod okay i can handle it just tell me what to do!!",
-            "timestamp": 3
           },
           {
             "id": "d2n_sujin_1",
             "characterId": "sujin",
-            "content": "i found a part-time job listing. it's at a convenience store - nothing glamorous, but it's honest work and the pay is reliable.",
+            "content": "i found a pro bono legal clinic. for entertainment contracts. we could... try. for my situation. if you think it's worth it.",
             "timestamp": 4,
             "choices": [
               {
                 "id": "d2n_sujin_c1",
-                "text": "That's perfect. Let's apply. All of us if they need people.",
+                "text": "Of course it's worth it. Let's go together.",
                 "consequences": [
-                  { "target": "meter", "stat": "moneyPressure", "value": -10 },
-                  { "target": "meter", "stat": "teamCohesion", "value": 5 },
-                  { "target": "meter", "stat": "energy", "value": -10 }
+                  { "target": "meter", "stat": "teamCohesion", "value": 10 },
+                  { "target": "meter", "stat": "hope", "value": 10 },
+                  { "target": "meter", "stat": "moneyPressure", "value": 5 }
                 ]
               }
             ]
@@ -403,44 +403,46 @@
         ]
       },
       "night": {
-        "title": "Shadows",
-        "description": "Evening brings reflection. Some truths are harder than others.",
+        "title": "Truths",
+        "description": "In the dark, secrets fester. Some need light.",
         "messages": [
           {
             "id": "d2nt_sujin_1",
             "characterId": "sujin",
-            "content": "can i tell you something? in private?",
+            "content": "can we talk? privately? there's something i need to say. to all of you.",
             "timestamp": 1,
             "choices": [
               {
                 "id": "d2nt_sujin_c1",
-                "text": "Of course. I'm here.",
+                "text": "Of course. We're here.",
                 "consequences": [
                   { "target": "meter", "stat": "trust", "value": 10 }
                 ],
-                "nextMessageId": "d2nt_sujin_2a"
+                "nextMessageId": "d2nt_sujin_2"
               }
             ]
           },
           {
-            "id": "d2nt_sujin_2a",
+            "id": "d2nt_sujin_2",
             "characterId": "sujin",
-            "content": "there's this person. from before. they won't stop messaging me. they say they love me but i don't... i never asked for any of this.",
+            "content": "that company that bought my contract. the 'private events.' it's not... it's not dancing. or performances. they wanted me to come to 'private parties.' for 'important clients.' i ran. that's why i have nothing. i chose survival.",
             "timestamp": 2,
             "choices": [
               {
                 "id": "d2nt_sujin_c2",
-                "text": "That's harassment. We should block them and document everything.",
+                "text": "I'm so sorry. That should never have happened to you.",
                 "consequences": [
-                  { "target": "meter", "stat": "exposureRisk", "value": 5 }
+                  { "target": "meter", "stat": "teamCohesion", "value": 10 },
+                  { "target": "meter", "stat": "hope", "value": 5 }
                 ],
                 "nextMessageId": "d2nt_sujin_3a"
               },
               {
                 "id": "d2nt_sujin_c3",
-                "text": "I'm sorry you're dealing with this. Do you want to talk about it more?",
+                "text": "We need to report this. What they did is illegal.",
                 "consequences": [
-                  { "target": "meter", "stat": "trust", "value": 5 }
+                  { "target": "meter", "stat": "exposureRisk", "value": 10 },
+                  { "target": "meter", "stat": "hope", "value": 8 }
                 ],
                 "nextMessageId": "d2nt_sujin_3b"
               }
@@ -449,49 +451,35 @@
           {
             "id": "d2nt_sujin_3a",
             "characterId": "sujin",
-            "content": "i've already blocked like five accounts. they just make new ones. please... don't tell the others. i don't want them to worry.",
+            "content": "thank you. for not... for not making it weird. or making me feel worse. i just needed someone to know. to witness it. so it's real.",
             "timestamp": 3
           },
           {
             "id": "d2nt_sujin_3b",
             "characterId": "sujin",
-            "content": "thank you. it means a lot that you listened. i just... i need to feel like i have some control over my life again.",
+            "content": "i know. i know we should. but they're powerful. and i'm scared. can we... can we just figure out the legal thing first? before we do anything else?",
             "timestamp": 3
           },
           {
             "id": "d2nt_yuseong_1",
             "characterId": "yuseong",
-            "content": "so. have you thought about my offer? i can make all your problems disappear. just one little thing in return...",
+            "content": "sujin's story is very... moving. i wonder how it'd sound in the press. 'ex-idol claims abuse, denies contract obligations.' you know how that ends. for her. for all of you.",
             "timestamp": 4,
             "choices": [
               {
                 "id": "d2nt_yuseong_c1",
-                "text": "What exactly do you want?",
+                "text": "Leave her alone.",
                 "consequences": [
                   { "target": "meter", "stat": "exposureRisk", "value": 10 }
                 ],
-                "nextMessageId": "d2nt_yuseong_2a"
-              },
-              {
-                "id": "d2nt_yuseong_c2",
-                "text": "We'll find our own way. Leave us alone.",
-                "consequences": [
-                  { "target": "meter", "stat": "moneyPressure", "value": 10 }
-                ],
-                "nextMessageId": "d2nt_yuseong_2b"
+                "nextMessageId": "d2nt_yuseong_2"
               }
             ]
           },
           {
-            "id": "d2nt_yuseong_2a",
+            "id": "d2nt_yuseong_2",
             "characterId": "yuseong",
-            "content": "simple. you perform. i profit. we call it... 'consulting.' don't worry, no one will know. well. except everyone will. but that's the price, isn't it?",
-            "timestamp": 5
-          },
-          {
-            "id": "d2nt_yuseong_2b",
-            "characterId": "yuseong",
-            "content": "stubborn. i like it. for now. enjoy your poverty while it lasts.",
+            "content": "or what? you have nothing. i have everything. think carefully about whose side you want to be on. i'll be watching.",
             "timestamp": 5
           }
         ]
@@ -500,18 +488,18 @@
     {
       "day": 3,
       "morning": {
-        "title": "Turning Point",
-        "description": "A choice must be made. The group faces its first major decision.",
+        "title": "Reckoning",
+        "description": "A choice must be made. Again.",
         "messages": [
           {
             "id": "d3m_group_1",
             "characterId": "group",
-            "content": "[The apartment is quiet. Everyone has something on their mind.]",
+            "content": "[Everyone is awake. No one slept well.]",
             "timestamp": 1,
             "choices": [
               {
                 "id": "d3m_group_c1",
-                "text": "We need to decide our path. Let's have an honest discussion.",
+                "text": "We need to decide what kind of future we want.",
                 "consequences": [
                   { "target": "meter", "stat": "teamCohesion", "value": 5 }
                 ],
@@ -522,49 +510,45 @@
           {
             "id": "d3m_hyunju_1",
             "characterId": "hyunju",
-            "content": "okay so i was thinking - what if we made our OWN content?? dance covers, vlogs, anything!! we have skills!! we just need a platform!!",
+            "content": "i've been thinking. about what we can actually do. i can't keep working the jobs i'm working. my body... it's breaking. i can't admit it but i know.",
             "timestamp": 2,
             "choices": [
               {
                 "id": "d3m_hyunju_c1",
-                "text": "That's a great idea! We could start small and build an audience.",
+                "text": "Then we find something else. Together.",
                 "consequences": [
-                  { "target": "meter", "stat": "exposureRisk", "value": 10 },
-                  { "target": "meter", "stat": "energy", "value": -10 }
+                  { "target": "meter", "stat": "teamCohesion", "value": 8 },
+                  { "target": "meter", "stat": "hope", "value": 8 }
                 ],
-                "nextMessageId": "d3m_hyunju_2a"
-              },
-              {
-                "id": "d3m_hyunju_c2",
-                "text": "It takes time to build an audience. We need something more immediate.",
-                "consequences": [
-                  { "target": "meter", "stat": "moneyPressure", "value": 5 }
-                ],
-                "nextMessageId": "d3m_hyunju_2b"
+                "nextMessageId": "d3m_hyunju_2"
               }
             ]
           },
           {
-            "id": "d3m_hyunju_2a",
+            "id": "d3m_hyunju_2",
             "characterId": "hyunju",
-            "content": "YESSSS i knew you'd get it!! don't worry i'll work super hard!! just tell me what to create first!!",
-            "timestamp": 3
-          },
-          {
-            "id": "d3m_hyunju_2b",
-            "characterId": "hyunju",
-            "content": "i know i know... but still... it's not fair. we worked so hard and now we have to start from zero again...",
-            "timestamp": 3
+            "content": "you all would... help me? even though i can't... even when i can't contribute like before?",
+            "timestamp": 3,
+            "choices": [
+              {
+                "id": "d3m_hyunju_c2",
+                "text": "That's what being a team means. We carry each other.",
+                "consequences": [
+                  { "target": "meter", "stat": "trust", "value": 15 },
+                  { "target": "meter", "stat": "hope", "value": 10 }
+                ]
+              }
+            ]
           },
           {
             "id": "d3m_sohee_1",
             "characterId": "sohee",
-            "content": "whatever you decide. just don't expect me to be in any videos. i didn't leave one prison to step into another.",
+            "content": "i need to say something too. about before. about all of it.",
             "timestamp": 4,
             "choices": [
               {
                 "id": "d3m_sohee_c1",
-                "text": "That's fair. No one will pressure you to do anything you're uncomfortable with.",
+                "text": "I'm listening.",
                 "consequences": [
                   { "target": "meter", "stat": "trust", "value": 10 }
                 ],
@@ -575,36 +559,36 @@
           {
             "id": "d3m_sohee_2",
             "characterId": "sohee",
-            "content": "...thank you. i mean it.",
+            "content": "i was scared. of losing what little i had. so i watched everyone suffer and told myself it wasn't my problem. that was wrong. i know that now. i'm sorry it took me this long to say it.",
             "timestamp": 5
           }
         ]
       },
       "noon": {
-        "title": "Crossroads",
-        "description": "An unexpected visitor brings news that will change everything.",
+        "title": "Pressure",
+        "description": "The world doesn't let you breathe.",
         "messages": [
           {
             "id": "d3n_yuseong_1",
             "characterId": "yuseong",
-            "content": "changing your minds yet? the clock is ticking. your little 'honest work' won't save you forever.",
+            "content": "interesting morning. very touching. but here's the thing - pretty words don't pay rent. i have a job. legitimate. well. mostly. and i think sujin would be perfect for it. don't you, sujin?",
             "timestamp": 1,
             "choices": [
               {
                 "id": "d3n_yuseong_c1",
-                "text": "We don't need your help. We're going to make it on our own.",
+                "text": "She has a name. And she doesn't work for you.",
                 "consequences": [
-                  { "target": "meter", "stat": "teamCohesion", "value": 5 },
-                  { "target": "meter", "stat": "moneyPressure", "value": 10 }
+                  { "target": "meter", "stat": "teamCohesion", "value": 10 },
+                  { "target": "meter", "stat": "exposureRisk", "value": 5 }
                 ],
                 "nextMessageId": "d3n_yuseong_2a"
               },
               {
                 "id": "d3n_yuseong_c2",
-                "text": "What exactly are you offering? Tell me more.",
+                "text": "What exactly are you offering?",
                 "consequences": [
                   { "target": "meter", "stat": "exposureRisk", "value": 15 },
-                  { "target": "meter", "stat": "moneyPressure", "value": -15 }
+                  { "target": "meter", "stat": "moneyPressure", "value": -10 }
                 ],
                 "nextMessageId": "d3n_yuseong_2b"
               }
@@ -613,19 +597,22 @@
           {
             "id": "d3n_yuseong_2a",
             "characterId": "yuseong",
-            "content": "brave. foolish, but brave. we'll see how long that lasts.",
+            "content": "brave. i like it. for now. but everyone has a price. you'll see.",
             "timestamp": 2
           },
           {
             "id": "d3n_yuseong_2b",
             "characterId": "yuseong",
-            "content": "now you're thinking. i have connections. private events, exclusive parties, 'entertainment' for wealthy clients. the money is incredible. and all you have to do is... perform. like you were meant to.",
+            "content": "now we're talking. i have clients. wealthy men. they want entertainment. and sujin here has skills they'd pay for. handsomely. what do you say, sujin? your friends need money. you could provide.",
             "timestamp": 2,
             "choices": [
               {
                 "id": "d3n_yuseong_c3",
-                "text": "That sounds like...",
-                "consequences": [],
+                "text": "Sujin, you don't have to answer that.",
+                "consequences": [
+                  { "target": "meter", "stat": "trust", "value": 10 },
+                  { "target": "meter", "stat": "hope", "value": 5 }
+                ],
                 "nextMessageId": "d3n_yuseong_3"
               }
             ]
@@ -633,62 +620,41 @@
           {
             "id": "d3n_yuseong_3",
             "characterId": "yuseong",
-            "content": "don't overthink it. just know the offer is on the table. for all of you. especially that eager one - hyunju, was it?",
+            "content": "suit yourselves. but my offer stands. for any of you. times running out. for everyone.",
             "timestamp": 3
           },
           {
             "id": "d3n_hyunju_1",
             "characterId": "hyunju",
-            "content": "wait what?? me?? i wasn't - i didn't say anything!!",
+            "content": "i hate that he's right. about the money. about everything. but we can't... we can't give in right?? we just can't??",
             "timestamp": 4,
             "choices": [
               {
                 "id": "d3n_hyunju_c1",
-                "text": "Ignore him. He's just trying to manipulate us.",
+                "text": "We won't. There's always another way.",
                 "consequences": [
-                  { "target": "meter", "stat": "exposureRisk", "value": -5 }
-                ],
-                "nextMessageId": "d3n_hyunju_2a"
-              },
-              {
-                "id": "d3n_hyunju_c2",
-                "text": "Are you okay, Hyunju? This seems to have affected you.",
-                "consequences": [
-                  { "target": "meter", "stat": "trust", "value": 5 }
-                ],
-                "nextMessageId": "d3n_hyunju_2b"
+                  { "target": "meter", "stat": "hope", "value": 8 }
+                ]
               }
             ]
-          },
-          {
-            "id": "d3n_hyunju_2a",
-            "characterId": "hyunju",
-            "content": "yeah yeah you're right okay!! let's just... let's just focus on something else.",
-            "timestamp": 5
-          },
-          {
-            "id": "d3n_hyunju_2b",
-            "characterId": "hyunju",
-            "content": "i'm fine!! really!! i just... i don't know. it felt like he could see right through me. it's scary.",
-            "timestamp": 5
           }
         ]
       },
       "night": {
-        "title": "Revelation",
-        "description": "The day ends with a shocking discovery about the company's true fate.",
+        "title": "Fragile",
+        "description": "Something shifts. Something breaks. Something begins.",
         "messages": [
           {
             "id": "d3nt_miho_1",
             "characterId": "miho",
-            "content": "okay so i may have done a bad thing. i may have like... looked up what happened to our company?? and UM.",
+            "content": "hey. can i tell you something? something i haven't told anyone?",
             "timestamp": 1,
             "choices": [
               {
                 "id": "d3nt_miho_c1",
-                "text": "What did you find?",
+                "text": "Always.",
                 "consequences": [
-                  { "target": "meter", "stat": "exposureRisk", "value": 10 }
+                  { "target": "meter", "stat": "trust", "value": 10 }
                 ],
                 "nextMessageId": "d3nt_miho_2"
               }
@@ -697,22 +663,24 @@
           {
             "id": "d3nt_miho_2",
             "characterId": "miho",
-            "content": "so like... it wasn't just mismanagement. there was like... fraud?? and SOMEONE sold us out to the media. the whole thing was planned. we were set up.",
+            "content": "when they kicked me out... i stopped eating. not on purpose at first. i was just... numb. and then it became a thing. if i was skinny enough they'd want me back right?? if i was perfect they'd take me back right??",
             "timestamp": 2,
             "choices": [
               {
                 "id": "d3nt_miho_c2",
-                "text": "Who? Who sold us out?",
+                "text": "You don't have to be perfect. You just have to be here.",
                 "consequences": [
-                  { "target": "meter", "stat": "exposureRisk", "value": 15 }
+                  { "target": "meter", "stat": "hope", "value": 15 },
+                  { "target": "meter", "stat": "trust", "value": 10 }
                 ],
                 "nextMessageId": "d3nt_miho_3a"
               },
               {
                 "id": "d3nt_miho_c3",
-                "text": "We can't trust everything we read online. Let's not jump to conclusions.",
+                "text": "We need to get you help. Real help.",
                 "consequences": [
-                  { "target": "meter", "stat": "moneyPressure", "value": 5 }
+                  { "target": "meter", "stat": "moneyPressure", "value": 10 },
+                  { "target": "meter", "stat": "hope", "value": 10 }
                 ],
                 "nextMessageId": "d3nt_miho_3b"
               }
@@ -721,36 +689,30 @@
           {
             "id": "d3nt_miho_3a",
             "characterId": "miho",
-            "content": "i don't KNOW that's the worst part!! but there are like... rumors. and they all point to someone high up. someone who left BEFORE everything went down.",
+            "content": "...i don't know who i am without trying to be perfect. i've been performing so long i forgot there's a person underneath. is there? is there a person underneath?",
             "timestamp": 3
           },
           {
             "id": "d3nt_miho_3b",
             "characterId": "miho",
-            "content": "i know right?? but also the evidence was like... really detailed?? this isn't just random rumors??",
+            "content": "i don't know if i can afford help. i don't know if i deserve it. but... maybe i want to try? is that stupid?",
             "timestamp": 3
           },
           {
             "id": "d3nt_sohee_1",
             "characterId": "sohee",
-            "content": "yuseong. it was yuseong. i saw him meeting with reporters. i saw him smile.",
+            "content": "i've been watching. all of you. for years. and i finally... i finally feel something. watching you all be honest. it's scary. but maybe that's okay.",
             "timestamp": 4,
             "choices": [
               {
                 "id": "d3nt_sohee_c1",
-                "text": "Are you sure? This is a serious accusation.",
+                "text": "Feelings are supposed to be scary. That's how you know they're real.",
                 "consequences": [
+                  { "target": "meter", "stat": "hope", "value": 8 },
                   { "target": "meter", "stat": "trust", "value": 5 }
-                ],
-                "nextMessageId": "d3nt_sohee_2"
+                ]
               }
             ]
-          },
-          {
-            "id": "d3nt_sohee_2",
-            "characterId": "sohee",
-            "content": "positive. he sold us. he made money off our dreams. and now he wants to buy us back for parts. that's who we're dealing with.",
-            "timestamp": 5
           }
         ]
       }

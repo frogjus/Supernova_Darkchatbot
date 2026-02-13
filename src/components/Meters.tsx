@@ -9,9 +9,9 @@ interface MetersProps {
 
 export function MetersDisplay({ meters, trust, characters }: MetersProps) {
   const meterConfig = [
+    { key: 'hope', label: 'Hope', type: 'positive' as const, icon: '✨' },
     { key: 'energy', label: 'Energy', type: 'positive' as const, icon: '⚡' },
-    { key: 'moneyPressure', label: 'Money Pressure', type: 'negative' as const, icon: '💰' },
-    { key: 'exposureRisk', label: 'Exposure Risk', type: 'negative' as const, icon: '👁️' },
+    { key: 'moneyPressure', label: 'Money', type: 'negative' as const, icon: '💰' },
     { key: 'teamCohesion', label: 'Team', type: 'positive' as const, icon: '💜' },
   ];
 

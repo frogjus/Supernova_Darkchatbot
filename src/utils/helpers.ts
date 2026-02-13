@@ -61,17 +61,18 @@ export function createInitialState(): GameState {
     day: 1,
     timeOfDay: 'morning',
     meters: {
-      energy: 80,
-      moneyPressure: 30,
-      exposureRisk: 10,
-      teamCohesion: 50,
+      energy: 30,
+      moneyPressure: 70,
+      exposureRisk: 30,
+      teamCohesion: 20,
+      hope: 15,
     },
     characterTrust: {
-      miho: 40,
-      sohee: 30,
-      sujin: 35,
-      hyunju: 45,
-      yuseong: 20,
+      miho: 25,
+      sohee: 15,
+      sujin: 20,
+      hyunju: 30,
+      yuseong: 5,
     },
     unlockedChannels: ['miho', 'sohee', 'sujin', 'hyunju', 'group'],
     currentChannel: 'miho',
@@ -79,6 +80,12 @@ export function createInitialState(): GameState {
     consequences: [],
     messages: [],
     eventActive: false,
+    redemptionProgress: {
+      miho: 0,
+      sohee: 0,
+      sujin: 0,
+      hyunju: 0,
+    },
   };
 }
 
