@@ -1,10 +1,56 @@
-.chat-window {
+/* Chat container - flex layout for character panel + chat */
+.chat-container {
   flex: 1;
+  display: flex;
   overflow: hidden;
+  min-height: 0;
+}
+
+/* Mobile: character on top, chat below */
+.chat-container.mobile {
+  flex-direction: column;
+}
+
+.chat-container.mobile .character-panel-container {
+  height: 55vh;
+  width: 100%;
+  flex-shrink: 0;
+}
+
+.chat-container.mobile .chat-panel {
+  height: 45vh;
+  border-top: 1px solid var(--border-color);
+}
+
+/* Desktop: character on left, chat on right */
+.chat-container.desktop {
+  flex-direction: row;
+}
+
+.chat-container.desktop .character-panel-container {
+  width: 45%;
+  height: 100%;
+  flex-shrink: 0;
+}
+
+.chat-container.desktop .chat-panel {
+  flex: 1;
+  min-width: 0;
+  border-left: 1px solid #2a2a4a;
+}
+
+/* Character panel container */
+.character-panel-container {
+  position: relative;
+  overflow: hidden;
+}
+
+/* Chat panel */
+.chat-panel {
   display: flex;
   flex-direction: column;
   background: linear-gradient(180deg, #0a0a14 0%, #12121f 100%);
-  min-height: 0;
+  overflow: hidden;
 }
 
 .messages-container {
@@ -62,9 +108,9 @@
 }
 
 .message-avatar {
-  width: 36px;
-  height: 36px;
-  border-radius: 8px;
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -78,7 +124,7 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  image-rendering: pixelated;
+  background: none;
 }
 
 .avatar-fallback {
@@ -88,7 +134,7 @@
   align-items: center;
   justify-content: center;
   font-weight: 700;
-  font-size: 14px;
+  font-size: 12px;
   color: #fff;
 }
 
@@ -193,7 +239,7 @@
 }
 
 /* Mobile adjustments */
-@media (max-width: 480px) {
+@media (max-width: 767px) {
   .messages-container {
     padding: 10px 8px;
     gap: 10px;
@@ -229,5 +275,29 @@
     font-size: 11px;
     max-width: 220px;
     border-radius: 7px;
+  }
+}
+
+/* Desktop specific adjustments */
+@media (min-width: 768px) {
+  .messages-container {
+    padding: 16px;
+    gap: 14px;
+  }
+
+  .message-avatar {
+    width: 36px;
+    height: 36px;
+  }
+
+  .message-bubble {
+    padding: 12px 16px;
+    font-size: 14px;
+  }
+
+  .choice-button {
+    padding: 12px 16px;
+    font-size: 13px;
+    max-width: 300px;
   }
 }

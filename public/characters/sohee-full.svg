@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 400" width="200" height="400">
+  <!-- Sohee - The frozen one, violet/soft neon theme -->
+
+  <!-- Hair back - straight, cold -->
+  <path d="M45 50 Q25 80 25 160 L25 240 Q30 280 50 300 L50 180 Z" fill="#5c6d7e"/>
+  <path d="M155 50 Q175 80 175 160 L175 240 Q170 280 150 300 L150 180 Z" fill="#5c6d7e"/>
+  <path d="M35 45 Q15 65 20 120 L30 100 Z" fill="#5c6d7e"/>
+  <path d="M165 45 Q185 65 180 120 L170 100 Z" fill="#5c6d7e"/>
+
+  <!-- Neck -->
+  <rect x="85" y="130" width="30" height="30" fill="#e8dcd0"/>
+
+  <!-- Outfit - cool visual's outfit -->
+  <path d="M50 160 Q100 150 150 160 L155 280 Q100 295 45 280 Z" fill="#9b7ed9"/>
+  <path d="M60 165 L140 165 L138 185 L62 185 Z" fill="#c4b5e8"/>
+  <path d="M75 190 L125 190 L122 270 L78 270 Z" fill="#9b7ed9" opacity="0.9"/>
+
+  <!-- Arms - stiff, by sides -->
+  <path d="M50 170 Q30 210 35 265" stroke="#e8dcd0" stroke-width="18" fill="none" stroke-linecap="round"/>
+  <path d="M150 170 Q170 210 165 265" stroke="#e8dcd0" stroke-width="18" fill="none" stroke-linecap="round"/>
+
+  <!-- Hands -->
+  <circle cx="35" cy="270" r="12" fill="#e8dcd0"/>
+  <circle cx="165" cy="270" r="12" fill="#e8dcd0"/>
+
+  <!-- Face -->
+  <ellipse cx="100" cy="90" rx="42" ry="48" fill="#e8dcd0"/>
+
+  <!-- Hair front - straight, severe -->
+  <path d="M58 40 Q100 15 142 40 Q158 65 155 90 Q135 55 100 50 Q65 55 45 90 Q42 65 58 40" fill="#5c6d7e"/>
+  <path d="M55 48 Q45 80 50 110" stroke="#5c6d7e" stroke-width="10" fill="none"/>
+  <path d="M145 48 Q155 80 150 110" stroke="#5c6d7e" stroke-width="10" fill="none"/>
+
+  <!-- Hair top - flat -->
+  <rect x="60" y="35" width="80" height="10" fill="#4a5a6a"/>
+
+  <!-- Hair bangs -->
+  <path d="M58 45 L62 70 L70 70 L68 45 Z" fill="#5c6d7e"/>
+  <path d="M75 42 L75 68" stroke="#5c6d7e" stroke-width="5" fill="none"/>
+  <path d="M90 42 L90 68" stroke="#5c6d7e" stroke-width="5" fill="none"/>
+  <path d="M105 42 L105 68" stroke="#5c6d7e" stroke-width="5" fill="none"/>
+  <path d="M120 42 L120 68" stroke="#5c6d7e" stroke-width="5" fill="none"/>
+  <path d="M132 45 L130 70 L138 70 L142 45 Z" fill="#5c6d7e"/>
+
+  <!-- Hair highlights - cold shine -->
+  <path d="M65 35 Q80 28 100 30" stroke="#8899aa" stroke-width="2" fill="none" opacity="0.6"/>
+  <path d="M120 30 Q140 28 150 35" stroke="#8899aa" stroke-width="2" fill="none" opacity="0.6"/>
+
+  <!-- Eyes - flat, distant, barely present -->
+  <ellipse cx="80" cy="92" rx="8" ry="8" fill="#2d2d2d"/>
+  <ellipse cx="120" cy="92" rx="8" ry="8" fill="#2d2d2d"/>
+  <ellipse cx="80" cy="90" rx="2" ry="2" fill="#fff" opacity="0.4"/>
+  <ellipse cx="120" cy="90" rx="2" ry="2" fill="#fff" opacity="0.4"/>
+
+  <!-- Eyebrows - flat, expressionless -->
+  <path d="M70 82 L90 82" stroke="#4a4a4a" stroke-width="1.5" fill="none"/>
+  <path d="M110 82 L130 82" stroke="#4a4a4a" stroke-width="1.5" fill="none"/>
+
+  <!-- No blush - she's numb -->
+
+  <!-- Mouth - thin, barely there line -->
+  <path d="M95 120 L105 120" stroke="#8b6b6b" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+
+  <!-- Tear track hint (faint) -->
+  <path d="M75 105 L72 115" stroke="#9b7ed9" stroke-width="1" fill="none" opacity="0.3"/>
+  <path d="M125 105 L128 115" stroke="#9b7ed9" stroke-width="1" fill="none" opacity="0.3"/>
+</svg>
