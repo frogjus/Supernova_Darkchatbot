@@ -5,6 +5,7 @@ import { MessageInput } from './MessageInput';
 import { GlitchTitle } from './GlitchTitle';
 import { FormattedMessage } from './FormattedMessage';
 import { zalgoify } from '../utils/zalgo';
+import { redactMessage } from '../utils/redact';
 import './ChatWindow.css';
 
 interface ChatWindowProps {
@@ -92,7 +93,18 @@ export function ChatWindow({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [zalgoIntensity, zalgoTick]);
 
+  const isGroupChat = currentChannel === 'supernova';
+
   const renderMessage = (message: Message) => {
+    // System messages (group chat announcements)
+    if (message.characterId === 'system') {
+      return (
+        <div key={message.id} className="message system-message">
+          <div className="system-message-content">{message.content}</div>
+        </div>
+      );
+    }
+
     const character = characters.find(c => c.id === message.characterId);
     const isPlayer = message.isPlayer;
     const showChoices = message.choices && message.choices.length > 0;
@@ -120,7 +132,17 @@ export function ChatWindow({
             </span>
           )}
           <div className="message-bubble">
-            <FormattedMessage content={message.content} />
+            {!isPlayer && bloomLevel <= 25 ? (() => {
+              const { text: redacted, wasRedacted } = redactMessage(message.content, bloomLevel);
+              return (
+                <>
+                  <FormattedMessage content={redacted} />
+                  {wasRedacted && <span className="redact-hint">[ signal lost ]</span>}
+                </>
+              );
+            })() : (
+              <FormattedMessage content={message.content} />
+            )}
           </div>
 
           {showChoices && (
@@ -143,8 +165,8 @@ export function ChatWindow({
 
   return (
     <div className={`chat-container ${isMobile ? 'mobile' : 'desktop'}`}>
-      {/* Character Panel */}
-      {currentCharacter && (
+      {/* Character Panel — hidden in group chat */}
+      {currentCharacter && !isGroupChat && (
         <div className="character-panel-container">
           <CharacterPanel
             character={currentCharacter}
@@ -154,17 +176,17 @@ export function ChatWindow({
       )}
 
       {/* Chat Panel — pixel dialog window */}
-      <div className={`chat-panel ${bloomLevel <= 30 ? 'decayed' : ''}`}>
+      <div className={`chat-panel ${bloomLevel <= 30 ? 'decayed' : ''} ${isGroupChat ? 'group-chat' : ''}`}>
         {/* Title bar */}
         <div className="chat-titlebar">
           <div className="chat-titlebar-hearts">
-            <span>♥</span>
-            <span>♥</span>
-            <span>♥</span>
+            <span>{isGroupChat ? '✦' : '♥'}</span>
+            <span>{isGroupChat ? '✦' : '♥'}</span>
+            <span>{isGroupChat ? '✦' : '♥'}</span>
           </div>
           <GlitchTitle
-            text={currentCharacter ? `${currentCharacter.name.toLowerCase()}_chat.exe` : 'chat.exe'}
-            bloomLevel={bloomLevel}
+            text={isGroupChat ? 'supernova_reunion.exe' : (currentCharacter ? `${currentCharacter.name.toLowerCase()}_chat.exe` : 'chat.exe')}
+            bloomLevel={isGroupChat ? 80 : bloomLevel}
             className="chat-titlebar-text"
           />
           <div className="chat-titlebar-buttons">
@@ -180,30 +202,34 @@ export function ChatWindow({
             <div className="empty-state">
               <span className="empty-state-icon">💌</span>
               <p className="empty-state-text">
-                {currentCharacter
+                {isGroupChat
+                  ? 'SUPERNOVA is together again...'
+                  : currentCharacter
                   ? `Say something to ${currentCharacter.name}...`
                   : 'Select a character to begin'}
               </p>
-              <p className="empty-state-hint">be gentle with them</p>
+              <p className="empty-state-hint">{isGroupChat ? 'yuseongshin can\'t stop this' : 'be gentle with them'}</p>
             </div>
           ) : (
             messages.map(renderMessage)
           )}
           {/* Typing indicator */}
-          {aiLoading && currentCharacter && (
+          {aiLoading && (currentCharacter || isGroupChat) && (
             <div className="message character typing">
-              <div className="message-avatar" style={{ borderColor: currentCharacter.color }}>
-                {currentCharacter.avatar ? (
+              <div className="message-avatar" style={{ borderColor: isGroupChat ? '#FFD700' : currentCharacter?.color }}>
+                {isGroupChat ? (
+                  <div className="avatar-fallback" style={{ backgroundColor: '#1a0a2e', color: '#FFD700', fontSize: '14px' }}>✦</div>
+                ) : currentCharacter?.avatar ? (
                   <img src={currentCharacter.avatar} alt={currentCharacter.name} className={`avatar-image avatar-${currentCharacter.id}`} />
                 ) : (
-                  <div className="avatar-fallback" style={{ backgroundColor: currentCharacter.color }}>
-                    {currentCharacter.name.charAt(0)}
+                  <div className="avatar-fallback" style={{ backgroundColor: currentCharacter?.color }}>
+                    {currentCharacter?.name.charAt(0)}
                   </div>
                 )}
               </div>
               <div className="message-content">
-                <span className={`message-sender ${zalgoIntensity > 0 ? 'zalgo' : ''}`} style={{ color: currentCharacter.color }}>
-                  {corruptName(currentCharacter.name)}
+                <span className={`message-sender ${zalgoIntensity > 0 ? 'zalgo' : ''}`} style={{ color: isGroupChat ? '#FFD700' : currentCharacter?.color }}>
+                  {isGroupChat ? 'SUPERNOVA' : corruptName(currentCharacter!.name)}
                 </span>
                 <div className="message-bubble">
                   <div className="typing-dots">
@@ -243,7 +269,7 @@ export function ChatWindow({
         {/* Input */}
         <MessageInput
           onSend={onSendMessage}
-          placeholder={currentCharacter ? `Message ${currentCharacter.name}...` : 'Type a message...'}
+          placeholder={isGroupChat ? 'Message SUPERNOVA...' : currentCharacter ? `Message ${currentCharacter.name}...` : 'Type a message...'}
           disabled={aiLoading}
           bloomLevel={bloomLevel}
         />

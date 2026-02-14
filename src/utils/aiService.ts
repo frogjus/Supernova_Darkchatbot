@@ -13,6 +13,7 @@ interface AIGenerateParams {
   gameState: GameState;
   conversationHistory: Message[];
   playerMessage?: string;
+  systemPromptOverride?: string;
 }
 
 export async function generateCharacterResponse({
@@ -20,11 +21,12 @@ export async function generateCharacterResponse({
   gameState,
   conversationHistory,
   playerMessage,
+  systemPromptOverride,
 }: AIGenerateParams): Promise<string> {
   const bloomValue = gameState.characterBloom[character.id] || 0;
   const bloomStage = getBloomStage(character, bloomValue);
   const now = new Date();
-  const systemPrompt = buildSystemPrompt(character, bloomStage, bloomValue, now);
+  const systemPrompt = systemPromptOverride || buildSystemPrompt(character, bloomStage, bloomValue, now);
 
   const requestBody = JSON.stringify({
     model: 'claude-3-haiku-20240307',

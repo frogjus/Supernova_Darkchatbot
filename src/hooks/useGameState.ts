@@ -6,6 +6,8 @@ import { detectBloomToken } from '../utils/bloomDetector';
 import { getGreetingMessage } from '../utils/greetings';
 import { getUnpromptedMessage } from '../utils/unprompted';
 import { playMessageReceive } from '../utils/sound';
+import { getGroupGreeting, pickGroupResponder, buildGroupSystemPrompt } from '../utils/groupChat';
+import { GROUP_CHANNEL_ID, GROUP_BLOOM_THRESHOLD } from '../components/ChannelTabs';
 import { updateMemory } from '../utils/memoryService';
 
 const STORAGE_KEY = 'supernova_darkmode_state';
@@ -164,16 +166,38 @@ export function useGameState() {
 
     setAiLoading(true);
     try {
-      const character = characters.find(c => c.id === item.characterId);
+      // Group chat: pick a responding character from eligible members
+      let responderId = item.characterId;
+      if (item.characterId === GROUP_CHANNEL_ID) {
+        const freshState = stateRef.current;
+        const eligible = characters.filter(
+          c => (freshState.characterBloom[c.id] ?? 0) >= GROUP_BLOOM_THRESHOLD
+        );
+        const responder = pickGroupResponder(eligible, freshState.messages);
+        responderId = responder.id;
+      }
+
+      const character = characters.find(c => c.id === responderId);
       if (character) {
         // Use stateRef for fresh state (avoids stale closure)
         const freshState = stateRef.current;
+
+        // Use group system prompt for group chat
+        const isGroup = item.characterId === GROUP_CHANNEL_ID;
+        const groupSystemPrompt = isGroup
+          ? buildGroupSystemPrompt(
+              character,
+              characters.filter(c => (freshState.characterBloom[c.id] ?? 0) >= GROUP_BLOOM_THRESHOLD),
+              freshState.characterBloom
+            )
+          : undefined;
 
         const response = await generateCharacterResponse({
           character,
           gameState: freshState,
           conversationHistory: freshState.messages,
           playerMessage: item.playerMessage,
+          systemPromptOverride: groupSystemPrompt,
         });
 
         // Variable typing delay — longer responses take longer to "type"
@@ -184,7 +208,7 @@ export function useGameState() {
 
         const newMessage: Message = {
           id: `ai_${Date.now()}`,
-          characterId: item.characterId,
+          characterId: responderId,
           content: response,
           timestamp: Date.now(),
         };
@@ -193,6 +217,20 @@ export function useGameState() {
           ...prev,
           messages: [...prev.messages, newMessage],
         }));
+
+        // In group chat, sometimes a second character reacts (40% chance)
+        if (isGroup && Math.random() < 0.4) {
+          const eligible = characters.filter(
+            c => (freshState.characterBloom[c.id] ?? 0) >= GROUP_BLOOM_THRESHOLD
+          );
+          const secondResponder = pickGroupResponder(eligible, [...freshState.messages, newMessage]);
+          if (secondResponder.id !== responderId) {
+            messageQueueRef.current.push({
+              characterId: GROUP_CHANNEL_ID,
+              playerMessage: undefined,
+            });
+          }
+        }
       }
     } catch (error) {
       console.error('AI response error:', error);
@@ -224,8 +262,17 @@ export function useGameState() {
       // Restore messages for the new channel
       let restored = messageHistoryRef.current[channel] || [];
 
-      // First visit — inject greeting message
-      if (restored.length === 0) {
+      // Group channel — inject group greeting on first visit
+      if (channel === GROUP_CHANNEL_ID) {
+        if (restored.length === 0) {
+          const eligible = characters.filter(
+            c => (prev.characterBloom[c.id] ?? 0) >= GROUP_BLOOM_THRESHOLD
+          );
+          restored = getGroupGreeting(eligible, prev.characterBloom);
+          messageHistoryRef.current[channel] = restored;
+        }
+      } else if (restored.length === 0) {
+        // First visit — inject greeting message
         const bloomValue = prev.characterBloom[channel] || 0;
         const greeting = getGreetingMessage(channel, bloomValue);
         if (greeting) {
@@ -248,11 +295,31 @@ export function useGameState() {
         messages: restored,
       };
     });
-  }, []);
+  }, [characters]);
 
   const sendPlayerMessage = useCallback((message: string) => {
     const charId = state.currentChannel;
     if (!charId) return;
+
+    // Group chat: no bloom changes, just add message and queue response
+    if (charId === GROUP_CHANNEL_ID) {
+      const playerMsg: Message = {
+        id: `player_${Date.now()}`,
+        characterId: 'player',
+        content: message,
+        timestamp: Date.now(),
+        isPlayer: true,
+      };
+      setState(prev => ({
+        ...prev,
+        messages: [...prev.messages, playerMsg],
+      }));
+      messageQueueRef.current.push({
+        characterId: GROUP_CHANNEL_ID,
+        playerMessage: message,
+      });
+      return;
+    }
 
     // Detect bloom token from player message
     const convCount = (state.conversationCount[charId] || 0) + 1;

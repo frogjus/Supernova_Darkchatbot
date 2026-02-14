@@ -10,6 +10,7 @@ import { MuteButton } from './components/MuteButton';
 import { EndingScreen } from './components/EndingScreen';
 import { useGameState } from './hooks/useGameState';
 import { initAudio, startAmbient, setMusicBloom, playTabSwitch, playBloomUp, playBloomDown } from './utils/sound';
+import { initConsoleEasterEggs } from './utils/consoleEasterEggs';
 import './App.css';
 
 // Bloom stage thresholds
@@ -99,6 +100,7 @@ function App() {
         audioInitRef.current = true;
         initAudio();
         startAmbient();
+        initConsoleEasterEggs();
       }
     };
     window.addEventListener('click', handleInteraction, { once: true });
@@ -290,7 +292,8 @@ function App() {
     );
   }
 
-  const currentBloom = state.characterBloom?.[state.currentChannel] ?? 10;
+  const isGroupChannel = state.currentChannel === 'supernova';
+  const currentBloom = isGroupChannel ? 80 : (state.characterBloom?.[state.currentChannel] ?? 10);
 
   return (
     <div className={`app theme-${state.currentChannel}`}>

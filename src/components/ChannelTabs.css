@@ -157,6 +157,51 @@
   background: var(--purple-mid);
 }
 
+/* ---- SUPERNOVA group tab ---- */
+.group-tab {
+  border-color: #FFD700 !important;
+  background: linear-gradient(135deg, var(--bg-raised), #1a0a2e);
+}
+
+.group-tab.active {
+  background: linear-gradient(135deg, #2a1040, #1a0a2e);
+  box-shadow:
+    inset -2px -2px 0 #FFD700,
+    inset 2px 2px 0 #FFF8DC,
+    0 0 12px rgba(255, 215, 0, 0.4) !important;
+}
+
+.group-tab.active::after {
+  background: linear-gradient(90deg, #FFD700, #FF69B4, #FFD700) !important;
+}
+
+.group-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  color: #FFD700;
+  border-color: #FFD700 !important;
+}
+
+.group-name {
+  background: linear-gradient(90deg, #FFD700, #FF69B4);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: 1px;
+}
+
+/* Unlock flash animation */
+.group-tab.group-flash {
+  animation: group-unlock 0.5s steps(3) 6;
+}
+
+@keyframes group-unlock {
+  0%, 100% { border-color: #FFD700; }
+  50% { border-color: #FF69B4; box-shadow: 0 0 16px rgba(255, 215, 0, 0.6); }
+}
+
 /* ---- Mobile adjustments ---- */
 @media (max-width: 767px) {
   .channel-tabs {

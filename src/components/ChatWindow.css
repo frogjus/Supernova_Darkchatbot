@@ -389,6 +389,50 @@
   background: linear-gradient(90deg, var(--purple-mid), var(--purple-deep));
 }
 
+/* Group chat — takes full width */
+.chat-panel.group-chat {
+  flex: 1;
+}
+
+/* System messages — centered announcements */
+.system-message {
+  max-width: 100% !important;
+  justify-content: center !important;
+  margin: var(--space-3) 0;
+}
+
+.system-message-content {
+  text-align: center;
+  font-family: var(--font-pixel);
+  font-size: 8px;
+  color: #FFD700;
+  background: rgba(255, 215, 0, 0.08);
+  border: 2px solid rgba(255, 215, 0, 0.2);
+  padding: var(--space-2) var(--space-4);
+  white-space: pre-line;
+  letter-spacing: 1px;
+  text-shadow: 0 0 8px rgba(255, 215, 0, 0.3);
+}
+
+/* Redacted text — ████ blocks with eerie glow */
+.redact-hint {
+  display: block;
+  font-family: var(--font-pixel);
+  font-size: 7px;
+  color: #9c27b0;
+  opacity: 0.5;
+  margin-top: 4px;
+  letter-spacing: 2px;
+  animation: redact-flicker 3s infinite;
+}
+
+@keyframes redact-flicker {
+  0%, 90%, 100% { opacity: 0.5; }
+  92% { opacity: 0; }
+  94% { opacity: 0.7; }
+  96% { opacity: 0.1; }
+}
+
 /* Zalgo corrupted names — eerie glow */
 .message-sender.zalgo {
   text-shadow: 0 0 4px currentColor;
