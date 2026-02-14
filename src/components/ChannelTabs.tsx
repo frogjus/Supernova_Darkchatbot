@@ -28,7 +28,7 @@ export function ChannelTabs({ characters, currentChannel, onSelectChannel, chara
             >
               <span className="tab-avatar">
                 {character.avatar ? (
-                  <img src={character.avatar} alt="" className="tab-avatar-img" />
+                  <img src={character.avatar} alt="" className={`tab-avatar-img avatar-${character.id}`} />
                 ) : (
                   <span className="tab-avatar-fallback">{character.name.charAt(0)}</span>
                 )}

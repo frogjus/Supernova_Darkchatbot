@@ -39,7 +39,6 @@
 .chat-container.desktop .chat-panel {
   flex: 1;
   min-width: 0;
-  border-left: 3px solid var(--border-primary);
 }
 
 /* Character panel container */
@@ -192,8 +191,16 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+  object-position: top;
   background: none;
-  mix-blend-mode: multiply;
+  /* Scale up to zoom into face area — container overflow:hidden crops the rest */
+  transform: scale(1.6);
+  transform-origin: top center;
+}
+
+/* Hyunju's composition is already tighter — less zoom needed */
+.avatar-image.avatar-hyunju {
+  transform: scale(1.15);
 }
 
 .avatar-fallback {
@@ -238,9 +245,9 @@
   position: relative;
 }
 
-/* Character messages — pink pixel box */
+/* Character messages — soft pink pixel box */
 .message.character .message-bubble {
-  background: white;
+  background: #FFF5F8;
   border-color: var(--border-primary);
   box-shadow:
     inset -2px -2px 0 var(--pink-pale),

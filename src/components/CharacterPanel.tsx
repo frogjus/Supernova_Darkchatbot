@@ -1,4 +1,3 @@
-import { useEffect, useRef } from 'react';
 import type { Character } from '../types';
 import { BloomMeter } from './BloomMeter';
 import './CharacterPanel.css';
@@ -11,29 +10,9 @@ interface CharacterPanelProps {
 const SPARKLE_ICONS = ['✦', '♡', '🦋', '⭐', '✧', '🌸', '💫', '🔑'];
 
 export function CharacterPanel({ character, bloomLevel }: CharacterPanelProps) {
-  const floatRef = useRef<HTMLDivElement>(null);
+  const isHyunju = character.id === 'hyunju';
 
-  // Gentle floating animation
-  useEffect(() => {
-    let offset = 0;
-    let direction = 1;
-    const speed = 0.012;
-    const maxOffset = 3;
-
-    const animate = () => {
-      if (floatRef.current) {
-        offset += speed * direction;
-        if (Math.abs(offset) >= maxOffset) {
-          direction *= -1;
-        }
-        floatRef.current.style.transform = `translateX(-50%) translateY(${offset}px)`;
-      }
-      requestAnimationFrame(animate);
-    };
-
-    const frameId = requestAnimationFrame(animate);
-    return () => cancelAnimationFrame(frameId);
-  }, []);
+  // Gentle bob uses CSS animation instead — see .character-visual in CSS
 
   // Bloom-dependent saturation: wilted = grayscale, blooming = full color
   const saturation = Math.min(100, (bloomLevel / 100) * 120 + 20);
@@ -71,7 +50,7 @@ export function CharacterPanel({ character, bloomLevel }: CharacterPanelProps) {
       </div>
 
       {/* Character image — BIG, center */}
-      <div className="character-visual" ref={floatRef}>
+      <div className={`character-visual ${isHyunju ? '' : 'zoomed'}`}>
         <img
           src={character.fullBody}
           alt={character.name}
@@ -94,14 +73,6 @@ export function CharacterPanel({ character, bloomLevel }: CharacterPanelProps) {
         <div className="character-accent-line" />
       </div>
 
-      {/* Corner brackets */}
-      <div className="corner-bracket top-left" />
-      <div className="corner-bracket top-right" />
-      <div className="corner-bracket bottom-left" />
-      <div className="corner-bracket bottom-right" />
-
-      {/* Animated shine */}
-      <div className="character-shine" />
     </div>
   );
 }

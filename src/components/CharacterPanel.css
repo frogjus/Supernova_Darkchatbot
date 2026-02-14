@@ -12,7 +12,8 @@
   align-items: center;
   justify-content: flex-end;
   overflow: hidden;
-  background: var(--bg-blush);
+  /* No background — character floats directly on app background */
+  background: transparent;
 }
 
 /* Soft glow behind character */
@@ -78,26 +79,36 @@
 /* Character image — BIG and center */
 .character-visual {
   position: absolute;
-  bottom: 0;
+  top: 5%;
   left: 50%;
   transform: translateX(-50%);
-  height: 88%;
+  height: 101%;
   width: auto;
   display: flex;
-  align-items: flex-end;
+  align-items: flex-start;
   justify-content: center;
   z-index: 2;
+  animation: characterBob 3s ease-in-out infinite;
+}
+
+/* 15% zoom for everyone except Hyunju */
+.character-visual.zoomed {
+  height: 116%;
+}
+
+@keyframes characterBob {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50% { transform: translateX(-50%) translateY(8px); }
 }
 
 .character-image {
   height: 100%;
   width: auto;
   object-fit: contain;
-  object-position: bottom center;
+  object-position: top center;
   background: none;
   max-width: none;
-  /* Blend white/light backgrounds into the pink world */
-  mix-blend-mode: multiply;
+  /* Transparent PNGs — no blend mode needed */
   /* Bloom-dependent saturation — controlled via inline style */
   transition: filter 1s ease;
 }
@@ -112,8 +123,7 @@
   padding-bottom: max(var(--space-4), env(safe-area-inset-bottom));
   background: linear-gradient(
     to top,
-    rgba(255, 240, 245, 0.95) 0%,
-    rgba(255, 240, 245, 0.6) 60%,
+    var(--bg-blush) 0%,
     transparent 100%
   );
   text-align: center;
@@ -145,60 +155,7 @@
   background: var(--border-primary);
 }
 
-/* Corner pixel brackets */
-.corner-bracket {
-  position: absolute;
-  width: 16px;
-  height: 16px;
-  border-color: var(--pink-soft);
-  border-style: solid;
-  opacity: 0.5;
-  z-index: 5;
-}
-
-.corner-bracket.top-left {
-  top: 12px; left: 12px;
-  border-width: 2px 0 0 2px;
-}
-
-.corner-bracket.top-right {
-  top: 12px; right: 12px;
-  border-width: 2px 2px 0 0;
-}
-
-.corner-bracket.bottom-left {
-  bottom: 12px; left: 12px;
-  border-width: 0 0 2px 2px;
-}
-
-.corner-bracket.bottom-right {
-  bottom: 12px; right: 12px;
-  border-width: 0 2px 2px 0;
-}
-
-/* Animated shine effect */
-.character-shine {
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 50%;
-  height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    rgba(255, 255, 255, 0.15) 50%,
-    transparent 100%
-  );
-  transform: skewX(-20deg);
-  animation: shine 5s ease-in-out infinite;
-  pointer-events: none;
-  z-index: 3;
-}
-
-@keyframes shine {
-  0%, 100% { left: -100%; }
-  50% { left: 200%; }
-}
+/* Corner brackets and shine removed — no card chrome */
 
 /* ---- Bloom meter inside character panel ---- */
 .character-bloom-container {
@@ -257,7 +214,11 @@
 /* ---- Desktop ---- */
 @media (min-width: 768px) {
   .character-visual {
-    height: 85%;
+    height: 98%;
+  }
+
+  .character-visual.zoomed {
+    height: 113%;
   }
 
   .character-name {
@@ -265,13 +226,4 @@
     letter-spacing: 4px;
   }
 
-  .corner-bracket {
-    width: 24px;
-    height: 24px;
-  }
-
-  .corner-bracket.top-left { top: 20px; left: 20px; }
-  .corner-bracket.top-right { top: 20px; right: 20px; }
-  .corner-bracket.bottom-left { bottom: 20px; left: 20px; }
-  .corner-bracket.bottom-right { bottom: 20px; right: 20px; }
 }

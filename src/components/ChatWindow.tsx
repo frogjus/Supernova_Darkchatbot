@@ -53,7 +53,7 @@ export function ChatWindow({
         {!isPlayer && character && (
           <div className="message-avatar" style={{ borderColor: character.color }}>
             {character.avatar ? (
-              <img src={character.avatar} alt={character.name} className="avatar-image" />
+              <img src={character.avatar} alt={character.name} className={`avatar-image avatar-${character.id}`} />
             ) : (
               <div className="avatar-fallback" style={{ backgroundColor: character.color }}>
                 {character.name.charAt(0)}
@@ -142,7 +142,7 @@ export function ChatWindow({
             <div className="message character typing">
               <div className="message-avatar" style={{ borderColor: currentCharacter.color }}>
                 {currentCharacter.avatar ? (
-                  <img src={currentCharacter.avatar} alt={currentCharacter.name} className="avatar-image" />
+                  <img src={currentCharacter.avatar} alt={currentCharacter.name} className={`avatar-image avatar-${currentCharacter.id}`} />
                 ) : (
                   <div className="avatar-fallback" style={{ backgroundColor: currentCharacter.color }}>
                     {currentCharacter.name.charAt(0)}

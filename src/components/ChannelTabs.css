@@ -92,7 +92,14 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  mix-blend-mode: multiply;
+  object-position: top;
+  /* Scale up to zoom into face area */
+  transform: scale(1.6);
+  transform-origin: top center;
+}
+
+.tab-avatar-img.avatar-hyunju {
+  transform: scale(1.15);
 }
 
 .tab-avatar-fallback {

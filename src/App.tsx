@@ -33,6 +33,38 @@ function App() {
     sendPlayerMessage,
   } = useGameState();
 
+  // Splash screen: show for at least 2 seconds, then fade out
+  const [splashVisible, setSplashVisible] = useState(true);
+  const [splashFading, setSplashFading] = useState(false);
+  const splashTimerDone = useRef(false);
+  const dataReady = useRef(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      splashTimerDone.current = true;
+      if (dataReady.current) {
+        setSplashFading(true);
+      }
+    }, 2000);
+    return () => clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
+    if (!loading) {
+      dataReady.current = true;
+      if (splashTimerDone.current) {
+        setSplashFading(true);
+      }
+    }
+  }, [loading]);
+
+  useEffect(() => {
+    if (splashFading) {
+      const fadeTimer = setTimeout(() => setSplashVisible(false), 600);
+      return () => clearTimeout(fadeTimer);
+    }
+  }, [splashFading]);
+
   // Track bloom stages to detect transitions
   const prevBloomRef = useRef<Record<string, number>>({});
   const [transition, setTransition] = useState<{ characterName: string; stageName: string } | null>(null);
@@ -62,9 +94,9 @@ function App() {
     setTransition(null);
   }, []);
 
-  if (loading) {
+  if (splashVisible) {
     return (
-      <div className="loading-screen">
+      <div className={`loading-screen ${splashFading ? 'fade-out' : ''}`}>
         {/* Floating pixel props */}
         <div className="loading-props">
           <span className="loading-prop">🦋</span>
@@ -96,6 +128,9 @@ function App() {
               <div className="loading-heart" />
               <div className="loading-heart" />
               <div className="loading-heart" />
+            </div>
+            <div className="loading-bar-container">
+              <div className="loading-bar" />
             </div>
             <div className="loading-text">loading...</div>
           </div>
