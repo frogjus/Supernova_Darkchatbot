@@ -223,13 +223,13 @@ export function CreatorGhosts({ bloomLevel, characterId }: CreatorGhostsProps) {
 
       // Schedule next
       const nextDelay = isHigh
-        ? 8000 + Math.random() * 12000  // high bloom: less frequent, more grateful
-        : 12000 + Math.random() * 18000; // low bloom: occasional haunting
+        ? 6000 + Math.random() * 8000   // high bloom: warm and frequent
+        : 8000 + Math.random() * 10000; // low bloom: ghostly appearances
       timerRef.current = window.setTimeout(showGhost, nextDelay);
     }
 
-    // Start after initial delay
-    const startDelay = 5000 + Math.random() * 5000;
+    // Start quickly so user sees it
+    const startDelay = 2000 + Math.random() * 2000;
     timerRef.current = window.setTimeout(showGhost, startDelay);
 
     return () => {
