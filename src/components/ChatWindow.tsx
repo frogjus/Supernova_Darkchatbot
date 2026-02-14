@@ -3,6 +3,7 @@ import type { Message, Character, Choice } from '../types';
 import { CharacterPanel } from './CharacterPanel';
 import { MessageInput } from './MessageInput';
 import { GlitchTitle } from './GlitchTitle';
+import { FormattedMessage } from './FormattedMessage';
 import './ChatWindow.css';
 
 interface ChatWindowProps {
@@ -67,7 +68,7 @@ export function ChatWindow({
             </span>
           )}
           <div className="message-bubble">
-            {message.content}
+            <FormattedMessage content={message.content} />
           </div>
 
           {showChoices && (
