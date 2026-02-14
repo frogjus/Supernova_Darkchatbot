@@ -228,16 +228,13 @@ export function CreatorGhosts({ bloomLevel, characterId }: CreatorGhostsProps) {
       timerRef.current = window.setTimeout(showGhost, nextDelay);
     }
 
-    // Start quickly so user sees it
-    const startDelay = 2000 + Math.random() * 2000;
-    timerRef.current = window.setTimeout(showGhost, startDelay);
+    // Show first ghost immediately, then schedule more
+    showGhost();
 
     return () => {
       if (timerRef.current) clearTimeout(timerRef.current);
     };
   }, [bloomLevel, characterId, isHigh]);
-
-  if (visibleGhosts.length === 0) return null;
 
   return (
     <div className="creator-ghosts">
