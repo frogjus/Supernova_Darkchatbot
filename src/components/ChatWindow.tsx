@@ -170,6 +170,7 @@ export function ChatWindow({
         <MessageInput
           onSend={onSendMessage}
           placeholder={currentCharacter ? `Message ${currentCharacter.name}...` : 'Type a message...'}
+          disabled={aiLoading}
         />
       </div>
     </div>

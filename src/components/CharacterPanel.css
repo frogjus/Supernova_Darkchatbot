@@ -96,6 +96,8 @@
   object-position: bottom center;
   background: none;
   max-width: none;
+  /* Blend white/light backgrounds into the pink world */
+  mix-blend-mode: multiply;
   /* Bloom-dependent saturation — controlled via inline style */
   transition: filter 1s ease;
 }
