@@ -1,163 +1,222 @@
 /* ==========================================
-   Creator Ghosts — tribute to the makers
-   Ghost text floating behind characters
+   Creator Ghosts — neon tribute to the makers
+   Floating text on edges, avoiding character center
    ========================================== */
 
 .creator-ghosts {
   position: absolute;
   inset: 0;
   pointer-events: none;
-  z-index: 5; /* above character image (z-index 2) but below info overlay (z-index 10) */
+  z-index: 5;
   overflow: hidden;
 }
 
-/* Individual ghost line */
+/* Individual ghost line — positioned on left or right edge */
 .creator-ghost {
   position: absolute;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  max-width: 80%;
-  animation: ghost-drift 4s ease-in-out forwards;
+  max-width: 45%;
   white-space: nowrap;
 }
 
-/* ---- Haunting mode (low bloom) — eerie, flickering ---- */
-.creator-ghost.haunting {
-  opacity: 0;
-  animation: ghost-haunt 4s ease-in-out forwards;
+.creator-ghost.side-left {
+  left: 3%;
+  text-align: left;
 }
 
-.creator-ghost.haunting .creator-ghost-name {
-  font-family: var(--font-pixel);
-  font-size: 8px;
-  color: #CE93D8;
-  opacity: 0.7;
-  letter-spacing: 2px;
-  text-transform: uppercase;
+.creator-ghost.side-right {
+  right: 3%;
+  text-align: right;
+}
+
+/* ---- Ghost text — no name label, just the line ---- */
+.creator-ghost-text {
+  display: block;
+  font-family: var(--font-display);
+  letter-spacing: 0.5px;
+}
+
+/* ================================================================
+   HAUNTING MODE (low bloom) — flickering neon purple/pink
+   ================================================================ */
+
+.creator-ghost.haunting {
+  opacity: 0;
+  animation: ghost-haunt 5s ease-in-out forwards;
 }
 
 .creator-ghost.haunting .creator-ghost-text {
-  font-family: var(--font-display);
-  font-size: 12px;
+  font-size: 14px;
   color: #E1BEE7;
-  opacity: 0.6;
-  text-shadow: 0 0 8px rgba(156, 39, 176, 0.5);
-  letter-spacing: 0.5px;
+  text-shadow:
+    0 0 4px #CE93D8,
+    0 0 12px rgba(156, 39, 176, 0.6),
+    0 0 24px rgba(156, 39, 176, 0.3);
 }
 
 @keyframes ghost-haunt {
   0% { opacity: 0; transform: translateY(10px); }
-  10% { opacity: 0.8; }
-  15% { opacity: 0.2; } /* flicker */
-  20% { opacity: 0.7; }
-  50% { opacity: 0.6; transform: translateY(-5px); }
-  80% { opacity: 0.5; }
-  85% { opacity: 0.8; } /* flicker */
-  90% { opacity: 0.3; }
-  100% { opacity: 0; transform: translateY(-20px); }
+  8% { opacity: 0.85; }
+  12% { opacity: 0.15; } /* flicker */
+  16% { opacity: 0.8; }
+  25% { opacity: 0.7; transform: translateY(0); }
+  50% { opacity: 0.65; transform: translateY(-5px); }
+  75% { opacity: 0.6; }
+  82% { opacity: 0.85; } /* flicker */
+  86% { opacity: 0.2; }
+  90% { opacity: 0.5; }
+  100% { opacity: 0; transform: translateY(-18px); }
 }
 
-/* ---- Grateful mode (high bloom) — warm, glowing ---- */
+/* ================================================================
+   GRATEFUL MODE (high bloom) — warm golden/pink neon glow
+   ================================================================ */
+
 .creator-ghost.grateful {
   opacity: 0;
-  animation: ghost-bloom 5s ease-in-out forwards;
-}
-
-.creator-ghost.grateful .creator-ghost-name {
-  font-family: var(--font-pixel);
-  font-size: 8px;
-  color: #FFD700;
-  opacity: 0.9;
-  letter-spacing: 2px;
-  text-transform: uppercase;
+  animation: ghost-bloom 6s ease-in-out forwards;
 }
 
 .creator-ghost.grateful .creator-ghost-text {
-  font-family: var(--font-display);
-  font-size: 13px;
-  color: #FFE0F0;
-  opacity: 0.8;
-  text-shadow: 0 0 10px rgba(255, 105, 180, 0.5), 0 0 20px rgba(255, 215, 0, 0.3);
-  letter-spacing: 0.5px;
+  font-size: 15px;
+  color: #FFF0F5;
+  text-shadow:
+    0 0 4px #FF69B4,
+    0 0 14px rgba(255, 105, 180, 0.6),
+    0 0 28px rgba(255, 215, 0, 0.3),
+    0 0 42px rgba(255, 105, 180, 0.15);
 }
 
 @keyframes ghost-bloom {
-  0% { opacity: 0; transform: translateY(15px) scale(0.95); }
-  15% { opacity: 0.9; transform: translateY(0) scale(1); }
-  50% { opacity: 0.8; transform: translateY(-3px); }
-  85% { opacity: 0.6; }
-  100% { opacity: 0; transform: translateY(-15px) scale(1.02); }
+  0% { opacity: 0; transform: translateY(12px) scale(0.97); }
+  12% { opacity: 0.95; transform: translateY(0) scale(1); }
+  30% { opacity: 0.85; }
+  50% { opacity: 0.8; transform: translateY(-4px); }
+  80% { opacity: 0.7; }
+  100% { opacity: 0; transform: translateY(-14px) scale(1.01); }
 }
 
-/* ---- Role-based accent colors ---- */
+/* ================================================================
+   ROLE-BASED NEON COLORS — each role glows differently
+   ================================================================ */
 
-/* Story creators — ink purple */
+/* Story (정인, 영재) — neon rose */
 .creator-ghost.haunting.role-story .creator-ghost-text {
-  color: #CE93D8;
+  color: #F8BBD0;
+  text-shadow:
+    0 0 4px #E91E63,
+    0 0 12px rgba(233, 30, 99, 0.6),
+    0 0 24px rgba(233, 30, 99, 0.3);
 }
 .creator-ghost.grateful.role-story .creator-ghost-text {
-  color: #F8BBD0;
-  text-shadow: 0 0 10px rgba(233, 30, 99, 0.3), 0 0 20px rgba(255, 215, 0, 0.15);
+  color: #FFF0F5;
+  text-shadow:
+    0 0 6px #FF69B4,
+    0 0 16px rgba(255, 105, 180, 0.7),
+    0 0 32px rgba(255, 215, 0, 0.3);
 }
 
-/* Art creators — rose pink */
+/* Art (명훈) — neon magenta */
 .creator-ghost.haunting.role-art .creator-ghost-text {
   color: #F48FB1;
-  opacity: 0.3;
+  text-shadow:
+    0 0 4px #E91E63,
+    0 0 12px rgba(233, 30, 99, 0.5),
+    0 0 24px rgba(255, 64, 129, 0.3);
 }
 .creator-ghost.grateful.role-art .creator-ghost-text {
-  color: #FFCDD2;
-  text-shadow: 0 0 10px rgba(255, 105, 180, 0.4), 0 0 20px rgba(255, 215, 0, 0.2);
+  color: #FFE0EC;
+  text-shadow:
+    0 0 6px #FF4081,
+    0 0 16px rgba(255, 64, 129, 0.7),
+    0 0 32px rgba(255, 215, 0, 0.25);
 }
 
-/* Color creators — lavender */
+/* Color (혜미) — neon lavender */
 .creator-ghost.haunting.role-color .creator-ghost-text {
-  color: #B39DDB;
+  color: #CE93D8;
+  text-shadow:
+    0 0 4px #AB47BC,
+    0 0 12px rgba(171, 71, 188, 0.6),
+    0 0 24px rgba(186, 104, 200, 0.3);
 }
 .creator-ghost.grateful.role-color .creator-ghost-text {
-  color: #E1BEE7;
-  text-shadow: 0 0 10px rgba(186, 104, 200, 0.4), 0 0 20px rgba(255, 215, 0, 0.15);
+  color: #F3E5F5;
+  text-shadow:
+    0 0 6px #BA68C8,
+    0 0 16px rgba(186, 104, 200, 0.7),
+    0 0 32px rgba(255, 215, 0, 0.25);
 }
 
-/* Animation creators — cyan ghost */
+/* Animation (영하) — neon cyan */
 .creator-ghost.haunting.role-animation .creator-ghost-text {
-  color: #80CBC4;
-  opacity: 0.3;
+  color: #80DEEA;
+  text-shadow:
+    0 0 4px #00BCD4,
+    0 0 12px rgba(0, 188, 212, 0.5),
+    0 0 24px rgba(77, 208, 225, 0.3);
 }
 .creator-ghost.grateful.role-animation .creator-ghost-text {
-  color: #B2EBF2;
-  text-shadow: 0 0 10px rgba(77, 208, 225, 0.3), 0 0 20px rgba(255, 215, 0, 0.15);
+  color: #E0F7FA;
+  text-shadow:
+    0 0 6px #4DD0E1,
+    0 0 16px rgba(77, 208, 225, 0.7),
+    0 0 32px rgba(255, 215, 0, 0.2);
 }
 
-/* Asset creators — warm amber */
+/* Assets (동주, 가은) — neon amber */
 .creator-ghost.haunting.role-assets .creator-ghost-text {
-  color: #FFCC80;
-  opacity: 0.25;
+  color: #FFE082;
+  text-shadow:
+    0 0 4px #FFB300,
+    0 0 12px rgba(255, 179, 0, 0.5),
+    0 0 24px rgba(255, 183, 77, 0.3);
 }
 .creator-ghost.grateful.role-assets .creator-ghost-text {
-  color: #FFE0B2;
-  text-shadow: 0 0 10px rgba(255, 183, 77, 0.3), 0 0 20px rgba(255, 215, 0, 0.2);
+  color: #FFF8E1;
+  text-shadow:
+    0 0 6px #FFC107,
+    0 0 16px rgba(255, 193, 7, 0.7),
+    0 0 32px rgba(255, 215, 0, 0.3);
 }
 
-/* Plan + Design — golden */
-.creator-ghost.haunting.role-plan .creator-ghost-text,
+/* Plan (제나) — neon peach */
+.creator-ghost.haunting.role-plan .creator-ghost-text {
+  color: #FFCCBC;
+  text-shadow:
+    0 0 4px #FF7043,
+    0 0 12px rgba(255, 112, 67, 0.5),
+    0 0 24px rgba(255, 138, 101, 0.3);
+}
+.creator-ghost.grateful.role-plan .creator-ghost-text {
+  color: #FFF3E0;
+  text-shadow:
+    0 0 6px #FF8A65,
+    0 0 16px rgba(255, 138, 101, 0.7),
+    0 0 32px rgba(255, 215, 0, 0.25);
+}
+
+/* Design (은빈) — neon gold */
 .creator-ghost.haunting.role-design .creator-ghost-text {
   color: #FFF59D;
-  opacity: 0.25;
+  text-shadow:
+    0 0 4px #FDD835,
+    0 0 12px rgba(253, 216, 53, 0.5),
+    0 0 24px rgba(255, 235, 59, 0.3);
 }
-.creator-ghost.grateful.role-plan .creator-ghost-text,
 .creator-ghost.grateful.role-design .creator-ghost-text {
-  color: #FFF9C4;
-  text-shadow: 0 0 12px rgba(255, 215, 0, 0.5);
+  color: #FFFDE7;
+  text-shadow:
+    0 0 6px #FFD700,
+    0 0 16px rgba(255, 215, 0, 0.8),
+    0 0 32px rgba(255, 215, 0, 0.4);
 }
 
-/* ---- Mobile ---- */
+/* ---- Mobile — slightly smaller to fit ---- */
 @media (max-width: 767px) {
   .creator-ghost-text {
-    font-size: 9px !important;
+    font-size: 11px !important;
   }
-  .creator-ghost-name {
-    font-size: 6px !important;
+  .creator-ghost {
+    max-width: 50%;
   }
 }
