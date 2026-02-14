@@ -4,7 +4,7 @@ import { VitePWA } from 'vite-plugin-pwa'
 
 // https://vite.dev/config/
 export default defineConfig({
-  base: '/Supernova_Darkchatbot/',
+  base: process.env.GITHUB_PAGES ? '/Supernova_Darkchatbot/' : '/',
   plugins: [
     react(),
     VitePWA({
@@ -20,7 +20,7 @@ export default defineConfig({
         display: 'standalone',
         orientation: 'portrait',
         scope: '/',
-        start_url: '/Supernova_Darkchatbot/',
+        start_url: '/',
         icons: [
           {
             src: 'icon.svg',
