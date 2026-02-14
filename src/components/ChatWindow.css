@@ -345,6 +345,26 @@
   border: 2px solid var(--bg-surface);
 }
 
+/* ---- Phantom messages — appear then vanish ---- */
+.message.phantom {
+  animation: phantomAppear 2.5s ease-in-out forwards;
+}
+
+.phantom-bubble {
+  background: rgba(106, 27, 154, 0.1) !important;
+  border-color: var(--purple-mid) !important;
+  color: var(--purple-deep) !important;
+  font-style: italic;
+  box-shadow: 0 0 12px rgba(106, 27, 154, 0.2) !important;
+}
+
+@keyframes phantomAppear {
+  0% { opacity: 0; transform: translateY(4px); }
+  15% { opacity: 0.7; transform: translateY(0); }
+  70% { opacity: 0.6; }
+  100% { opacity: 0; transform: translateY(-4px); }
+}
+
 /* ==========================================
    DARK DECAY — Chat panel corruption
    ========================================== */
@@ -367,6 +387,12 @@
 /* Titlebar gradient shifts darker */
 .chat-panel.decayed .chat-titlebar {
   background: linear-gradient(90deg, var(--purple-mid), var(--purple-deep));
+}
+
+/* Zalgo corrupted names — eerie glow */
+.message-sender.zalgo {
+  text-shadow: 0 0 4px currentColor;
+  letter-spacing: 1.5px;
 }
 
 /* ---- Mobile ---- */

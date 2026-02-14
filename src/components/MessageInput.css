@@ -30,6 +30,21 @@
 .message-input::placeholder {
   color: var(--text-soft);
   font-family: var(--font-body);
+  transition: color 0.15s;
+}
+
+/* Haunted placeholder — creepy text flash */
+.message-input.haunted::placeholder {
+  color: var(--purple-deep);
+  font-style: italic;
+  animation: hauntFlicker 0.3s steps(2);
+}
+
+@keyframes hauntFlicker {
+  0% { opacity: 0; }
+  30% { opacity: 1; }
+  60% { opacity: 0.3; }
+  100% { opacity: 0.8; }
 }
 
 .message-input:focus {

@@ -1,0 +1,43 @@
+/* Pixel mute toggle — bottom-right corner */
+.mute-button {
+  position: fixed;
+  top: 12px;
+  right: 12px;
+  z-index: 999;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  background: var(--bg-raised);
+  border: 2px solid var(--border-primary);
+  box-shadow:
+    inset -2px -2px 0 var(--pink-pale),
+    inset 2px 2px 0 white;
+  font-size: 14px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.1s steps(2);
+  opacity: 0.6;
+}
+
+.mute-button:hover {
+  opacity: 1;
+  border-color: var(--pink-hot);
+  box-shadow:
+    inset -2px -2px 0 var(--pink-soft),
+    inset 2px 2px 0 white,
+    0 0 6px var(--pink-glow);
+}
+
+.mute-button:active {
+  box-shadow:
+    inset 2px 2px 0 var(--pink-pale),
+    inset -2px -2px 0 white;
+}
+
+.mute-button.muted {
+  opacity: 0.4;
+  border-color: var(--border-secondary);
+}

@@ -5,7 +5,11 @@ import { BloomToast } from './components/BloomToast';
 import { BloomTransition } from './components/BloomTransition';
 import { PixelProps } from './components/PixelProps';
 import { DarkVeins } from './components/DarkVeins';
+import { ScreenGlitch } from './components/ScreenGlitch';
+import { MuteButton } from './components/MuteButton';
+import { EndingScreen } from './components/EndingScreen';
 import { useGameState } from './hooks/useGameState';
+import { initAudio, startAmbient, setMusicBloom, playTabSwitch, playBloomUp, playBloomDown } from './utils/sound';
 import './App.css';
 
 // Bloom stage thresholds
@@ -32,6 +36,28 @@ function App() {
     makeChoice,
     sendPlayerMessage,
   } = useGameState();
+
+  // Channel switch transition
+  const [switching, setSwitching] = useState(false);
+  const pendingChannelRef = useRef<string | null>(null);
+
+  const handleChannelSwitch = useCallback((ch: string) => {
+    if (ch === state.currentChannel) return;
+    playTabSwitch();
+    setSwitching(true);
+    pendingChannelRef.current = ch;
+    // After fade-out, swap channel and fade-in
+    setTimeout(() => {
+      setCurrentChannel(ch);
+      setTimeout(() => setSwitching(false), 50);
+    }, 250);
+  }, [state.currentChannel, setCurrentChannel]);
+
+  // Onboarding — first time only
+  const [showOnboarding, setShowOnboarding] = useState(() => {
+    return !localStorage.getItem('supernova_onboarded');
+  });
+  const [onboardingStep, setOnboardingStep] = useState(0);
 
   // Splash screen: show for at least 2 seconds, then fade out
   const [splashVisible, setSplashVisible] = useState(true);
@@ -65,6 +91,24 @@ function App() {
     }
   }, [splashFading]);
 
+  // Init audio on first user interaction
+  const audioInitRef = useRef(false);
+  useEffect(() => {
+    const handleInteraction = () => {
+      if (!audioInitRef.current) {
+        audioInitRef.current = true;
+        initAudio();
+        startAmbient();
+      }
+    };
+    window.addEventListener('click', handleInteraction, { once: true });
+    window.addEventListener('touchstart', handleInteraction, { once: true });
+    return () => {
+      window.removeEventListener('click', handleInteraction);
+      window.removeEventListener('touchstart', handleInteraction);
+    };
+  }, []);
+
   // Track bloom stages to detect transitions
   const prevBloomRef = useRef<Record<string, number>>({});
   const [transition, setTransition] = useState<{ characterName: string; stageName: string } | null>(null);
@@ -76,6 +120,10 @@ function App() {
     const prevBloom = prevBloomRef.current[charId];
 
     if (prevBloom !== undefined && prevBloom !== currentBloom) {
+      // Play bloom sound
+      if (currentBloom > prevBloom) playBloomUp();
+      else playBloomDown();
+
       const prevStage = getStageName(prevBloom);
       const newStage = getStageName(currentBloom);
 
@@ -93,6 +141,105 @@ function App() {
   const handleTransitionComplete = useCallback(() => {
     setTransition(null);
   }, []);
+
+  // Ending screen — bloom hits 0 or 100
+  const [ending, setEnding] = useState<{ characterId: string; type: 'saved' | 'lost' } | null>(null);
+  const endingShownRef = useRef<Set<string>>(new Set());
+
+  useEffect(() => {
+    const charId = state.currentChannel;
+    const bloom = state.characterBloom?.[charId] ?? 50;
+    const key = `${charId}_${bloom <= 0 ? 'lost' : bloom >= 100 ? 'saved' : ''}`;
+    if ((bloom <= 0 || bloom >= 100) && !endingShownRef.current.has(key)) {
+      endingShownRef.current.add(key);
+      setEnding({ characterId: charId, type: bloom >= 100 ? 'saved' : 'lost' });
+    }
+  }, [state.characterBloom, state.currentChannel]);
+
+  // Browser tab title corruption
+  useEffect(() => {
+    const HAUNTED_TITLES = [
+      'someone is watching',
+      'close this app',
+      'you can\'t save them',
+      '4 missed calls',
+      'don\'t look behind you',
+      'they remember everything',
+      'why did you come back',
+      'this was a mistake',
+      'she knows',
+      '...',
+    ];
+
+    const currentBloom = state.characterBloom?.[state.currentChannel] ?? 50;
+    if (currentBloom > 40) {
+      document.title = 'SUPERNOVA DARKMODE';
+      return;
+    }
+
+    function scheduleCorruption() {
+      const intensity = Math.max(0.1, 1 - currentBloom / 40);
+      const delay = 15000 + (1 - intensity) * 30000 + Math.random() * 20000;
+
+      return window.setTimeout(() => {
+        const title = HAUNTED_TITLES[Math.floor(Math.random() * HAUNTED_TITLES.length)];
+        document.title = title;
+
+        setTimeout(() => {
+          document.title = 'SUPERNOVA DARKMODE';
+        }, 2000 + Math.random() * 3000);
+      }, delay);
+    }
+
+    const timerId = scheduleCorruption();
+    return () => clearTimeout(timerId);
+  }, [state.characterBloom, state.currentChannel]);
+
+  // Sync bloom to music engine so melody shifts dark/dream
+  const currentBloomForMusic = state.characterBloom?.[state.currentChannel] ?? 10;
+  useEffect(() => {
+    setMusicBloom(currentBloomForMusic);
+  }, [currentBloomForMusic]);
+
+  // Onboarding intro — first time only
+  const ONBOARDING_LINES = [
+    'You found a phone at a bus stop.',
+    'It was still warm.',
+    'There are 4 contacts.',
+    'They seem to be waiting for someone.',
+    '...maybe they\'re waiting for you.',
+  ];
+
+  if (showOnboarding) {
+    return (
+      <div
+        className="onboarding-screen"
+        onClick={() => {
+          initAudio();
+          if (onboardingStep < ONBOARDING_LINES.length - 1) {
+            setOnboardingStep(s => s + 1);
+          } else {
+            localStorage.setItem('supernova_onboarded', 'true');
+            setShowOnboarding(false);
+          }
+        }}
+      >
+        <div className="onboarding-content">
+          {ONBOARDING_LINES.slice(0, onboardingStep + 1).map((line, i) => (
+            <p
+              key={i}
+              className={`onboarding-line ${i === onboardingStep ? 'current' : 'past'}`}
+            >
+              {line}
+            </p>
+          ))}
+        </div>
+        <p className="onboarding-hint">
+          {onboardingStep < ONBOARDING_LINES.length - 1 ? 'tap to continue' : 'tap to enter'}
+        </p>
+      </div>
+    );
+  }
 
   if (splashVisible) {
     return (
@@ -149,6 +296,24 @@ function App() {
       {/* DARK DECAY: Vignette + pixel corruption at low bloom */}
       <DarkVeins bloomLevel={currentBloom} />
 
+      {/* NIGHTMARE: Random screen glitches */}
+      <ScreenGlitch bloomLevel={currentBloom} />
+
+      {/* Ending screen — bloom 0 or 100 */}
+      {ending && (() => {
+        const endChar = characters.find(c => c.id === ending.characterId);
+        return endChar ? (
+          <EndingScreen
+            character={endChar}
+            type={ending.type}
+            onDismiss={() => setEnding(null)}
+          />
+        ) : null;
+      })()}
+
+      {/* Mute toggle */}
+      <MuteButton />
+
       {/* Bloom feedback toast */}
       <BloomToast event={lastBloomEvent} />
 
@@ -164,11 +329,11 @@ function App() {
       <ChannelTabs
         characters={characters}
         currentChannel={state.currentChannel}
-        onSelectChannel={setCurrentChannel}
+        onSelectChannel={handleChannelSwitch}
         characterBloom={state.characterBloom}
       />
 
-      <div className="app-main">
+      <div className={`app-main ${switching ? 'channel-switching' : ''}`}>
         <ChatWindow
           messages={state.messages}
           characters={characters}

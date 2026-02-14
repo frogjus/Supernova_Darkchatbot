@@ -53,8 +53,8 @@
   /* Typography
      Pixelify Sans — round pixel-style display font (titles, labels, UI chrome)
      DotGothic16 — round CJK pixel font (messages, dialog text — lives inside pixel windows) */
-  --font-display: 'Pixelify Sans', 'Press Start 2P', cursive;
-  --font-body: 'DotGothic16', 'VT323', monospace;
+  --font-display: 'Pixelify Sans', 'Galmuri11', 'Press Start 2P', cursive;
+  --font-body: 'Galmuri11', 'DotGothic16', 'VT323', monospace;
 
   /* Display font — titles, labels, tab names, UI chrome */
   --text-display-xs: 11px;

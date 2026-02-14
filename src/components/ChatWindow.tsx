@@ -1,9 +1,10 @@
-import { useRef, useEffect, useState } from 'react';
+import { useRef, useEffect, useState, useMemo } from 'react';
 import type { Message, Character, Choice } from '../types';
 import { CharacterPanel } from './CharacterPanel';
 import { MessageInput } from './MessageInput';
 import { GlitchTitle } from './GlitchTitle';
 import { FormattedMessage } from './FormattedMessage';
+import { zalgoify } from '../utils/zalgo';
 import './ChatWindow.css';
 
 interface ChatWindowProps {
@@ -27,6 +28,41 @@ export function ChatWindow({
 }: ChatWindowProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  const [phantomMessage, setPhantomMessage] = useState<string | null>(null);
+  const phantomTimerRef = useRef<number | null>(null);
+
+  // Phantom messages — appear briefly then vanish at very low bloom
+  const PHANTOM_MESSAGES: Record<string, string[]> = {
+    miho: ['help me', 'i remember what happened', 'don\'t leave me alone with them', 'the stage lights are still on', 'munyeol?'],
+    sohee: ['i can hear it', 'the words won\'t stop', 'this isn\'t real', 'i wrote the ending already', 'nobody reads anymore'],
+    sujin: ['i\'m so tired of being good', 'let me rest', 'it\'s never enough', 'i can\'t hold this together', 'who am i without the schedule'],
+    hyunju: ['am i real?', 'the smile hurts', 'i don\'t want to perform anymore', 'please don\'t look at me', 'i drew something terrible'],
+  };
+
+  useEffect(() => {
+    if (bloomLevel > 20) {
+      setPhantomMessage(null);
+      return;
+    }
+
+    function schedulePhantom() {
+      const delay = 25000 + Math.random() * 35000;
+      phantomTimerRef.current = window.setTimeout(() => {
+        const pool = PHANTOM_MESSAGES[currentChannel] || PHANTOM_MESSAGES.miho;
+        const msg = pool[Math.floor(Math.random() * pool.length)];
+        setPhantomMessage(msg);
+
+        // Vanish after 2-3 seconds
+        setTimeout(() => {
+          setPhantomMessage(null);
+          schedulePhantom();
+        }, 2000 + Math.random() * 1000);
+      }, delay);
+    }
+
+    schedulePhantom();
+    return () => { if (phantomTimerRef.current) clearTimeout(phantomTimerRef.current); };
+  }, [bloomLevel, currentChannel]);
 
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 768);
@@ -39,6 +75,22 @@ export function ChatWindow({
   }, [messages]);
 
   const currentCharacter = characters.find(c => c.id === currentChannel);
+
+  // Zalgo corruption intensity — kicks in at bloom < 20
+  const zalgoIntensity = bloomLevel < 20 ? (1 - bloomLevel / 20) : 0;
+
+  // Re-corrupt names periodically for a flickering effect
+  const [zalgoTick, setZalgoTick] = useState(0);
+  useEffect(() => {
+    if (zalgoIntensity <= 0) return;
+    const interval = setInterval(() => setZalgoTick(t => t + 1), 2000);
+    return () => clearInterval(interval);
+  }, [zalgoIntensity]);
+
+  const corruptName = useMemo(() => {
+    return (name: string) => zalgoIntensity > 0 ? zalgoify(name, zalgoIntensity) : name;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [zalgoIntensity, zalgoTick]);
 
   const renderMessage = (message: Message) => {
     const character = characters.find(c => c.id === message.characterId);
@@ -63,8 +115,8 @@ export function ChatWindow({
         )}
         <div className="message-content">
           {!isPlayer && character && (
-            <span className="message-sender" style={{ color: character.color }}>
-              {character.name}
+            <span className={`message-sender ${zalgoIntensity > 0 ? 'zalgo' : ''}`} style={{ color: character.color }}>
+              {corruptName(character.name)}
             </span>
           )}
           <div className="message-bubble">
@@ -150,8 +202,8 @@ export function ChatWindow({
                 )}
               </div>
               <div className="message-content">
-                <span className="message-sender" style={{ color: currentCharacter.color }}>
-                  {currentCharacter.name}
+                <span className={`message-sender ${zalgoIntensity > 0 ? 'zalgo' : ''}`} style={{ color: currentCharacter.color }}>
+                  {corruptName(currentCharacter.name)}
                 </span>
                 <div className="message-bubble">
                   <div className="typing-dots">
@@ -159,6 +211,28 @@ export function ChatWindow({
                     <span />
                     <span />
                   </div>
+                </div>
+              </div>
+            </div>
+          )}
+          {/* Phantom message — appears briefly then vanishes */}
+          {phantomMessage && currentCharacter && (
+            <div className="message character phantom">
+              <div className="message-avatar" style={{ borderColor: currentCharacter.color }}>
+                {currentCharacter.avatar ? (
+                  <img src={currentCharacter.avatar} alt={currentCharacter.name} className={`avatar-image avatar-${currentCharacter.id}`} />
+                ) : (
+                  <div className="avatar-fallback" style={{ backgroundColor: currentCharacter.color }}>
+                    {currentCharacter.name.charAt(0)}
+                  </div>
+                )}
+              </div>
+              <div className="message-content">
+                <span className={`message-sender ${zalgoIntensity > 0 ? 'zalgo' : ''}`} style={{ color: currentCharacter.color }}>
+                  {corruptName(currentCharacter.name)}
+                </span>
+                <div className="message-bubble phantom-bubble">
+                  {phantomMessage}
                 </div>
               </div>
             </div>
@@ -171,6 +245,7 @@ export function ChatWindow({
           onSend={onSendMessage}
           placeholder={currentCharacter ? `Message ${currentCharacter.name}...` : 'Type a message...'}
           disabled={aiLoading}
+          bloomLevel={bloomLevel}
         />
       </div>
     </div>

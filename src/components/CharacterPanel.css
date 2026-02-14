@@ -34,45 +34,95 @@
   filter: blur(30px);
 }
 
-/* Floating pixel sparkles */
+/* Floating dreamcore sparkles — varying sizes and speeds */
 .character-sparkles {
   position: absolute;
   inset: 0;
   overflow: hidden;
   pointer-events: none;
+  z-index: 1;
 }
 
 .sparkle {
   position: absolute;
-  font-size: 14px;
+  font-size: var(--size, 14px);
   opacity: 0;
-  animation: sparkleFloat 5s ease-in-out infinite;
   animation-delay: var(--delay);
 }
 
-.sparkle:nth-child(1) { left: 8%; top: 15%; }
-.sparkle:nth-child(2) { right: 12%; top: 25%; }
-.sparkle:nth-child(3) { left: 15%; bottom: 35%; }
-.sparkle:nth-child(4) { right: 8%; top: 45%; }
-.sparkle:nth-child(5) { left: 25%; top: 10%; }
-.sparkle:nth-child(6) { right: 20%; bottom: 25%; }
-.sparkle:nth-child(7) { left: 5%; top: 55%; }
-.sparkle:nth-child(8) { right: 5%; top: 65%; }
+/* Three speed tiers for visual depth */
+.sparkle-slow {
+  animation: sparkleRise 7s ease-in-out infinite;
+}
 
-@keyframes sparkleFloat {
+.sparkle-mid {
+  animation: sparkleDrift 5s ease-in-out infinite;
+}
+
+.sparkle-fast {
+  animation: sparkleFlicker 3.5s ease-in-out infinite;
+}
+
+@keyframes sparkleRise {
   0%, 100% {
     opacity: 0;
-    transform: translateY(0) scale(0.8);
+    transform: translateY(8px) scale(0.6);
   }
-  30% {
+  20% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 0.7;
+    transform: translateY(-14px) scale(1);
+  }
+  80% {
+    opacity: 0.3;
+  }
+}
+
+@keyframes sparkleDrift {
+  0%, 100% {
+    opacity: 0;
+    transform: translate(0, 0) scale(0.7);
+  }
+  25% {
     opacity: 0.6;
+    transform: translate(6px, -8px) scale(0.9);
   }
   50% {
     opacity: 0.8;
+    transform: translate(-4px, -16px) scale(1.05);
+  }
+  75% {
+    opacity: 0.4;
+    transform: translate(3px, -6px) scale(0.85);
+  }
+}
+
+@keyframes sparkleFlicker {
+  0%, 100% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  15% {
+    opacity: 0.7;
+    transform: scale(1.1);
+  }
+  30% {
+    opacity: 0.2;
+    transform: scale(0.8);
+  }
+  50% {
+    opacity: 0.9;
     transform: translateY(-10px) scale(1);
   }
   70% {
-    opacity: 0.4;
+    opacity: 0.3;
+    transform: scale(0.7);
+  }
+  85% {
+    opacity: 0.5;
+    transform: scale(0.9);
   }
 }
 
@@ -132,7 +182,7 @@
 
 .character-name {
   font-family: var(--font-display);
-  font-size: var(--text-display-xl);
+  font-size: 29px;
   font-weight: 700;
   letter-spacing: 3px;
   color: var(--text-primary);
@@ -146,6 +196,21 @@
   color: var(--text-secondary);
   margin: var(--space-1) 0 0;
   font-style: italic;
+  transition: color 0.3s, text-shadow 0.3s;
+}
+
+/* Fourth wall crack — tagline replaced with creepy text */
+.character-tagline.fourth-wall {
+  color: var(--purple-deep);
+  text-shadow: 0 0 8px rgba(106, 27, 154, 0.6);
+  animation: fourthWallFlicker 0.4s steps(3);
+}
+
+@keyframes fourthWallFlicker {
+  0% { opacity: 0; transform: translateX(-2px); }
+  25% { opacity: 1; transform: translateX(1px); }
+  50% { opacity: 0.5; transform: translateX(-1px); }
+  100% { opacity: 1; transform: translateX(0); }
 }
 
 .character-accent-line {
@@ -222,7 +287,7 @@
   }
 
   .character-name {
-    font-size: var(--text-display-2xl);
+    font-size: 38px;
     letter-spacing: 4px;
   }
 

@@ -1,0 +1,198 @@
+/* ==========================================
+   Ending Screens — Bloom 100 (saved) & 0 (lost)
+   ========================================== */
+
+.ending-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: endingFadeIn 1s ease forwards;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.ending-screen.saved {
+  background: radial-gradient(ellipse at center, #fff5f8 0%, #ffe0ec 40%, #ffc0d6 100%);
+}
+
+.ending-screen.lost {
+  background: radial-gradient(ellipse at center, #1a0a2e 0%, #0d0015 60%, #000 100%);
+}
+
+.ending-screen.fade-out {
+  animation: endingFadeOut 0.6s ease forwards;
+}
+
+@keyframes endingFadeIn {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+@keyframes endingFadeOut {
+  0% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/* Content container */
+.ending-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+  text-align: center;
+  padding: var(--space-6);
+  max-width: 400px;
+  z-index: 1;
+}
+
+/* Character portrait */
+.ending-portrait {
+  width: 180px;
+  height: 220px;
+  overflow: hidden;
+  border: 3px solid var(--pink-hot);
+  box-shadow:
+    inset -2px -2px 0 var(--pink-pale),
+    inset 2px 2px 0 white,
+    0 0 20px var(--pink-glow);
+}
+
+.ending-portrait.lost {
+  border-color: var(--purple-mid);
+  box-shadow:
+    inset -2px -2px 0 var(--purple-pale),
+    inset 2px 2px 0 rgba(255,255,255,0.1),
+    0 0 20px rgba(106, 27, 154, 0.4);
+  filter: grayscale(60%) brightness(70%);
+}
+
+.ending-portrait img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
+}
+
+/* Badge */
+.ending-badge {
+  font-family: var(--font-display);
+  font-size: var(--text-display-xs);
+  letter-spacing: 2px;
+  padding: var(--space-1) var(--space-3);
+  border: 2px solid;
+}
+
+.ending-badge.saved {
+  color: var(--pink-hot);
+  border-color: var(--pink-hot);
+  background: rgba(255, 105, 180, 0.1);
+  box-shadow: 0 0 12px var(--pink-glow);
+}
+
+.ending-badge.lost {
+  color: var(--purple-mid);
+  border-color: var(--purple-mid);
+  background: rgba(106, 27, 154, 0.15);
+  box-shadow: 0 0 12px rgba(106, 27, 154, 0.3);
+}
+
+/* Character name */
+.ending-name {
+  font-family: var(--font-display);
+  font-size: 28px;
+  letter-spacing: 3px;
+  margin: 0;
+}
+
+.ending-name.saved {
+  color: var(--pink-deep);
+  text-shadow: 0 0 8px var(--pink-glow);
+}
+
+.ending-name.lost {
+  color: var(--purple-light);
+  text-shadow: 0 0 8px rgba(106, 27, 154, 0.5);
+}
+
+/* Lines */
+.ending-lines {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-height: 120px;
+}
+
+.ending-line {
+  font-family: var(--font-body);
+  font-size: var(--text-body-base);
+  font-style: italic;
+  animation: endingLineIn 0.6s ease;
+  margin: 0;
+}
+
+.ending-screen.saved .ending-line {
+  color: var(--text-secondary);
+}
+
+.ending-screen.lost .ending-line {
+  color: rgba(200, 180, 220, 0.8);
+}
+
+.ending-line.past {
+  opacity: 0.4;
+}
+
+.ending-line.current {
+  opacity: 1;
+}
+
+@keyframes endingLineIn {
+  0% { opacity: 0; transform: translateY(8px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+/* Hint */
+.ending-hint {
+  font-family: var(--font-display);
+  font-size: var(--text-display-xs);
+  animation: endingPulse 2s ease-in-out infinite;
+}
+
+.ending-screen.saved .ending-hint {
+  color: var(--pink-soft);
+}
+
+.ending-screen.lost .ending-hint {
+  color: rgba(150, 120, 180, 0.5);
+}
+
+@keyframes endingPulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.8; }
+}
+
+/* Floating particles */
+.ending-particles {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.ending-particle {
+  position: absolute;
+  bottom: -20px;
+  font-size: 18px;
+  animation: endingFloat linear infinite;
+  opacity: 0.6;
+}
+
+@keyframes endingFloat {
+  0% { transform: translateY(0); opacity: 0; }
+  10% { opacity: 0.6; }
+  90% { opacity: 0.6; }
+  100% { transform: translateY(-100vh); opacity: 0; }
+}
