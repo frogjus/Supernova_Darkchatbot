@@ -24,11 +24,18 @@ function getMaster(): GainNode {
 }
 
 // Resume audio context on first user interaction (browser autoplay policy)
+// iOS Safari requires playing a sound within the gesture handler to unlock audio
 export function initAudio() {
   const ctx = getCtx();
   if (ctx.state === 'suspended') {
     ctx.resume();
   }
+  // Play a silent buffer to unlock audio on iOS
+  const buffer = ctx.createBuffer(1, 1, ctx.sampleRate);
+  const source = ctx.createBufferSource();
+  source.buffer = buffer;
+  source.connect(ctx.destination);
+  source.start(0);
 }
 
 // Update bloom for music mood shifts

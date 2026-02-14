@@ -218,8 +218,8 @@ export function useGameState() {
           messages: [...prev.messages, newMessage],
         }));
 
-        // In group chat, sometimes a second character reacts (40% chance)
-        if (isGroup && Math.random() < 0.4) {
+        // In group chat, sometimes a second character reacts (20% chance)
+        if (isGroup && Math.random() < 0.2) {
           const eligible = characters.filter(
             c => (freshState.characterBloom[c.id] ?? 0) >= GROUP_BLOOM_THRESHOLD
           );

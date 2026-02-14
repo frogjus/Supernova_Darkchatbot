@@ -81,13 +81,13 @@ const UNPROMPTED: Record<string, UnpromptedSet> = {
 const lastUnprompted: Record<string, number> = {};
 
 export function getUnpromptedMessage(characterId: string, bloomValue: number): Message | null {
-  // 30% chance
-  if (Math.random() > 0.3) return null;
+  // 15% chance — enough to feel alive without being overwhelming
+  if (Math.random() > 0.15) return null;
 
-  // Minimum 60 seconds between unprompted messages per character
+  // Minimum 3 minutes between unprompted messages per character
   const now = Date.now();
   const lastTime = lastUnprompted[characterId] || 0;
-  if (now - lastTime < 60000) return null;
+  if (now - lastTime < 180000) return null;
 
   const charMessages = UNPROMPTED[characterId];
   if (!charMessages) return null;

@@ -47,7 +47,7 @@ export function ChatWindow({
     }
 
     function schedulePhantom() {
-      const delay = 25000 + Math.random() * 35000;
+      const delay = 45000 + Math.random() * 60000;
       phantomTimerRef.current = window.setTimeout(() => {
         const pool = PHANTOM_MESSAGES[currentChannel] || PHANTOM_MESSAGES.miho;
         const msg = pool[Math.floor(Math.random() * pool.length)];
