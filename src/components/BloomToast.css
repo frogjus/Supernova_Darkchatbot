@@ -1,0 +1,70 @@
+/* ==========================================
+   Bloom Toast — Floating feedback notification
+   ========================================== */
+
+.bloom-toast {
+  position: fixed;
+  top: 60px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  border: 2px solid var(--border-primary);
+  box-shadow:
+    inset -2px -2px 0 var(--pink-pale),
+    inset 2px 2px 0 white,
+    4px 4px 0 var(--pink-glow);
+  font-family: var(--font-display);
+  font-size: var(--text-display-sm);
+  animation: toastIn 0.3s steps(4) forwards, toastOut 0.3s steps(4) 2.2s forwards;
+  pointer-events: none;
+}
+
+.bloom-toast.positive {
+  background: white;
+  border-color: var(--pink-hot);
+  color: var(--pink-deep);
+}
+
+.bloom-toast.negative {
+  background: var(--bg-raised);
+  border-color: var(--purple-deep);
+  color: var(--purple-deep);
+}
+
+.bloom-toast-icon {
+  font-size: 14px;
+  animation: toastHeartPop 0.4s steps(2);
+}
+
+.bloom-toast.positive .bloom-toast-icon {
+  color: var(--pink-hot);
+}
+
+.bloom-toast.negative .bloom-toast-icon {
+  color: var(--purple-deep);
+}
+
+.bloom-toast-text {
+  letter-spacing: 0.5px;
+}
+
+@keyframes toastIn {
+  0% { opacity: 0; transform: translateX(-50%) translateY(-10px); }
+  50% { opacity: 0.8; }
+  100% { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+@keyframes toastOut {
+  0% { opacity: 1; transform: translateX(-50%) translateY(0); }
+  100% { opacity: 0; transform: translateX(-50%) translateY(-10px); }
+}
+
+@keyframes toastHeartPop {
+  0% { transform: scale(0.5); }
+  50% { transform: scale(1.4); }
+  100% { transform: scale(1); }
+}

@@ -1,3 +1,8 @@
+/* ==========================================
+   Character Panel — Large character display
+   Pink dreamcore with bloom-dependent effects
+   ========================================== */
+
 .character-panel {
   position: relative;
   width: 100%;
@@ -7,82 +12,76 @@
   align-items: center;
   justify-content: flex-end;
   overflow: hidden;
-  background: radial-gradient(
-    ellipse at center bottom,
-    var(--gradient-start) 0%,
-    var(--gradient-end) 40%,
-    #0a0a14 80%
-  );
+  background: var(--bg-blush);
 }
 
-/* Glow behind character */
+/* Soft glow behind character */
 .character-glow {
   position: absolute;
-  bottom: 10%;
+  bottom: 5%;
   left: 50%;
   transform: translateX(-50%);
-  width: 120%;
-  height: 80%;
+  width: 100%;
+  height: 70%;
   background: radial-gradient(
-    ellipse at center,
-    var(--glow-color) 0%,
+    ellipse at center bottom,
+    var(--glow-color, var(--pink-glow)) 0%,
     transparent 60%
   );
-  opacity: 0.4;
+  opacity: 0.5;
   pointer-events: none;
-  filter: blur(40px);
+  filter: blur(30px);
 }
 
-/* Particle field */
-.character-particles {
+/* Floating pixel sparkles */
+.character-sparkles {
   position: absolute;
   inset: 0;
   overflow: hidden;
   pointer-events: none;
 }
 
-.particle {
+.sparkle {
   position: absolute;
-  width: 2px;
-  height: 2px;
-  background: var(--particle-color);
-  border-radius: 50%;
+  font-size: 14px;
   opacity: 0;
-  animation: particleFloat 4s ease-in-out infinite;
+  animation: sparkleFloat 5s ease-in-out infinite;
   animation-delay: var(--delay);
 }
 
-.particle:nth-child(1) { left: 10%; bottom: 20%; }
-.particle:nth-child(2) { left: 20%; bottom: 40%; }
-.particle:nth-child(3) { left: 30%; bottom: 15%; }
-.particle:nth-child(4) { left: 40%; bottom: 50%; }
-.particle:nth-child(5) { left: 50%; bottom: 25%; }
-.particle:nth-child(6) { left: 60%; bottom: 45%; }
-.particle:nth-child(7) { left: 70%; bottom: 15%; }
-.particle:nth-child(8) { left: 80%; bottom: 35%; }
-.particle:nth-child(9) { left: 15%; bottom: 55%; }
-.particle:nth-child(10) { left: 85%; bottom: 55%; }
-.particle:nth-child(11) { left: 45%; bottom: 10%; }
-.particle:nth-child(12) { left: 55%; bottom: 60%; }
+.sparkle:nth-child(1) { left: 8%; top: 15%; }
+.sparkle:nth-child(2) { right: 12%; top: 25%; }
+.sparkle:nth-child(3) { left: 15%; bottom: 35%; }
+.sparkle:nth-child(4) { right: 8%; top: 45%; }
+.sparkle:nth-child(5) { left: 25%; top: 10%; }
+.sparkle:nth-child(6) { right: 20%; bottom: 25%; }
+.sparkle:nth-child(7) { left: 5%; top: 55%; }
+.sparkle:nth-child(8) { right: 5%; top: 65%; }
 
-@keyframes particleFloat {
+@keyframes sparkleFloat {
   0%, 100% {
     opacity: 0;
-    transform: translateY(0) scale(1);
+    transform: translateY(0) scale(0.8);
+  }
+  30% {
+    opacity: 0.6;
   }
   50% {
-    opacity: 0.6;
-    transform: translateY(-20px) scale(1.5);
+    opacity: 0.8;
+    transform: translateY(-10px) scale(1);
+  }
+  70% {
+    opacity: 0.4;
   }
 }
 
-/* Character visual - main focus */
+/* Character image — BIG and center */
 .character-visual {
   position: absolute;
   bottom: 0;
   left: 50%;
   transform: translateX(-50%);
-  height: 90%;
+  height: 88%;
   width: auto;
   display: flex;
   align-items: flex-end;
@@ -95,10 +94,10 @@
   width: auto;
   object-fit: contain;
   object-position: bottom center;
-  /* No white background - transparent by default */
   background: none;
-  /* Allow image to overflow container */
   max-width: none;
+  /* Bloom-dependent saturation — controlled via inline style */
+  transition: filter 1s ease;
 }
 
 /* Character info overlay at bottom */
@@ -107,12 +106,12 @@
   bottom: 0;
   left: 0;
   right: 0;
-  padding: 20px;
-  padding-bottom: max(20px, env(safe-area-inset-bottom));
+  padding: var(--space-4);
+  padding-bottom: max(var(--space-4), env(safe-area-inset-bottom));
   background: linear-gradient(
     to top,
-    rgba(10, 10, 20, 0.95) 0%,
-    rgba(10, 10, 20, 0.7) 50%,
+    rgba(255, 240, 245, 0.95) 0%,
+    rgba(255, 240, 245, 0.6) 60%,
     transparent 100%
   );
   text-align: center;
@@ -120,62 +119,58 @@
 }
 
 .character-name {
-  font-size: 28px;
-  font-weight: 800;
-  letter-spacing: 4px;
-  color: #fff;
+  font-family: var(--font-display);
+  font-size: var(--text-display-xl);
+  font-weight: 700;
+  letter-spacing: 3px;
+  color: var(--text-primary);
   margin: 0;
-  text-shadow: 0 0 20px var(--glow-color);
+  text-shadow: 1px 1px 0 var(--pink-pale);
 }
 
 .character-tagline {
-  font-size: 12px;
+  font-family: var(--font-body);
+  font-size: var(--text-body-sm);
+  color: var(--text-secondary);
+  margin: var(--space-1) 0 0;
   font-style: italic;
-  color: var(--accent-color);
-  margin: 6px 0 0;
-  opacity: 0.9;
 }
 
 .character-accent-line {
-  width: 60px;
+  width: 50px;
   height: 2px;
-  margin: 10px auto 0;
-  background: linear-gradient(90deg, transparent, var(--glow-color), transparent);
-  box-shadow: 0 0 10px var(--glow-color);
+  margin: var(--space-2) auto 0;
+  background: var(--border-primary);
 }
 
 /* Corner pixel brackets */
 .corner-bracket {
   position: absolute;
-  width: 20px;
-  height: 20px;
-  border-color: var(--accent-color);
+  width: 16px;
+  height: 16px;
+  border-color: var(--pink-soft);
   border-style: solid;
-  opacity: 0.6;
+  opacity: 0.5;
   z-index: 5;
 }
 
 .corner-bracket.top-left {
-  top: 15px;
-  left: 15px;
+  top: 12px; left: 12px;
   border-width: 2px 0 0 2px;
 }
 
 .corner-bracket.top-right {
-  top: 15px;
-  right: 15px;
+  top: 12px; right: 12px;
   border-width: 2px 2px 0 0;
 }
 
 .corner-bracket.bottom-left {
-  bottom: 15px;
-  left: 15px;
+  bottom: 12px; left: 12px;
   border-width: 0 0 2px 2px;
 }
 
 .corner-bracket.bottom-right {
-  bottom: 15px;
-  right: 15px;
+  bottom: 12px; right: 12px;
   border-width: 0 2px 2px 0;
 }
 
@@ -189,61 +184,92 @@
   background: linear-gradient(
     90deg,
     transparent 0%,
-    rgba(255, 255, 255, 0.1) 50%,
+    rgba(255, 255, 255, 0.15) 50%,
     transparent 100%
   );
   transform: skewX(-20deg);
-  animation: shine 4s ease-in-out infinite;
+  animation: shine 5s ease-in-out infinite;
   pointer-events: none;
   z-index: 3;
 }
 
 @keyframes shine {
-  0%, 100% {
-    left: -100%;
-  }
-  50% {
-    left: 200%;
-  }
+  0%, 100% { left: -100%; }
+  50% { left: 200%; }
 }
 
-/* Desktop: larger sizing */
+/* ---- Bloom meter inside character panel ---- */
+.character-bloom-container {
+  position: absolute;
+  top: var(--space-3);
+  right: var(--space-3);
+  z-index: 15;
+}
+
+/* ==========================================
+   DARK DECAY — Scanline interference
+   VHS tracking lines at low bloom
+   ========================================== */
+
+.character-scanlines {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 20;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0px,
+    transparent 3px,
+    rgba(42, 10, 31, 0.06) 3px,
+    rgba(42, 10, 31, 0.06) 4px
+  );
+  animation: scanlineScroll 8s linear infinite;
+  mix-blend-mode: multiply;
+}
+
+/* Occasional VHS tracking glitch bar */
+.character-scanlines::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: rgba(106, 27, 154, 0.15);
+  animation: trackingBar 6s steps(1) infinite;
+}
+
+@keyframes scanlineScroll {
+  0% { background-position: 0 0; }
+  100% { background-position: 0 200px; }
+}
+
+@keyframes trackingBar {
+  0%, 95% { top: -10px; opacity: 0; }
+  96% { top: 20%; opacity: 1; }
+  97% { top: 45%; opacity: 0.8; }
+  98% { top: 70%; opacity: 0.6; }
+  99% { top: 90%; opacity: 0.3; }
+  100% { top: 110%; opacity: 0; }
+}
+
+/* ---- Desktop ---- */
 @media (min-width: 768px) {
   .character-visual {
     height: 85%;
   }
 
   .character-name {
-    font-size: 36px;
-    letter-spacing: 6px;
-  }
-
-  .character-tagline {
-    font-size: 14px;
+    font-size: var(--text-display-2xl);
+    letter-spacing: 4px;
   }
 
   .corner-bracket {
-    width: 30px;
-    height: 30px;
+    width: 24px;
+    height: 24px;
   }
 
-  .corner-bracket.top-left {
-    top: 25px;
-    left: 25px;
-  }
-
-  .corner-bracket.top-right {
-    top: 25px;
-    right: 25px;
-  }
-
-  .corner-bracket.bottom-left {
-    bottom: 25px;
-    left: 25px;
-  }
-
-  .corner-bracket.bottom-right {
-    bottom: 25px;
-    right: 25px;
-  }
+  .corner-bracket.top-left { top: 20px; left: 20px; }
+  .corner-bracket.top-right { top: 20px; right: 20px; }
+  .corner-bracket.bottom-left { bottom: 20px; left: 20px; }
+  .corner-bracket.bottom-right { bottom: 20px; right: 20px; }
 }

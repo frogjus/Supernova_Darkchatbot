@@ -1,51 +1,46 @@
-import type { Character } from '../types';
+import type { Character, CharacterBloom } from '../types';
 import './ChannelTabs.css';
 
 interface ChannelTabsProps {
   characters: Character[];
   currentChannel: string;
   onSelectChannel: (channel: string) => void;
+  characterBloom?: CharacterBloom;
 }
 
-interface Channel {
-  id: string;
-  name: string;
-  icon?: string;
-  color?: string;
-  isGroup: boolean;
-}
-
-export function ChannelTabs({ characters, currentChannel, onSelectChannel }: ChannelTabsProps) {
-  const channels: Channel[] = [
-    { id: 'group', name: 'Group', icon: '👥', isGroup: true },
-    ...characters.filter(c => c.id !== 'yuseong').map(c => ({
-      id: c.id,
-      name: c.name,
-      color: c.color,
-      isGroup: false,
-    })),
-  ];
-
+export function ChannelTabs({ characters, currentChannel, onSelectChannel, characterBloom }: ChannelTabsProps) {
   return (
     <div className="channel-tabs">
-      {channels.map(channel => {
-        const isActive = currentChannel === channel.id;
-        const char = !channel.isGroup ? characters.find(c => c.id === channel.id) : null;
+      <div className="channel-tabs-inner">
+        {characters.map(character => {
+          const isActive = currentChannel === character.id;
+          const bloom = characterBloom?.[character.id] ?? 50;
+          const isWilted = bloom <= 20;
 
-        return (
-          <button
-            key={channel.id}
-            className={`channel-tab ${isActive ? 'active' : ''} ${channel.isGroup ? 'group' : ''}`}
-            onClick={() => onSelectChannel(channel.id)}
-            style={{
-              '--channel-color': channel.isGroup ? '#6c5ce7' : char?.color,
-            } as React.CSSProperties}
-          >
-            <span className="channel-icon">{channel.icon || '💬'}</span>
-            <span className="channel-name">{channel.name}</span>
-          </button>
-        );
-      })}
+          return (
+            <button
+              key={character.id}
+              className={`channel-tab ${isActive ? 'active' : ''} ${isWilted ? 'wilted' : ''}`}
+              onClick={() => onSelectChannel(character.id)}
+              style={{
+                '--char-color': character.color,
+              } as React.CSSProperties}
+            >
+              <span className="tab-avatar">
+                {character.avatar ? (
+                  <img src={character.avatar} alt="" className="tab-avatar-img" />
+                ) : (
+                  <span className="tab-avatar-fallback">{character.name.charAt(0)}</span>
+                )}
+              </span>
+              <span className="tab-name">{character.name}</span>
+              {isActive && (
+                <span className="tab-heart">{isWilted ? '💔' : '♥'}</span>
+              )}
+            </button>
+          );
+        })}
+      </div>
     </div>
   );
 }

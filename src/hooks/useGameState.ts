@@ -1,40 +1,88 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
-import type { GameState, Message, Character, DayContent, WeeklyEvent, Choice, ConsequenceItem } from '../types';
-import { createInitialState, applyConsequences, advanceTime, loadCharacters, loadDays, loadEvents } from '../utils/helpers';
+import type { GameState, Message, Character, Choice, BloomToken } from '../types';
+import { createInitialState, applyConsequences, loadCharacters } from '../utils/helpers';
 import { generateCharacterResponse } from '../utils/aiService';
+import { detectBloomToken } from '../utils/bloomDetector';
+import { getGreetingMessage } from '../utils/greetings';
+
+const STORAGE_KEY = 'supernova_darkmode_state';
+
+// Load persisted state from localStorage
+function loadPersistedState(): Partial<GameState> | null {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) return JSON.parse(saved);
+  } catch {
+    // Corrupted data, ignore
+  }
+  return null;
+}
+
+// Save state to localStorage (debounced via caller)
+function persistState(state: GameState) {
+  try {
+    // Save bloom data + conversation counts, not messages (those are session-based)
+    const toSave = {
+      characterBloom: state.characterBloom,
+      conversationCount: state.conversationCount,
+      bloomTokensEarned: state.bloomTokensEarned,
+    };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(toSave));
+  } catch {
+    // Storage full or unavailable
+  }
+}
+
+export interface BloomEvent {
+  token: BloomToken | null;
+  delta: number;
+  characterId: string;
+  timestamp: number;
+}
 
 export function useGameState() {
-  const [state, setState] = useState<GameState>(createInitialState());
+  const [state, setState] = useState<GameState>(() => {
+    const initial = createInitialState();
+    const persisted = loadPersistedState();
+    if (persisted) {
+      return {
+        ...initial,
+        characterBloom: persisted.characterBloom || initial.characterBloom,
+        conversationCount: persisted.conversationCount || initial.conversationCount,
+        bloomTokensEarned: persisted.bloomTokensEarned || initial.bloomTokensEarned,
+      };
+    }
+    return initial;
+  });
   const [characters, setCharacters] = useState<Character[]>([]);
-  const [days, setDays] = useState<DayContent[]>([]);
-  const [events, setEvents] = useState<WeeklyEvent[]>([]);
   const [loading, setLoading] = useState(true);
   const [aiLoading, setAiLoading] = useState(false);
+  const [lastBloomEvent, setLastBloomEvent] = useState<BloomEvent | null>(null);
   const messageQueueRef = useRef<string[]>([]);
+  const processingRef = useRef(false);
+  const persistTimerRef = useRef<number | null>(null);
 
-  // Load initial data
+  // Load characters + inject initial greeting
   useEffect(() => {
     async function loadData() {
       try {
-        const [chars, daysData, eventsData] = await Promise.all([
-          loadCharacters(),
-          loadDays(),
-          loadEvents(),
-        ]);
+        const chars = await loadCharacters();
         setCharacters(chars);
-        setDays(daysData);
-        setEvents(eventsData);
 
-        // Load initial messages for day 1
-        const day1 = daysData.find(d => d.day === 1);
-        if (day1) {
-          setState(prev => ({
-            ...prev,
-            messages: day1.morning.messages.filter(m => m.characterId !== 'group')
-          }));
-        }
+        // Inject greeting for the default channel on first load
+        setState(prev => {
+          if (prev.messages.length === 0) {
+            const bloomValue = prev.characterBloom[prev.currentChannel] || 0;
+            const greeting = getGreetingMessage(prev.currentChannel, bloomValue);
+            if (greeting) {
+              messageHistoryRef.current[prev.currentChannel] = [greeting];
+              return { ...prev, messages: [greeting] };
+            }
+          }
+          return prev;
+        });
       } catch (error) {
-        console.error('Failed to load game data:', error);
+        console.error('Failed to load characters:', error);
       } finally {
         setLoading(false);
       }
@@ -42,77 +90,146 @@ export function useGameState() {
     loadData();
   }, []);
 
+  // Persist bloom state (debounced)
+  useEffect(() => {
+    if (persistTimerRef.current) clearTimeout(persistTimerRef.current);
+    persistTimerRef.current = window.setTimeout(() => {
+      persistState(state);
+    }, 500);
+  }, [state.characterBloom, state.conversationCount, state.bloomTokensEarned]);
+
   // Process AI message queue
   useEffect(() => {
-    if (messageQueueRef.current.length > 0 && !aiLoading) {
-      const processNext = async () => {
-        const charId = messageQueueRef.current.shift();
-        if (charId) {
-          setAiLoading(true);
-          try {
-            await generateAIResponse(charId);
-          } catch (error) {
-            console.error('AI response error:', error);
-          }
-          setAiLoading(false);
+    if (messageQueueRef.current.length === 0 || processingRef.current) return;
+
+    const processNext = async () => {
+      processingRef.current = true;
+      const charId = messageQueueRef.current.shift();
+      if (!charId) {
+        processingRef.current = false;
+        return;
+      }
+
+      setAiLoading(true);
+      try {
+        const character = characters.find(c => c.id === charId);
+        if (character) {
+          const response = await generateCharacterResponse({
+            character,
+            gameState: state,
+            conversationHistory: state.messages,
+          });
+
+          const newMessage: Message = {
+            id: `ai_${Date.now()}`,
+            characterId: charId,
+            content: response,
+            timestamp: Date.now(),
+          };
+
+          setState(prev => ({
+            ...prev,
+            messages: [...prev.messages, newMessage],
+          }));
         }
-      };
-      processNext();
-    }
-  }, [aiLoading, state.messages]);
-
-  const getCharacter = useCallback((id: string): Character | undefined => {
-    return characters.find(c => c.id === id);
-  }, [characters]);
-
-  const setCurrentChannel = useCallback((channel: string) => {
-    setState(prev => ({ ...prev, currentChannel: channel }));
-  }, []);
-
-  const generateAIResponse = useCallback(async (characterId: string) => {
-    const character = getCharacter(characterId);
-    if (!character) return;
-
-    const response = await generateCharacterResponse({
-      character,
-      gameState: state,
-      conversationHistory: state.messages,
-    });
-
-    const newMessage: Message = {
-      id: `ai_${Date.now()}`,
-      characterId,
-      content: response,
-      timestamp: Date.now(),
+      } catch (error) {
+        console.error('AI response error:', error);
+      }
+      setAiLoading(false);
+      processingRef.current = false;
     };
 
-    setState(prev => ({
-      ...prev,
-      messages: [...prev.messages, newMessage],
-    }));
-  }, [state, getCharacter]);
+    processNext();
+  }, [aiLoading, state.messages, characters, state]);
 
-  const sendPlayerMessage = useCallback(async (message: string) => {
-    const character = getCharacter(state.currentChannel);
-    if (!character || state.currentChannel === 'group') return;
+  // Per-character message history stored separately
+  const messageHistoryRef = useRef<Record<string, Message[]>>({});
 
-    // Add player message
+  const setCurrentChannel = useCallback((channel: string) => {
+    setState(prev => {
+      // Save current messages to history
+      if (prev.currentChannel && prev.messages.length > 0) {
+        messageHistoryRef.current[prev.currentChannel] = prev.messages;
+      }
+
+      // Restore messages for the new channel
+      let restored = messageHistoryRef.current[channel] || [];
+
+      // First visit — inject greeting message
+      if (restored.length === 0) {
+        const bloomValue = prev.characterBloom[channel] || 0;
+        const greeting = getGreetingMessage(channel, bloomValue);
+        if (greeting) {
+          restored = [greeting];
+          messageHistoryRef.current[channel] = restored;
+        }
+      }
+
+      return {
+        ...prev,
+        currentChannel: channel,
+        messages: restored,
+      };
+    });
+  }, []);
+
+  const sendPlayerMessage = useCallback((message: string) => {
+    const charId = state.currentChannel;
+    if (!charId) return;
+
+    // Detect bloom token from player message
+    const convCount = (state.conversationCount[charId] || 0) + 1;
+    const detection = detectBloomToken(message, convCount);
+
+    // Add player message with bloom effect
     const playerMsg: Message = {
       id: `player_${Date.now()}`,
       characterId: 'player',
       content: message,
       timestamp: Date.now(),
       isPlayer: true,
+      bloomEffect: detection.bloomDelta,
     };
 
-    setState(prev => ({
-      ...prev,
-      messages: [...prev.messages, playerMsg],
-    }));
+    setState(prev => {
+      const currentBloom = prev.characterBloom[charId] || 0;
+      const newBloom = Math.max(0, Math.min(100, currentBloom + detection.bloomDelta));
+
+      const newTokens = detection.token
+        ? [...(prev.bloomTokensEarned[charId] || []), detection.token]
+        : prev.bloomTokensEarned[charId] || [];
+
+      return {
+        ...prev,
+        messages: [...prev.messages, playerMsg],
+        characterBloom: {
+          ...prev.characterBloom,
+          [charId]: newBloom,
+        },
+        conversationCount: {
+          ...prev.conversationCount,
+          [charId]: convCount,
+        },
+        bloomTokensEarned: {
+          ...prev.bloomTokensEarned,
+          [charId]: newTokens,
+        },
+      };
+    });
+
+    // Emit bloom event for UI feedback
+    if (detection.bloomDelta !== 0) {
+      setLastBloomEvent({
+        token: detection.token,
+        delta: detection.bloomDelta,
+        characterId: charId,
+        timestamp: Date.now(),
+      });
+    }
 
     // Queue AI response
-    messageQueueRef.current.push(state.currentChannel);
-  }, [state.currentChannel, getCharacter]);
+    messageQueueRef.current.push(charId);
+  }, [state.currentChannel, state.conversationCount]);
 
   const makeChoice = useCallback((choice: Choice, _messageId: string) => {
     setState(prev => {
@@ -124,69 +241,17 @@ export function useGameState() {
       return newState;
     });
 
-    // Queue AI response for the character's channel
-    const currentChar = getCharacter(state.currentChannel);
-    if (currentChar) {
-      messageQueueRef.current.push(currentChar.id);
-    }
-  }, [state.currentChannel, getCharacter]);
-
-  const advanceTimeOfDay = useCallback(() => {
-    setState(prev => {
-      const newState = advanceTime(prev);
-
-      // Load messages for new time period
-      const dayContent = days.find(d => d.day === newState.day);
-      if (dayContent) {
-        const messages = dayContent[newState.timeOfDay].messages.filter(m =>
-          m.characterId === newState.currentChannel || m.characterId === 'group'
-        );
-        return { ...newState, messages };
-      }
-
-      return newState;
-    });
-  }, [days]);
-
-  const addConsequence = useCallback((content: string, type: string, relatedCharacter?: string) => {
-    const consequence: ConsequenceItem = {
-      id: `c_${Date.now()}`,
-      type: type as ConsequenceItem['type'],
-      content,
-      timestamp: Date.now(),
-      relatedCharacter,
-    };
-    setState(prev => ({
-      ...prev,
-      consequences: [consequence, ...prev.consequences].slice(0, 20),
-    }));
-  }, []);
-
-  const getMessagesForCurrentChannel = useCallback((): Message[] => {
-    const dayContent = days.find(d => d.day === state.day);
-    if (!dayContent) return [];
-
-    const phase = dayContent[state.timeOfDay];
-    return phase.messages.filter(m =>
-      m.characterId === state.currentChannel ||
-      m.characterId === 'group' ||
-      (state.currentChannel === 'group' && !characters.find(c => c.id === m.characterId))
-    );
-  }, [days, state.day, state.timeOfDay, state.currentChannel, characters]);
+    messageQueueRef.current.push(state.currentChannel);
+  }, [state.currentChannel]);
 
   return {
     state,
     characters,
-    days,
-    events,
     loading,
     aiLoading,
-    getCharacter,
+    lastBloomEvent,
     setCurrentChannel,
     makeChoice,
-    advanceTimeOfDay,
-    addConsequence,
-    getMessagesForCurrentChannel,
     sendPlayerMessage,
   };
 }

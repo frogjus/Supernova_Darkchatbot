@@ -1,0 +1,125 @@
+/* ==========================================
+   Dark Decay — Vignette + Pixel Corruption
+   The void is eating the edges of the pink.
+   Small pixel blocks flash and vanish like
+   data rot in a retro game.
+   ========================================== */
+
+.dark-decay {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 50;
+}
+
+/* ---- Layer 1: Vignette ---- */
+/* Dark purple gradient consuming the screen edges.
+   The pink world is being swallowed by void. */
+
+.decay-vignette {
+  position: absolute;
+  inset: 0;
+  opacity: var(--vignette-strength, 0);
+  transition: opacity 2s ease;
+  background:
+    /* Top edge */
+    linear-gradient(
+      to bottom,
+      rgba(26, 5, 20, 0.7) 0%,
+      rgba(42, 10, 31, 0.3) var(--vignette-spread, 15%),
+      transparent calc(var(--vignette-spread, 15%) + 10%)
+    ),
+    /* Bottom edge */
+    linear-gradient(
+      to top,
+      rgba(26, 5, 20, 0.6) 0%,
+      rgba(42, 10, 31, 0.25) var(--vignette-spread, 15%),
+      transparent calc(var(--vignette-spread, 15%) + 10%)
+    ),
+    /* Left edge */
+    linear-gradient(
+      to right,
+      rgba(26, 5, 20, 0.5) 0%,
+      rgba(42, 10, 31, 0.2) var(--vignette-spread, 15%),
+      transparent calc(var(--vignette-spread, 15%) + 8%)
+    ),
+    /* Right edge */
+    linear-gradient(
+      to left,
+      rgba(26, 5, 20, 0.5) 0%,
+      rgba(42, 10, 31, 0.2) var(--vignette-spread, 15%),
+      transparent calc(var(--vignette-spread, 15%) + 8%)
+    );
+  /* Slow breathing — the darkness pulses */
+  animation: vignetteBreathe 6s ease-in-out infinite;
+}
+
+@keyframes vignetteBreathe {
+  0%, 100% { filter: brightness(1); }
+  50% { filter: brightness(1.15); }
+}
+
+/* ---- Layer 2: Pixel Corruption ---- */
+/* Small blocks that flash near the edges like
+   data corruption in a retro game cartridge */
+
+.decay-corruption {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.corruption-block {
+  position: absolute;
+  display: block;
+  animation: corruptionFlash 0.8s steps(3) forwards;
+}
+
+/* Randomly pick from a few dark colors for variety */
+.corruption-block:nth-child(3n) {
+  background: rgba(106, 27, 154, 0.5);
+}
+
+.corruption-block:nth-child(3n+1) {
+  background: rgba(42, 10, 31, 0.6);
+}
+
+.corruption-block:nth-child(3n+2) {
+  background: rgba(156, 39, 176, 0.35);
+}
+
+/* Occasional block is a bright glitch — hot pink error pixel */
+.corruption-block:nth-child(7n) {
+  background: rgba(255, 20, 147, 0.4);
+}
+
+@keyframes corruptionFlash {
+  0% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  15% {
+    opacity: 0.9;
+    transform: scale(1);
+  }
+  40% {
+    opacity: 0.7;
+    transform: scale(1.1);
+  }
+  70% {
+    opacity: 0.4;
+    transform: scale(0.8);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0);
+  }
+}
+
+/* ---- Mobile ---- */
+@media (max-width: 480px) {
+  .decay-vignette {
+    /* Reduce spread so it doesn't eat too much content */
+    --vignette-spread: 8% !important;
+  }
+}

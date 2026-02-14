@@ -1,0 +1,82 @@
+/* ==========================================
+   Pixel Props — Ambient floating decorations
+   Butterflies, keys, hearts, stars drifting
+   at the edges like dreamcore pixel art.
+
+   DARK DECAY: At low bloom, cute props swap
+   to broken versions — roses wilt, hearts
+   crack, chains replace ribbons.
+   ========================================== */
+
+.pixel-props {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  overflow: hidden;
+}
+
+.pixel-prop {
+  position: absolute;
+  opacity: 0;
+  animation: propDrift ease-in-out infinite;
+  filter: drop-shadow(0 0 4px var(--pink-glow));
+  transition: filter 2s ease;
+}
+
+/* Dark mode props — purple glow instead of pink */
+.pixel-prop.prop-dark {
+  filter: drop-shadow(0 0 6px rgba(106, 27, 154, 0.4));
+}
+
+@keyframes propDrift {
+  0%, 100% {
+    opacity: 0;
+    transform: translateY(0) rotate(0deg) scale(0.8);
+  }
+  15% {
+    opacity: 0.25;
+  }
+  50% {
+    opacity: 0.35;
+    transform: translateY(-15px) rotate(8deg) scale(1);
+  }
+  85% {
+    opacity: 0.2;
+  }
+}
+
+/* Dark props drift more erratically */
+.pixel-props.dark .pixel-prop {
+  animation-name: propDriftDark;
+}
+
+@keyframes propDriftDark {
+  0%, 100% {
+    opacity: 0;
+    transform: translateY(0) rotate(0deg) scale(0.8);
+  }
+  10% {
+    opacity: 0.3;
+    transform: translateY(2px) rotate(-3deg) scale(0.9);
+  }
+  30% {
+    opacity: 0.2;
+    transform: translateY(-8px) rotate(5deg) scale(0.85);
+  }
+  50% {
+    opacity: 0.4;
+    transform: translateY(-12px) rotate(-2deg) scale(1);
+  }
+  70% {
+    opacity: 0.15;
+    transform: translateY(-6px) rotate(8deg) scale(0.9);
+  }
+}
+
+/* Hide on very small screens — props would crowd the content */
+@media (max-width: 480px) {
+  .pixel-props {
+    display: none;
+  }
+}

@@ -1,68 +1,190 @@
+/* ==========================================
+   SUPERNOVA DARKMODE — Design Tokens
+   "A magical girl's phone at 2am"
+   Pink dreamcore × 16-bit pixel art
+   ========================================== */
+
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
+  /* Backgrounds — warm pink world */
+  --bg-blush: #FFF0F5;
+  --bg-surface: #FFE4EE;
+  --bg-raised: #FFD6E8;
+  --bg-deep: #FFCCE0;
+  --bg-overlay: rgba(255, 240, 245, 0.92);
 
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  /* The darkness lives in the characters, not the UI */
+  --bg-void: #2A0A1F;
+  --bg-night: #1A0514;
 
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  /* Pinks — Primary */
+  --pink-hot: #FF69B4;
+  --pink-soft: #FFB6C1;
+  --pink-pale: #FFD1DC;
+  --pink-deep: #FF1493;
+  --pink-glow: rgba(255, 105, 180, 0.25);
+  --pink-glow-strong: rgba(255, 105, 180, 0.5);
+
+  /* Purples — Secondary */
+  --purple-deep: #6A1B9A;
+  --purple-mid: #9C27B0;
+  --purple-light: #CE93D8;
+  --purple-pale: #E8D5F0;
+  --purple-glow: rgba(156, 39, 176, 0.2);
+
+  /* Text — dark berry on pink */
+  --text-primary: #4A0028;
+  --text-secondary: #880044;
+  --text-muted: #B85C8A;
+  --text-soft: #D4849F;
+  --text-on-dark: #FFE4F0;
+
+  /* Borders — pixel-sharp */
+  --border-primary: #FF69B4;
+  --border-secondary: #FFB6C1;
+  --border-accent: #9C27B0;
+  --border-light: #FFD1DC;
+
+  /* Character Colors */
+  --color-miho: #FF6B9D;
+  --color-sohee: #4CAF50;
+  --color-sujin: #9C27B0;
+  --color-hyunju: #FF8A65;
+
+  /* Typography
+     Pixelify Sans — round pixel-style display font (titles, labels, UI chrome)
+     DotGothic16 — round CJK pixel font (messages, dialog text — lives inside pixel windows) */
+  --font-display: 'Pixelify Sans', 'Press Start 2P', cursive;
+  --font-body: 'DotGothic16', 'VT323', monospace;
+
+  /* Display font — titles, labels, tab names, UI chrome */
+  --text-display-xs: 11px;
+  --text-display-sm: 13px;
+  --text-display-base: 15px;
+  --text-display-lg: 18px;
+  --text-display-xl: 24px;
+  --text-display-2xl: 32px;
+
+  /* Body font — chat messages, dialog text, everything inside pixel windows
+     DotGothic16 is a round pixel font — needs slightly larger sizes for readability */
+  --text-body-sm: 16px;
+  --text-body-base: 18px;
+  --text-body-lg: 22px;
+  --text-body-xl: 26px;
+
+  /* Spacing */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+
+  /* Safe areas (PWA) */
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+
+  color-scheme: light;
 }
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
+/* ---- Reset ---- */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
 }
-a:hover {
-  color: #535bf2;
+
+html, body, #root {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  overscroll-behavior: none;
 }
 
 body {
-  margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
+  background-color: var(--bg-blush);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: var(--text-body-base);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  touch-action: manipulation;
 }
 
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
+/* Pixel rendering for character art */
+img {
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
 }
 
+/* Scrollbar — pixel candy */
+::-webkit-scrollbar {
+  width: 10px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-surface);
+  border-left: 2px solid var(--border-secondary);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--pink-hot);
+  border: 2px solid var(--bg-surface);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--pink-deep);
+}
+
+/* Selection */
+::selection {
+  background: var(--pink-hot);
+  color: white;
+}
+
+/* Button base */
 button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
+  font-family: var(--font-display);
   cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+  border: none;
+  background: none;
+  color: var(--text-primary);
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
+button:focus-visible,
+input:focus-visible {
+  outline: 3px solid var(--pink-hot);
+  outline-offset: 2px;
+}
+
+/* ---- Pixel Border Utilities ---- */
+
+/* Raised pixel panel (buttons, tabs, dialog chrome) */
+.pixel-raised {
+  border: 2px solid var(--border-primary);
+  box-shadow:
+    inset -2px -2px 0 var(--pink-pale),
+    inset 2px 2px 0 white;
+}
+
+/* Sunken pixel panel (inputs, content areas) */
+.pixel-sunken {
+  border: 2px solid var(--pink-soft);
+  box-shadow:
+    inset -2px -2px 0 white,
+    inset 2px 2px 0 var(--pink-pale);
+}
+
+/* ---- Pixel decorative elements ---- */
+.pixel-heart::before {
+  content: '♥';
+  font-size: inherit;
+  color: var(--pink-hot);
+}
+
+/* PWA standalone mode */
+@media (display-mode: standalone) {
+  body {
+    -webkit-user-select: none;
+    user-select: none;
   }
 }

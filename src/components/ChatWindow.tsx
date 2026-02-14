@@ -2,6 +2,7 @@ import { useRef, useEffect, useState } from 'react';
 import type { Message, Character, Choice } from '../types';
 import { CharacterPanel } from './CharacterPanel';
 import { MessageInput } from './MessageInput';
+import { GlitchTitle } from './GlitchTitle';
 import './ChatWindow.css';
 
 interface ChatWindowProps {
@@ -10,9 +11,19 @@ interface ChatWindowProps {
   currentChannel: string;
   onChoiceSelect: (choice: Choice, messageId: string) => void;
   onSendMessage: (message: string) => void;
+  bloomLevel: number;
+  aiLoading?: boolean;
 }
 
-export function ChatWindow({ messages, characters, currentChannel, onChoiceSelect, onSendMessage }: ChatWindowProps) {
+export function ChatWindow({
+  messages,
+  characters,
+  currentChannel,
+  onChoiceSelect,
+  onSendMessage,
+  bloomLevel,
+  aiLoading,
+}: ChatWindowProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
 
@@ -26,23 +37,17 @@ export function ChatWindow({ messages, characters, currentChannel, onChoiceSelec
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  const getCharacter = (id: string): Character | undefined => {
-    if (id === 'group') return undefined;
-    return characters.find(c => c.id === id);
-  };
-
-  const currentCharacter = getCharacter(currentChannel);
-  const isGroupChat = currentChannel === 'group';
+  const currentCharacter = characters.find(c => c.id === currentChannel);
 
   const renderMessage = (message: Message) => {
-    const character = getCharacter(message.characterId);
+    const character = characters.find(c => c.id === message.characterId);
     const isPlayer = message.isPlayer;
     const showChoices = message.choices && message.choices.length > 0;
 
     return (
       <div
         key={message.id}
-        className={`message ${isPlayer ? 'player' : 'character'} ${character ? '' : 'system'}`}
+        className={`message ${isPlayer ? 'player' : 'character'}`}
       >
         {!isPlayer && character && (
           <div className="message-avatar" style={{ borderColor: character.color }}>
@@ -61,17 +66,7 @@ export function ChatWindow({ messages, characters, currentChannel, onChoiceSelec
               {character.name}
             </span>
           )}
-          <div
-            className="message-bubble"
-            style={{
-              backgroundColor: isPlayer
-                ? 'linear-gradient(135deg, #6c5ce7 0%, #5541d7 100%)'
-                : character
-                ? `linear-gradient(135deg, ${character.color}22 0%, ${character.color}11 100%)`
-                : '#1a1a2e',
-              borderColor: character?.color || '#2a2a4a',
-            }}
-          >
+          <div className="message-bubble">
             {message.content}
           </div>
 
@@ -95,34 +90,85 @@ export function ChatWindow({ messages, characters, currentChannel, onChoiceSelec
 
   return (
     <div className={`chat-container ${isMobile ? 'mobile' : 'desktop'}`}>
-      {/* Character Panel - left on desktop, top on mobile */}
-      {!isGroupChat && currentCharacter && (
+      {/* Character Panel */}
+      {currentCharacter && (
         <div className="character-panel-container">
-          <CharacterPanel character={currentCharacter} />
+          <CharacterPanel
+            character={currentCharacter}
+            bloomLevel={bloomLevel}
+          />
         </div>
       )}
 
-      {/* Chat Panel */}
-      <div className="chat-panel">
+      {/* Chat Panel — pixel dialog window */}
+      <div className={`chat-panel ${bloomLevel <= 30 ? 'decayed' : ''}`}>
+        {/* Title bar */}
+        <div className="chat-titlebar">
+          <div className="chat-titlebar-hearts">
+            <span>♥</span>
+            <span>♥</span>
+            <span>♥</span>
+          </div>
+          <GlitchTitle
+            text={currentCharacter ? `${currentCharacter.name.toLowerCase()}_chat.exe` : 'chat.exe'}
+            bloomLevel={bloomLevel}
+            className="chat-titlebar-text"
+          />
+          <div className="chat-titlebar-buttons">
+            <button className="chat-titlebar-btn">—</button>
+            <button className="chat-titlebar-btn">□</button>
+            <button className="chat-titlebar-btn">×</button>
+          </div>
+        </div>
+
+        {/* Messages */}
         <div className="messages-container">
           {messages.length === 0 ? (
             <div className="empty-state">
-              {isGroupChat ? (
-                <p>Group chat is empty. Start talking!</p>
-              ) : (
-                <p>Start a conversation with {currentCharacter?.name}...</p>
-              )}
+              <span className="empty-state-icon">💌</span>
+              <p className="empty-state-text">
+                {currentCharacter
+                  ? `Say something to ${currentCharacter.name}...`
+                  : 'Select a character to begin'}
+              </p>
+              <p className="empty-state-hint">be gentle with them</p>
             </div>
           ) : (
             messages.map(renderMessage)
           )}
+          {/* Typing indicator */}
+          {aiLoading && currentCharacter && (
+            <div className="message character typing">
+              <div className="message-avatar" style={{ borderColor: currentCharacter.color }}>
+                {currentCharacter.avatar ? (
+                  <img src={currentCharacter.avatar} alt={currentCharacter.name} className="avatar-image" />
+                ) : (
+                  <div className="avatar-fallback" style={{ backgroundColor: currentCharacter.color }}>
+                    {currentCharacter.name.charAt(0)}
+                  </div>
+                )}
+              </div>
+              <div className="message-content">
+                <span className="message-sender" style={{ color: currentCharacter.color }}>
+                  {currentCharacter.name}
+                </span>
+                <div className="message-bubble">
+                  <div className="typing-dots">
+                    <span />
+                    <span />
+                    <span />
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
           <div ref={messagesEndRef} />
         </div>
 
+        {/* Input */}
         <MessageInput
           onSend={onSendMessage}
-          disabled={isGroupChat}
-          placeholder={isGroupChat ? "Group chat - select a character first" : `Message ${currentCharacter?.name}...`}
+          placeholder={currentCharacter ? `Message ${currentCharacter.name}...` : 'Type a message...'}
         />
       </div>
     </div>

@@ -1,32 +1,9 @@
-import type { GameState, Character, DayContent, WeeklyEvent, Message, ConsequenceEffect } from '../types';
+import type { GameState, Character, ConsequenceEffect } from '../types';
 
 // Load characters from JSON
 export async function loadCharacters(): Promise<Character[]> {
   const data = await import('../../data/characters/characters.json');
   return data.characters;
-}
-
-// Load days content
-export async function loadDays(): Promise<DayContent[]> {
-  const data = await import('../../data/days/days.json');
-  return data.days as DayContent[];
-}
-
-// Load events
-export async function loadEvents(): Promise<WeeklyEvent[]> {
-  const data = await import('../../data/events/events.json');
-  return data.events as WeeklyEvent[];
-}
-
-// Load consequences
-export async function loadConsequences() {
-  const data = await import('../../data/consequences/consequences.json');
-  return data.consequences;
-}
-
-// Get messages for a specific day and time
-export function getMessagesForPhase(dayContent: DayContent, timeOfDay: 'morning' | 'noon' | 'night'): Message[] {
-  return dayContent[timeOfDay].messages;
 }
 
 // Apply consequences to game state
@@ -37,18 +14,16 @@ export function applyConsequences(
   const newState = { ...state };
 
   consequences.forEach((effect) => {
-    if (effect.target === 'meter' && effect.stat) {
-      const meterKey = effect.stat as keyof typeof newState.meters;
-      if (meterKey in newState.meters) {
-        newState.meters[meterKey] = Math.max(0, Math.min(100, newState.meters[meterKey] + effect.value));
-      }
+    if (effect.target === 'bloom' && effect.characterId) {
+      const current = newState.characterBloom[effect.characterId] || 0;
+      newState.characterBloom = {
+        ...newState.characterBloom,
+        [effect.characterId]: Math.max(0, Math.min(100, current + effect.value)),
+      };
     } else if (effect.target === 'unlock' && effect.targetId) {
       if (!newState.unlockedChannels.includes(effect.targetId)) {
-        newState.unlockedChannels.push(effect.targetId);
+        newState.unlockedChannels = [...newState.unlockedChannels, effect.targetId];
       }
-    } else if (effect.target === 'event') {
-      newState.eventActive = true;
-      newState.eventType = effect.targetId || undefined;
     }
   });
 
@@ -60,89 +35,43 @@ export function createInitialState(): GameState {
   return {
     day: 1,
     timeOfDay: 'morning',
-    meters: {
-      energy: 30,
-      moneyPressure: 70,
-      exposureRisk: 30,
-      teamCohesion: 20,
-      hope: 15,
+    characterBloom: {
+      miho: 8,
+      sohee: 5,
+      sujin: 12,
+      hyunju: 10,
     },
-    characterTrust: {
-      miho: 25,
-      sohee: 15,
-      sujin: 20,
-      hyunju: 30,
-      yuseong: 5,
-    },
-    unlockedChannels: ['miho', 'sohee', 'sujin', 'hyunju', 'group'],
+    unlockedChannels: ['miho', 'sohee', 'sujin', 'hyunju'],
     currentChannel: 'miho',
     choices: [],
     consequences: [],
     messages: [],
-    eventActive: false,
-    redemptionProgress: {
+    conversationCount: {
       miho: 0,
       sohee: 0,
       sujin: 0,
       hyunju: 0,
     },
+    bloomTokensEarned: {
+      miho: [],
+      sohee: [],
+      sujin: [],
+      hyunju: [],
+    },
   };
 }
 
-// Format meter value for display
-export function formatMeter(value: number): string {
-  return `${Math.round(value)}%`;
+// Get the current bloom stage for a character
+export function getBloomStage(character: Character, bloomValue: number) {
+  return character.bloomStages?.find(
+    (stage) => bloomValue >= stage.range[0] && bloomValue <= stage.range[1]
+  ) || character.bloomStages?.[0];
 }
 
-// Get meter color based on value
-export function getMeterColor(value: number, type: 'positive' | 'negative' | 'neutral'): string {
-  if (type === 'positive') {
-    if (value >= 70) return '#4CAF50';
-    if (value >= 40) return '#FFC107';
-    return '#f44336';
-  }
-  if (type === 'negative') {
-    if (value >= 70) return '#f44336';
-    if (value >= 40) return '#FFC107';
-    return '#4CAF50';
-  }
-  return '#2196F3';
-}
-
-// Parse message with character styling
-export function styleMessage(content: string, character: Character | undefined): string {
-  if (!character) return content;
-
-  // Add random common phrase occasionally
-  if (Math.random() < 0.3 && character.speakingStyle.commonPhrases.length > 0) {
-    const phrase = character.speakingStyle.commonPhrases[
-      Math.floor(Math.random() * character.speakingStyle.commonPhrases.length)
-    ];
-    return `${content} ${phrase}`;
-  }
-
-  return content;
-}
-
-// Advance time of day
-export function advanceTime(state: GameState): GameState {
-  const timeOrder: ('morning' | 'noon' | 'night')[] = ['morning', 'noon', 'night'];
-  const currentIndex = timeOrder.indexOf(state.timeOfDay);
-
-  if (currentIndex < 2) {
-    return { ...state, timeOfDay: timeOrder[currentIndex + 1] };
-  }
-
-  // Advance to next day
-  return {
-    ...state,
-    day: state.day + 1,
-    timeOfDay: 'morning',
-  };
-}
-
-// Check if an event should trigger
-export function shouldTriggerEvent(state: GameState, event: WeeklyEvent): boolean {
-  return state.day === event.trigger.day &&
-    (!event.trigger.timeOfDay || state.timeOfDay === event.trigger.timeOfDay);
+// Get bloom level as a fraction of 5 hearts
+export function getBloomHearts(bloomValue: number): { filled: number; partial: boolean } {
+  const heartValue = bloomValue / 20; // Each heart = 20 points
+  const filled = Math.floor(heartValue);
+  const partial = heartValue % 1 >= 0.5;
+  return { filled, partial };
 }

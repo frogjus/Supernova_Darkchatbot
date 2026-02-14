@@ -1,19 +1,23 @@
 import { useEffect, useRef } from 'react';
 import type { Character } from '../types';
+import { BloomMeter } from './BloomMeter';
 import './CharacterPanel.css';
 
 interface CharacterPanelProps {
   character: Character;
+  bloomLevel: number;
 }
 
-export function CharacterPanel({ character }: CharacterPanelProps) {
+const SPARKLE_ICONS = ['✦', '♡', '🦋', '⭐', '✧', '🌸', '💫', '🔑'];
+
+export function CharacterPanel({ character, bloomLevel }: CharacterPanelProps) {
   const floatRef = useRef<HTMLDivElement>(null);
 
-  // Floating animation with subtle parallax
+  // Gentle floating animation
   useEffect(() => {
     let offset = 0;
     let direction = 1;
-    const speed = 0.015;
+    const speed = 0.012;
     const maxOffset = 3;
 
     const animate = () => {
@@ -22,7 +26,7 @@ export function CharacterPanel({ character }: CharacterPanelProps) {
         if (Math.abs(offset) >= maxOffset) {
           direction *= -1;
         }
-        floatRef.current.style.transform = `translateY(${offset}px)`;
+        floatRef.current.style.transform = `translateX(-50%) translateY(${offset}px)`;
       }
       requestAnimationFrame(animate);
     };
@@ -31,33 +35,56 @@ export function CharacterPanel({ character }: CharacterPanelProps) {
     return () => cancelAnimationFrame(frameId);
   }, []);
 
+  // Bloom-dependent saturation: wilted = grayscale, blooming = full color
+  const saturation = Math.min(100, (bloomLevel / 100) * 120 + 20);
+  const brightness = Math.min(110, 70 + (bloomLevel / 100) * 40);
+
+  // Dark decay: show scanlines at low bloom
+  const showScanlines = bloomLevel <= 35;
+  const scanlineOpacity = showScanlines ? Math.max(0, 1 - bloomLevel / 35) * 0.6 : 0;
+
   return (
     <div
       className="character-panel"
       style={{
-        '--glow-color': character.glowColor,
-        '--gradient-start': character.gradientStart,
-        '--gradient-end': character.gradientEnd,
-        '--particle-color': character.particleColor,
+        '--glow-color': character.glowColor || 'rgba(255, 105, 180, 0.3)',
       } as React.CSSProperties}
     >
       {/* Background glow */}
       <div className="character-glow" />
 
-      {/* Particle field */}
-      <div className="character-particles">
-        {Array.from({ length: 12 }).map((_, i) => (
-          <div key={i} className="particle" style={{ '--delay': `${i * 0.3}s` } as React.CSSProperties} />
+      {/* DARK DECAY: Scanline interference at low bloom */}
+      {showScanlines && (
+        <div
+          className="character-scanlines"
+          style={{ opacity: scanlineOpacity }}
+        />
+      )}
+
+      {/* Floating pixel sparkles — more sparkles at higher bloom */}
+      <div className="character-sparkles">
+        {SPARKLE_ICONS.slice(0, Math.max(2, Math.floor(bloomLevel / 15))).map((icon, i) => (
+          <span key={i} className="sparkle" style={{ '--delay': `${i * 0.7}s` } as React.CSSProperties}>
+            {icon}
+          </span>
         ))}
       </div>
 
-      {/* Character container */}
+      {/* Character image — BIG, center */}
       <div className="character-visual" ref={floatRef}>
         <img
           src={character.fullBody}
           alt={character.name}
           className="character-image"
+          style={{
+            filter: `saturate(${saturation}%) brightness(${brightness}%)`,
+          }}
         />
+      </div>
+
+      {/* Bloom meter — top right corner */}
+      <div className="character-bloom-container">
+        <BloomMeter bloomLevel={bloomLevel} />
       </div>
 
       {/* Character info overlay */}

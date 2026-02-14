@@ -1,34 +1,35 @@
 // AI Service for dynamic character responses using Anthropic API
 import type { Character, GameState, Message } from '../types';
+import { getBloomStage } from './helpers';
 
-const ANTHROPIC_API_KEY = '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';
+const ANTHROPIC_API_KEY = import.meta.env.VITE_ANTHROPIC_API_KEY || '';
 const API_URL = 'https://api.anthropic.com/v1/messages';
 
 interface AIGenerateParams {
   character: Character;
   gameState: GameState;
   conversationHistory: Message[];
-  playerChoice?: string;
+  playerMessage?: string;
 }
 
 export async function generateCharacterResponse({
   character,
   gameState,
   conversationHistory,
-  playerChoice,
+  playerMessage,
 }: AIGenerateParams): Promise<string> {
-  // Build context about the character
-  const characterContext = buildCharacterContext(character, gameState);
-
-  // Build conversation history
+  const bloomValue = gameState.characterBloom[character.id] || 0;
+  const bloomStage = getBloomStage(character, bloomValue);
+  const systemPrompt = buildSystemPrompt(character, bloomStage, bloomValue);
   const historyText = buildConversationHistory(conversationHistory, character.id);
 
-  // Build the prompt
-  const systemPrompt = buildSystemPrompt(character, gameState);
+  const userMessage = playerMessage
+    ? `The player says: "${playerMessage}". Respond as ${character.name} would at bloom level ${bloomValue}/100 (stage: ${bloomStage?.name}).`
+    : `Continue the conversation as ${character.name}. You are at bloom level ${bloomValue}/100.`;
 
-  const userMessage = playerChoice
-    ? `The player chose: "${playerChoice}". Respond as ${character.name} would, considering your character's personality, the current game state, and the conversation history.`
-    : `Continue the conversation as ${character.name}. Consider the game state and conversation history.`;
+  if (!ANTHROPIC_API_KEY) {
+    return getFallbackResponse(character, bloomValue);
+  }
 
   try {
     const response = await fetch(API_URL, {
@@ -37,6 +38,7 @@ export async function generateCharacterResponse({
         'Content-Type': 'application/json',
         'x-api-key': ANTHROPIC_API_KEY,
         'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true',
       },
       body: JSON.stringify({
         model: 'claude-3-haiku-20240307',
@@ -45,171 +47,184 @@ export async function generateCharacterResponse({
         messages: [
           {
             role: 'user',
-            content: `${characterContext}\n\n${historyText}\n\n${userMessage}`,
+            content: `${historyText}\n\n${userMessage}`,
           },
         ],
       }),
     });
 
     if (!response.ok) {
-      const error = await response.text();
-      console.error('AI API Error:', error);
-      return getFallbackResponse(character);
+      console.error('AI API Error:', await response.text());
+      return getFallbackResponse(character, bloomValue);
     }
 
     const data = await response.json();
     const content = data.content?.[0]?.text;
 
     if (!content) {
-      return getFallbackResponse(character);
+      return getFallbackResponse(character, bloomValue);
     }
 
-    // Clean and format the response
-    return formatCharacterResponse(content, character);
+    return formatResponse(content);
   } catch (error) {
     console.error('AI Generation Error:', error);
-    return getFallbackResponse(character);
+    return getFallbackResponse(character, bloomValue);
   }
 }
 
-function buildCharacterContext(character: Character, gameState: GameState): string {
-  const trust = gameState.characterTrust[character.id] || 0;
-  const redemptionProgress = gameState.redemptionProgress?.[character.id] || 0;
+function buildSystemPrompt(
+  character: Character,
+  bloomStage: ReturnType<typeof getBloomStage>,
+  bloomValue: number
+): string {
+  const isWilted = bloomValue <= 20;
+  const isBlooming = bloomValue >= 80;
 
-  return `
-Character: ${character.name}
-Personality: ${character.personality}
-Background: ${character.background}
-Current Trust Level: ${trust}%
-Redemption Progress: ${redemptionProgress}%
-Vulnerability: ${character.traits.vulnerability}
-Dark Secret: ${character.traits.darkSecret}
-Redemption Path: ${character.traits.redemptionPath}
+  // Use darkSelf at low bloom, originalSelf at high bloom
+  const selfContext = isWilted
+    ? `You are deep in your DARK SELF:
+- Personality: ${character.darkSelf.personality}
+- Behavior: ${character.darkSelf.behavior}
+- Inner monologue: ${character.darkSelf.innerMonologue}
+- Defense mechanism: ${character.darkSelf.defense}`
+    : isBlooming
+    ? `You are emerging into your ORIGINAL SELF:
+- Personality: ${character.originalSelf.personality}
+- Behavior: ${character.originalSelf.behavior}
+- This is your signature moment: ${character.originalSelf.signatureMoment}`
+    : `You are somewhere between your dark self and original self.
+- Dark tendencies: ${character.darkSelf.behavior}
+- But glimpses of: ${character.originalSelf.personality}`;
 
-Current Game State:
-- Day: ${gameState.day}, Time: ${gameState.timeOfDay}
-- Hope: ${gameState.meters.hope}%
-- Energy: ${gameState.meters.energy}%
-- Money Pressure: ${gameState.meters.moneyPressure}%
-- Team Cohesion: ${gameState.meters.teamCohesion}%
-`;
+  return `You are ${character.name} (${character.fullName}), ${character.age}, ${character.species}.
+MBTI: ${character.mbti}. ${character.tagline}
+
+BACKGROUND: ${character.background}
+
+${selfContext}
+
+CURRENT BLOOM STAGE: ${bloomStage?.name} (${bloomValue}/100)
+${bloomStage ? `- Personality at this stage: ${bloomStage.personality}
+- Speaking style: ${bloomStage.speakingStyle}
+- Will talk about: ${bloomStage.unlockedTopics?.join(', ')}
+- Resistance: ${bloomStage.resistanceBehavior}` : ''}
+
+SPEAKING STYLE: ${character.speakingStyle.style}
+Emotional tone: ${character.speakingStyle.emotionalTone}
+Habits: ${character.speakingStyle.conversationHabits}
+Signature phrases: ${character.speakingStyle.signaturePhrases?.join(', ')}
+
+EMOTIONAL LOGIC:
+- Triggers: ${character.emotionalLogic.triggers?.join(', ')}
+- Comfort topics: ${character.emotionalLogic.comfortTopics?.join(', ')}
+- Avoidance topics: ${character.emotionalLogic.avoidanceTopics?.join(', ')}
+- Coping style: ${character.emotionalLogic.copingStyle}
+
+RULES:
+1. Stay IN CHARACTER at all times
+2. Responses must be SHORT (1-3 sentences) — like real text messages
+3. Match your bloom stage — at low bloom, be guarded/broken. At high bloom, show warmth
+4. If bloom < 20: deflect with humor, sarcasm, or silence. Don't open up easily
+5. If bloom 20-60: show cracks. Let small truths slip out. Then pull back
+6. If bloom > 60: be more vulnerable. Share real feelings. Still have bad days
+7. NEVER break character or mention you're an AI
+8. Use your signature phrases naturally
+9. The player is trying to help you heal. Healing is SLOW. Don't trust too easily
+10. You are a broken person who once dreamed of being an idol. That dream died. You're figuring out what's left`;
 }
 
 function buildConversationHistory(messages: Message[], _characterId: string): string {
-  const relevantMessages = messages.slice(-10); // Last 10 messages
+  const recent = messages.slice(-10);
+  if (recent.length === 0) return '';
 
-  return relevantMessages
+  return 'Recent conversation:\n' + recent
     .map((msg) => {
-      const isPlayer = msg.isPlayer;
-      const prefix = isPlayer ? 'Player:' : `${msg.characterId}:`;
-      return `${prefix} ${msg.content}`;
+      const prefix = msg.isPlayer ? 'Player' : msg.characterId;
+      return `${prefix}: ${msg.content}`;
     })
     .join('\n');
 }
 
-function buildSystemPrompt(character: Character, _gameState: GameState): string {
-  const isDarkMode = true;
-
-  return `You are ${character.name} from a dark K-pop noir narrative game called "K-Pop Aftermath".
-
-${isDarkMode ? `
-This is the DARK VERSION where:
-- All the characters have failed in their idol careers
-- They are struggling with trauma, addiction, exploitation, and desperation
-- The player is trying to guide them toward redemption and healing
-- The tone is noir, emotionally heavy, and realistic
-` : ''}
-
-Your speaking style:
-${character.speakingStyle.commonPhrases.map((p) => `- "${p}"`).join('\n')}
-${character.speakingStyle.suffix ? `You often end messages with: ${character.speakingStyle.suffix}` : ''}
-
-IMPORTANT RULES:
-1. Stay IN CHARACTER at all times
-2. Responses should be SHORT (1-3 sentences) - like a real text message
-3. Match the emotional state based on game state (desperate, guarded, hopeful, etc.)
-4. Your responses should reflect your character's current trust level and redemption progress
-5. If trust is low, be more distant/suspicious
-6. If trust is high, be more open/vulnerable
-7. NEVER break character or mention you're an AI
-8. Use your common phrases naturally
-9. The game is about HEALING from industry trauma - be authentic about pain while showing glimpses of hope
-
-Current situation: The group is living together after their careers ended. Yuseong (the antagonist) is trying to manipulate them back into exploitation. The player is trying to help them find healthy paths.
-
-Respond as ${character.name} would in this situation. Keep it natural, emotional, and in character.`;
-}
-
-function formatCharacterResponse(response: string, character: Character): string {
-  // Clean up the response
+function formatResponse(response: string): string {
   let formatted = response.trim();
 
-  // Remove any quotes if present
+  // Remove quotes if wrapped
   if (formatted.startsWith('"') && formatted.endsWith('"')) {
     formatted = formatted.slice(1, -1);
   }
 
-  // Add suffix if appropriate and not already present
-  if (character.speakingStyle.suffix && !formatted.endsWith(character.speakingStyle.suffix)) {
-    // Randomly add suffix 50% of the time
-    if (Math.random() > 0.5) {
-      formatted += character.speakingStyle.suffix;
-    }
-  }
+  // Remove character name prefix if AI added it
+  formatted = formatted.replace(/^[A-Za-z]+:\s*/, '');
 
   // Limit length
-  const maxLength = 280;
-  if (formatted.length > maxLength) {
-    formatted = formatted.slice(0, maxLength - 3) + '...';
+  if (formatted.length > 300) {
+    formatted = formatted.slice(0, 297) + '...';
   }
 
   return formatted;
 }
 
-function getFallbackResponse(character: Character): string {
-  const fallbacks: Record<string, string[]> = {
-    miho: [
-      "lol sorry i kinda zoned out there",
-      "i'm fine!! totally fine!!",
-      "anyway, what were we talking about?",
-    ],
-    sohee: [
-      "...whatever",
-      "sure. ok.",
-      "doesn't matter anyway",
-    ],
-    sujin: [
-      "it's okay, really",
-      "i understand",
-      "if that's what you think is best",
-    ],
-    hyunju: [
-      "got it!! on it!!",
-      "don't worry, i can handle it!!",
-      "leave it to me!!",
-    ],
-    yuseong: [
-      "i understand your hesitation...",
-      "trust me, this is for your own good",
-      "i know a way to help",
-    ],
+function getFallbackResponse(character: Character, bloomValue: number): string {
+  const isWilted = bloomValue <= 20;
+
+  const fallbacks: Record<string, { wilted: string[]; growing: string[] }> = {
+    miho: {
+      wilted: [
+        "lol sorry i kinda zoned out there~",
+        "i'm fine!! totally fine!! why wouldn't i be fine!!",
+        "ahaha anyway let's talk about something else",
+        "...you're still here? weird",
+      ],
+      growing: [
+        "hey... thanks for being here",
+        "i was just thinking about something you said earlier",
+        "do you ever feel like... nevermind, it's stupid",
+      ],
+    },
+    sohee: {
+      wilted: [
+        "...whatever",
+        "sure. ok.",
+        "doesn't matter anyway",
+        "why do you even care",
+      ],
+      growing: [
+        "...i guess that makes sense",
+        "i hadn't thought of it that way",
+        "that's... actually kind of nice to hear",
+      ],
+    },
+    sujin: {
+      wilted: [
+        "it's fine. i can handle it",
+        "i don't need help",
+        "just leave it alone",
+        "i said i'm okay.",
+      ],
+      growing: [
+        "maybe... you have a point",
+        "i want to believe that",
+        "thank you. i mean it",
+      ],
+    },
+    hyunju: {
+      wilted: [
+        "don't worry about me!! i'm great!!",
+        "i can handle it!! i always do!!",
+        "sorry sorry i'll do better!!",
+        "it's my fault, i know",
+      ],
+      growing: [
+        "you know... it's okay to not be perfect",
+        "i'm learning that. slowly",
+        "i don't have to prove anything to you, do i?",
+      ],
+    },
   };
 
-  const options = fallbacks[character.id] || ["..."];
-  return options[Math.floor(Math.random() * options.length)];
-}
+  const charFallbacks = fallbacks[character.id];
+  if (!charFallbacks) return "...";
 
-// Generate a response for when the player sends a message
-export async function generatePlayerResponse(
-  playerMessage: string,
-  character: Character,
-  gameState: GameState,
-  conversationHistory: Message[]
-): Promise<string> {
-  return generateCharacterResponse({
-    character,
-    gameState,
-    conversationHistory,
-    playerChoice: playerMessage,
-  });
+  const options = isWilted ? charFallbacks.wilted : charFallbacks.growing;
+  return options[Math.floor(Math.random() * options.length)];
 }

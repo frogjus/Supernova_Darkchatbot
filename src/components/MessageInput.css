@@ -1,58 +1,67 @@
+/* ==========================================
+   Message Input — Pixel sunken input field
+   ========================================== */
+
 .message-input-container {
   display: flex;
-  gap: 8px;
-  padding: 12px 16px;
-  padding-bottom: max(12px, env(safe-area-inset-bottom));
-  background: linear-gradient(
-    to top,
-    rgba(10, 10, 20, 0.98) 0%,
-    rgba(10, 10, 20, 0.95) 80%,
-    rgba(10, 10, 20, 0.9) 100%
-  );
-  border-top: 1px solid #2a2a4a;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  padding-bottom: max(var(--space-3), env(safe-area-inset-bottom));
+  background: var(--bg-surface);
+  border-top: 2px solid var(--border-secondary);
 }
 
+/* Sunken pixel input */
 .message-input {
   flex: 1;
-  padding: 12px 16px;
-  background: #1a1a2e;
-  border: 1px solid #3a3a5a;
-  border-radius: 24px;
-  color: #e0e0e0;
-  font-size: 14px;
-  font-family: inherit;
+  padding: var(--space-2) var(--space-3);
+  background: white;
+  border: 2px solid var(--pink-soft);
+  box-shadow:
+    inset -2px -2px 0 white,
+    inset 2px 2px 0 var(--pink-pale);
+  font-family: var(--font-body);
+  font-size: var(--text-body-base);
+  color: var(--text-primary);
   outline: none;
-  transition: all 0.2s ease;
+  transition: border-color 0.1s;
 }
 
 .message-input::placeholder {
-  color: #666;
+  color: var(--text-soft);
+  font-family: var(--font-body);
 }
 
 .message-input:focus {
-  border-color: #6c5ce7;
-  box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.2);
+  border-color: var(--pink-hot);
+  box-shadow:
+    inset -2px -2px 0 white,
+    inset 2px 2px 0 var(--pink-pale),
+    0 0 6px var(--pink-glow);
 }
 
 .message-input:disabled {
-  opacity: 0.5;
+  opacity: 0.4;
   cursor: not-allowed;
+  background: var(--bg-raised);
 }
 
+/* Pixel send button — raised */
 .send-button {
   width: 44px;
   height: 44px;
   padding: 0;
-  background: linear-gradient(135deg, #6c5ce7 0%, #5541d7 100%);
-  border: none;
-  border-radius: 50%;
-  color: #fff;
-  cursor: pointer;
+  background: var(--pink-hot);
+  border: 2px solid var(--pink-deep);
+  box-shadow:
+    inset -2px -2px 0 var(--pink-soft),
+    inset 2px 2px 0 white;
+  color: white;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s ease;
   flex-shrink: 0;
+  transition: all 0.1s steps(2);
 }
 
 .send-button svg {
@@ -61,29 +70,34 @@
 }
 
 .send-button:hover:not(:disabled) {
-  transform: scale(1.05);
-  box-shadow: 0 0 15px rgba(108, 92, 231, 0.5);
+  background: var(--pink-deep);
+  box-shadow:
+    inset -2px -2px 0 var(--pink-hot),
+    inset 2px 2px 0 white,
+    0 0 8px var(--pink-glow-strong);
 }
 
 .send-button:active:not(:disabled) {
-  transform: scale(0.95);
+  box-shadow:
+    inset 2px 2px 0 var(--pink-soft),
+    inset -2px -2px 0 white;
 }
 
 .send-button:disabled {
-  opacity: 0.4;
+  opacity: 0.3;
   cursor: not-allowed;
+  background: var(--pink-soft);
 }
 
-/* Desktop */
+/* ---- Desktop ---- */
 @media (min-width: 768px) {
   .message-input-container {
-    padding: 16px 24px;
-    padding-bottom: max(16px, env(safe-area-inset-bottom));
+    padding: var(--space-3) var(--space-4);
+    padding-bottom: max(var(--space-3), env(safe-area-inset-bottom));
   }
 
   .message-input {
-    padding: 14px 20px;
-    font-size: 15px;
+    padding: var(--space-3) var(--space-4);
   }
 
   .send-button {

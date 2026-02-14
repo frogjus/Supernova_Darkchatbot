@@ -1,4 +1,8 @@
-/* Chat container - flex layout for character panel + chat */
+/* ==========================================
+   Chat Window — Pixel dialog boxes
+   ========================================== */
+
+/* Main container */
 .chat-container {
   flex: 1;
   display: flex;
@@ -12,14 +16,13 @@
 }
 
 .chat-container.mobile .character-panel-container {
-  height: 55vh;
+  height: 50vh;
   width: 100%;
   flex-shrink: 0;
 }
 
 .chat-container.mobile .chat-panel {
-  height: 45vh;
-  border-top: 1px solid var(--border-color);
+  height: 50vh;
 }
 
 /* Desktop: character on left, chat on right */
@@ -36,7 +39,7 @@
 .chat-container.desktop .chat-panel {
   flex: 1;
   min-width: 0;
-  border-left: 1px solid #2a2a4a;
+  border-left: 3px solid var(--border-primary);
 }
 
 /* Character panel container */
@@ -45,52 +48,124 @@
   overflow: hidden;
 }
 
-/* Chat panel */
+/* ---- Chat Panel — pixel dialog window ---- */
 .chat-panel {
   display: flex;
   flex-direction: column;
-  background: linear-gradient(180deg, #0a0a14 0%, #12121f 100%);
+  background: var(--bg-blush);
   overflow: hidden;
+  position: relative;
 }
 
+/* Title bar for chat window */
+.chat-titlebar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: linear-gradient(90deg, var(--pink-hot), var(--purple-mid));
+  padding: var(--space-1) var(--space-2);
+  flex-shrink: 0;
+}
+
+.chat-titlebar-hearts {
+  display: flex;
+  gap: 3px;
+  font-size: 10px;
+}
+
+.chat-titlebar-text {
+  font-family: var(--font-display);
+  font-size: var(--text-display-xs);
+  color: white;
+  letter-spacing: 1px;
+  text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.3);
+}
+
+.chat-titlebar-buttons {
+  display: flex;
+  gap: 3px;
+}
+
+.chat-titlebar-btn {
+  width: 14px;
+  height: 14px;
+  background: var(--bg-surface);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-size: 6px;
+  color: var(--text-secondary);
+  line-height: 1;
+  padding: 0;
+}
+
+/* Messages area */
 .messages-container {
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
-  padding: 12px;
+  padding: var(--space-3);
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: var(--space-3);
   -webkit-overflow-scrolling: touch;
+  background: var(--bg-surface);
+  border: 2px solid var(--border-secondary);
+  border-top: none;
+  margin: 0 var(--space-2);
+  box-shadow:
+    inset -2px -2px 0 white,
+    inset 2px 2px 0 var(--pink-pale);
 }
 
+/* Empty state */
 .empty-state {
   display: flex;
   align-items: center;
   justify-content: center;
   height: 100%;
-  color: #666;
-  font-style: italic;
+  flex-direction: column;
+  gap: var(--space-3);
   text-align: center;
-  padding: 20px;
+  padding: var(--space-6);
 }
 
+.empty-state-icon {
+  font-size: 32px;
+  animation: prop-float 3s ease-in-out infinite;
+}
+
+.empty-state-text {
+  font-family: var(--font-body);
+  font-size: var(--text-body-sm);
+  color: var(--text-muted);
+}
+
+.empty-state-hint {
+  font-family: var(--font-display);
+  font-size: var(--text-display-xs);
+  color: var(--text-soft);
+}
+
+@keyframes prop-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+/* ---- Message bubbles as pixel dialog boxes ---- */
 .message {
   display: flex;
-  gap: 8px;
-  max-width: 90%;
-  animation: messageIn 0.3s ease-out;
+  gap: var(--space-2);
+  max-width: 88%;
+  animation: messagePixelIn 0.2s steps(3);
 }
 
-@keyframes messageIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+@keyframes messagePixelIn {
+  0% { opacity: 0; transform: translateY(4px); }
+  33% { opacity: 0.5; }
+  100% { opacity: 1; transform: translateY(0); }
 }
 
 .message.player {
@@ -102,22 +177,14 @@
   align-self: flex-start;
 }
 
-.message.system {
-  align-self: center;
-  max-width: 100%;
-}
-
+/* Avatar — pixel square */
 .message-avatar {
   width: 32px;
   height: 32px;
-  border-radius: 6px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  border: 2px solid var(--border-secondary);
   flex-shrink: 0;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
   overflow: hidden;
-  border: 2px solid;
+  background: var(--bg-raised);
 }
 
 .avatar-image {
@@ -133,156 +200,201 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 700;
-  font-size: 12px;
-  color: #fff;
+  font-family: var(--font-display);
+  font-size: 10px;
+  color: white;
 }
 
+/* Message content */
 .message-content {
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 2px;
 }
 
 .message.player .message-content {
   align-items: flex-end;
 }
 
+/* Sender name */
 .message-sender {
-  font-size: 10px;
-  font-weight: 600;
-  padding-left: 4px;
+  font-family: var(--font-display);
+  font-size: var(--text-display-xs);
+  padding-left: 2px;
+  letter-spacing: 0.5px;
 }
 
+/* Message bubble — pixel dialog box style */
 .message-bubble {
-  padding: 10px 14px;
-  border-radius: 14px;
-  border: 1px solid;
-  line-height: 1.5;
-  font-size: 13px;
-  color: #e0e0e0;
+  padding: var(--space-2) var(--space-3);
+  border: 2px solid var(--border-secondary);
+  font-family: var(--font-body);
+  font-size: var(--text-body-base);
+  color: var(--text-primary);
   word-wrap: break-word;
+  line-height: 1.3;
+  position: relative;
 }
 
-.message.player .message-bubble {
-  border-radius: 14px 14px 4px 14px;
-}
-
+/* Character messages — pink pixel box */
 .message.character .message-bubble {
-  border-radius: 14px 14px 14px 4px;
+  background: white;
+  border-color: var(--border-primary);
+  box-shadow:
+    inset -2px -2px 0 var(--pink-pale),
+    inset 2px 2px 0 white,
+    3px 3px 0 var(--pink-glow);
 }
 
-.message.system .message-bubble {
-  background: transparent !important;
-  border: 1px dashed #444;
-  color: #888;
-  font-style: italic;
-  font-size: 11px;
+/* Player messages — purple pixel box */
+.message.player .message-bubble {
+  background: var(--bg-raised);
+  border-color: var(--purple-light);
+  box-shadow:
+    inset -2px -2px 0 var(--purple-pale),
+    inset 2px 2px 0 white,
+    3px 3px 0 var(--purple-glow);
 }
 
+/* AI typing indicator */
+.message.typing .message-bubble {
+  color: var(--text-muted);
+}
+
+.typing-dots {
+  display: inline-flex;
+  gap: 4px;
+}
+
+.typing-dots span {
+  width: 6px;
+  height: 6px;
+  background: var(--pink-hot);
+  display: block;
+  animation: typingBounce 0.8s steps(2) infinite;
+}
+
+.typing-dots span:nth-child(2) { animation-delay: 0.15s; }
+.typing-dots span:nth-child(3) { animation-delay: 0.3s; }
+
+@keyframes typingBounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+/* ---- Choice buttons ---- */
 .message-choices {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  margin-top: 6px;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
   width: 100%;
 }
 
-.message.player .message-choices {
-  align-items: flex-end;
-}
-
-.message.character .message-choices {
-  align-items: flex-start;
-}
-
 .choice-button {
-  padding: 10px 14px;
-  background: linear-gradient(135deg, #1a1a2e 0%, #252540 100%);
-  border: 1px solid #3a3a5a;
-  border-radius: 8px;
-  color: #e0e0e0;
-  cursor: pointer;
-  font-size: 12px;
+  padding: var(--space-2) var(--space-3);
+  background: var(--bg-raised);
+  border: 2px solid var(--border-primary);
+  box-shadow:
+    inset -2px -2px 0 var(--pink-pale),
+    inset 2px 2px 0 white;
+  font-family: var(--font-body);
+  font-size: var(--text-body-sm);
+  color: var(--text-secondary);
   text-align: left;
-  transition: all 0.15s ease;
+  transition: all 0.1s steps(2);
   max-width: 260px;
-  touch-action: manipulation;
 }
 
 .choice-button:hover {
-  background: linear-gradient(135deg, #2a2a4e 0%, #3a3a6a 100%);
-  border-color: #6c5ce7;
+  background: var(--pink-pale);
+  border-color: var(--pink-hot);
+  color: var(--text-primary);
+  box-shadow:
+    inset -2px -2px 0 var(--pink-soft),
+    inset 2px 2px 0 white,
+    0 0 6px var(--pink-glow);
 }
 
 .choice-button:active {
-  transform: scale(0.98);
-  background: linear-gradient(135deg, #3a3a6a 0%, #4a4a8a 100%);
+  box-shadow:
+    inset 2px 2px 0 var(--pink-pale),
+    inset -2px -2px 0 white;
 }
 
-/* Scrollbar styling */
+/* Scrollbar in messages */
 .messages-container::-webkit-scrollbar {
-  width: 4px;
+  width: 8px;
 }
 
 .messages-container::-webkit-scrollbar-track {
-  background: #0a0a14;
+  background: var(--bg-surface);
 }
 
 .messages-container::-webkit-scrollbar-thumb {
-  background: #2a2a4a;
-  border-radius: 2px;
+  background: var(--pink-soft);
+  border: 2px solid var(--bg-surface);
 }
 
-.messages-container::-webkit-scrollbar-thumb:hover {
-  background: #3a3a5a;
+/* ==========================================
+   DARK DECAY — Chat panel corruption
+   ========================================== */
+
+/* At low bloom, the chat panel gets a faint purple tint */
+.chat-panel.decayed {
+  background: color-mix(in srgb, var(--bg-blush) 85%, var(--purple-pale));
 }
 
-/* Mobile adjustments */
+.chat-panel.decayed .messages-container {
+  background: color-mix(in srgb, var(--bg-surface) 88%, var(--purple-pale));
+  border-color: var(--purple-light);
+}
+
+/* Character message bubbles get subtle purple border at low bloom */
+.chat-panel.decayed .message.character .message-bubble {
+  border-color: color-mix(in srgb, var(--border-primary) 60%, var(--purple-light));
+}
+
+/* Titlebar gradient shifts darker */
+.chat-panel.decayed .chat-titlebar {
+  background: linear-gradient(90deg, var(--purple-mid), var(--purple-deep));
+}
+
+/* ---- Mobile ---- */
 @media (max-width: 767px) {
   .messages-container {
-    padding: 10px 8px;
-    gap: 10px;
+    padding: var(--space-2);
+    gap: var(--space-2);
+    margin: 0 var(--space-1);
   }
 
   .message {
     max-width: 92%;
-    gap: 6px;
+    gap: var(--space-1);
   }
 
   .message-avatar {
     width: 26px;
     height: 26px;
-    font-size: 11px;
   }
 
   .message-bubble {
-    padding: 8px 12px;
-    font-size: 12px;
-    border-radius: 12px;
-  }
-
-  .message.player .message-bubble {
-    border-radius: 12px 12px 4px 12px;
-  }
-
-  .message.character .message-bubble {
-    border-radius: 12px 12px 12px 4px;
+    padding: var(--space-2);
+    font-size: var(--text-body-sm);
   }
 
   .choice-button {
-    padding: 10px 12px;
-    font-size: 11px;
     max-width: 220px;
-    border-radius: 7px;
+    font-size: 18px;
   }
 }
 
-/* Desktop specific adjustments */
+/* ---- Desktop ---- */
 @media (min-width: 768px) {
   .messages-container {
-    padding: 16px;
-    gap: 14px;
+    padding: var(--space-4);
+    gap: var(--space-4);
+    margin: 0 var(--space-3);
   }
 
   .message-avatar {
@@ -291,13 +403,10 @@
   }
 
   .message-bubble {
-    padding: 12px 16px;
-    font-size: 14px;
+    padding: var(--space-3) var(--space-4);
   }
 
   .choice-button {
-    padding: 12px 16px;
-    font-size: 13px;
     max-width: 300px;
   }
 }
