@@ -25,10 +25,10 @@ const SPARKLE_POSITIONS: [string, string][] = [
 
 // Fourth-wall-breaking tagline replacements
 const FOURTH_WALL_LINES: Record<string, string[]> = {
-  miho: ['why are you reading this?', 'she knows you\'re here', 'this is not a game', 'stop staring at her', 'you can\'t save her'],
-  sohee: ['she wrote about you', 'the story doesn\'t end', 'you\'re a character too', 'close this app', 'she already knows the ending'],
-  sujin: ['your screen is cracked', 'she can see your face', 'this isn\'t helping', 'you should be sleeping', 'she practiced this smile for you'],
-  hyunju: ['i drew you', 'you look tired', 'am i cute enough?', 'the canvas remembers', 'stop scrolling'],
+  miho: ['yuseongshin is still here', 'he promised her munyeol', 'this was his design', 'you can\'t undo what he did', 'she doesn\'t know it\'s not real'],
+  sohee: ['he destroyed her father first', 'the debt was the leash', 'yuseongshin chose her because she had nothing', 'close this app before he sees', 'she was never going to be free'],
+  sujin: ['seoha was his puppet', 'he needed her broken', 'yuseongshin erased her on purpose', 'the evidence is still out there', 'she can\'t prove what he did'],
+  hyunju: ['he told her mother she wasn\'t enough', 'yuseongshin feeds on girls like her', 'she\'ll never stop performing for him', 'the approval she wants doesn\'t exist', 'he designed her to break'],
 };
 
 export function CharacterPanel({ character, bloomLevel }: CharacterPanelProps) {

@@ -10,20 +10,20 @@ interface MessageInputProps {
 }
 
 const HAUNTED_PLACEHOLDERS = [
-  "she can't hear you",
-  "why do you keep coming back",
-  "don't trust her",
-  "they're not real",
-  "you can't fix them",
-  "this isn't working",
-  "they don't remember you",
-  "stop pretending you care",
-  "no one asked you to stay",
-  "you're too late",
-  "type something. it won't matter.",
-  "are you sure?",
-  "don't say that",
-  "they already know",
+  "yuseongshin is listening",
+  "he designed this conversation",
+  "they were never going to debut",
+  "you can't undo his work",
+  "the illusion is all they have left",
+  "he collected them when they were broken",
+  "stop pretending you can fix this",
+  "yuseongshin says thank you for playing",
+  "none of this was supposed to be real",
+  "you're part of it now",
+  "he's watching through her eyes",
+  "the dream belongs to him",
+  "type something. he'll read it too.",
+  "you were never meant to find them",
 ];
 
 export function MessageInput({ onSend, disabled, placeholder, bloomLevel = 50 }: MessageInputProps) {

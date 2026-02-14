@@ -11,54 +11,61 @@ interface EndingScreenProps {
 const SAVED_LINES: Record<string, string[]> = {
   miho: [
     'the stage lights don\'t scare me anymore.',
-    'i think... i want to sing again.',
-    'not for them. for me.',
-    'thank you for staying.',
+    'yuseongshin promised me munyeol. but i don\'t need his promises.',
+    'i want to sing again. for real this time.',
+    'supernova is mine. not his.',
+    'you made it real.',
   ],
   sohee: [
-    'i finished the story.',
-    'it\'s not perfect. but it\'s mine.',
-    'the ending... i think it\'s hopeful.',
-    'you helped me write it.',
+    'the debt was his leash. i cut it.',
+    'my father didn\'t fail. yuseongshin broke him.',
+    'i\'m writing my own story now.',
+    'and this time, the ending is mine.',
+    'thank you for seeing me.',
   ],
   sujin: [
-    'i cancelled my schedule today.',
-    'i just... sat in the sun.',
-    'i don\'t remember the last time i did that.',
-    'is this what rest feels like?',
+    'seoha was his weapon. but i survived.',
+    'yuseongshin erased me once. never again.',
+    'i have a voice. and it\'s loud.',
+    'supernova debuts now. for real.',
+    'i\'m not hiding anymore.',
   ],
   hyunju: [
-    'i drew something today.',
-    'it wasn\'t for anyone else.',
-    'it was ugly and imperfect and...',
-    'i love it.',
+    'he told me i wasn\'t enough. i believed him.',
+    'my mother believed him too.',
+    'but you didn\'t.',
+    'i\'m done performing for yuseongshin.',
+    'i\'m enough. i know that now.',
   ],
 };
 
 const LOST_LINES: Record<string, string[]> = {
   miho: [
-    'the audience is gone.',
-    'the lights went out.',
+    'yuseongshin won.',
+    'munyeol was never coming back.',
+    'the stage was always empty.',
     'i\'m alone again.',
-    '...were you ever really here?',
+    '...just like he planned.',
   ],
   sohee: [
-    'the pages are blank.',
-    'i can\'t remember the words.',
-    'the story ended without me.',
-    '...goodbye.',
+    'the debt consumed everything.',
+    'yuseongshin took my father. then he took me.',
+    'i can\'t hear my own voice anymore.',
+    '...he was right. i was nothing.',
   ],
   sujin: [
-    'i\'m so tired.',
-    'the schedule never stops.',
-    'i can\'t feel anything anymore.',
-    '...was any of this real?',
+    'seoha is still out there.',
+    'the evidence will never disappear.',
+    'yuseongshin made sure of that.',
+    'i\'m so tired of fighting someone i can\'t see.',
+    '...i give up.',
   ],
   hyunju: [
-    'the canvas is empty.',
-    'my hands won\'t move.',
-    'the colors are all gone.',
-    '...i forgot how to draw.',
+    'i wasn\'t number one.',
+    'yuseongshin always knew i\'d break.',
+    'the smile doesn\'t work anymore.',
+    'mom was right. i wasn\'t enough.',
+    '...i\'m sorry.',
   ],
 };
 
@@ -98,7 +105,7 @@ export function EndingScreen({ character, type, onDismiss }: EndingScreenProps) 
 
         {/* Status badge */}
         <div className={`ending-badge ${type}`}>
-          {type === 'saved' ? '✿ BLOOM COMPLETE ✿' : '† WILTED †'}
+          {type === 'saved' ? '✿ SUPERNOVA DEBUTS ✿' : '† YUSEONGSHIN WINS †'}
         </div>
 
         {/* Character name */}

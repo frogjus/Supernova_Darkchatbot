@@ -33,10 +33,10 @@ export function ChatWindow({
 
   // Phantom messages — appear briefly then vanish at very low bloom
   const PHANTOM_MESSAGES: Record<string, string[]> = {
-    miho: ['help me', 'i remember what happened', 'don\'t leave me alone with them', 'the stage lights are still on', 'munyeol?'],
-    sohee: ['i can hear it', 'the words won\'t stop', 'this isn\'t real', 'i wrote the ending already', 'nobody reads anymore'],
-    sujin: ['i\'m so tired of being good', 'let me rest', 'it\'s never enough', 'i can\'t hold this together', 'who am i without the schedule'],
-    hyunju: ['am i real?', 'the smile hurts', 'i don\'t want to perform anymore', 'please don\'t look at me', 'i drew something terrible'],
+    miho: ['he promised me munyeol', 'yuseongshin lied', 'the stage was never real', 'i can still hear him laughing', 'help me', 'don\'t leave me alone with him'],
+    sohee: ['he ruined my father', 'the debt was his design', 'yuseongshin took everything', 'this isn\'t real', 'i was bait', 'none of us were supposed to debut'],
+    sujin: ['seoha worked for him', 'the photo was his idea', 'yuseongshin broke me on purpose', 'i\'m so tired of being good', 'he collected broken girls', 'the evidence came from inside'],
+    hyunju: ['he told my mother i wasn\'t enough', 'yuseongshin designed this', 'i was never going to debut', 'the smile hurts', 'he watches through the screen', 'am i even real?'],
   };
 
   useEffect(() => {

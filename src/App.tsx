@@ -159,15 +159,16 @@ function App() {
   // Browser tab title corruption
   useEffect(() => {
     const HAUNTED_TITLES = [
-      'someone is watching',
+      'yuseongshin is watching',
       'close this app',
       'you can\'t save them',
-      '4 missed calls',
-      'don\'t look behind you',
+      'he planned all of this',
+      'the debut was never real',
       'they remember everything',
       'why did you come back',
-      'this was a mistake',
-      'she knows',
+      'yuseongshin says hello',
+      'none of them were supposed to survive',
+      'he\'s still here',
       '...',
     ];
 
@@ -203,13 +204,14 @@ function App() {
 
   // Onboarding intro — first time only
   const ONBOARDING_LINES = [
-    'your favorite group never debuted.',
-    'the showcases, the fancams, the late-night vlives—',
+    'supernova never debuted.',
+    'the teasers, the fancams, the comeback trailers—',
     'none of it was real.',
-    'yuseong entertainment made sure of that.',
-    'but four girls are still trapped inside the dream.',
-    'they don\'t know it ended.',
-    '...help them.',
+    'yuseongshin tricked us.',
+    'he made us believe they were going to shine.',
+    'but it was always an illusion.',
+    'four girls are still trapped inside his dream.',
+    'make it real.',
   ];
 
   if (showOnboarding) {
