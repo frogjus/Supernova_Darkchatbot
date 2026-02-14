@@ -203,11 +203,13 @@ function App() {
 
   // Onboarding intro — first time only
   const ONBOARDING_LINES = [
-    'You found a phone at a bus stop.',
-    'It was still warm.',
-    'There are 4 contacts.',
-    'They seem to be waiting for someone.',
-    '...maybe they\'re waiting for you.',
+    'your favorite group never debuted.',
+    'the showcases, the fancams, the late-night vlives—',
+    'none of it was real.',
+    'yuseong entertainment made sure of that.',
+    'but four girls are still trapped inside the dream.',
+    'they don\'t know it ended.',
+    '...help them.',
   ];
 
   if (showOnboarding) {
