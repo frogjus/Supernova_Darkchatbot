@@ -160,7 +160,17 @@
   max-width: none;
   /* Transparent PNGs — no blend mode needed */
   /* Bloom-dependent saturation — controlled via inline style */
-  transition: filter 1s ease;
+  transition: filter 1s ease, transform 0.5s ease;
+}
+
+/* Happy bloom state — slight glow effect */
+.character-image.happy {
+  animation: happy-glow 3s ease-in-out infinite;
+}
+
+@keyframes happy-glow {
+  0%, 100% { filter: saturate(120%) brightness(110%) drop-shadow(0 0 8px rgba(255, 215, 0, 0.3)); }
+  50% { filter: saturate(130%) brightness(115%) drop-shadow(0 0 16px rgba(255, 105, 180, 0.4)); }
 }
 
 /* Character info overlay at bottom */

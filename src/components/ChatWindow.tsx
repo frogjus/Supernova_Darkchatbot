@@ -117,7 +117,7 @@ export function ChatWindow({
         {!isPlayer && character && (
           <div className="message-avatar" style={{ borderColor: character.color }}>
             {character.avatar ? (
-              <img src={character.avatar} alt={character.name} className={`avatar-image avatar-${character.id}`} />
+              <img src={bloomLevel >= 70 ? `/characters/${character.id.toUpperCase()}_HAPPY.png` : character.avatar} alt={character.name} className={`avatar-image avatar-${character.id}`} />
             ) : (
               <div className="avatar-fallback" style={{ backgroundColor: character.color }}>
                 {character.name.charAt(0)}

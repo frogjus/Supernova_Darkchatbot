@@ -60,6 +60,11 @@ export function CharacterPanel({ character, bloomLevel }: CharacterPanelProps) {
     return () => { if (fourthWallTimer.current) clearTimeout(fourthWallTimer.current); };
   }, [bloomLevel, character.id]);
 
+  // Happy art at high bloom (>= 70)
+  const isHappy = bloomLevel >= 70;
+  const happyImage = `/characters/${character.id.toUpperCase()}_HAPPY.png`;
+  const displayImage = isHappy ? happyImage : character.fullBody;
+
   // Bloom-dependent saturation: wilted = grayscale, blooming = full color
   const saturation = Math.min(100, (bloomLevel / 100) * 120 + 20);
   const brightness = Math.min(110, 70 + (bloomLevel / 100) * 40);
@@ -109,14 +114,16 @@ export function CharacterPanel({ character, bloomLevel }: CharacterPanelProps) {
         ))}
       </div>
 
-      {/* Character image — BIG, center */}
-      <div className={`character-visual ${isHyunju ? '' : 'zoomed'}`}>
+      {/* Character image — BIG, center. Swaps to happy art at high bloom */}
+      <div className={`character-visual ${isHyunju && !isHappy ? '' : 'zoomed'}`}>
         <img
-          src={character.fullBody}
+          src={displayImage}
           alt={character.name}
-          className="character-image"
+          className={`character-image ${isHappy ? 'happy' : ''}`}
           style={{
-            filter: `saturate(${saturation}%) brightness(${brightness}%)`,
+            filter: isHappy
+              ? `saturate(120%) brightness(110%)`
+              : `saturate(${saturation}%) brightness(${brightness}%)`,
           }}
         />
       </div>
