@@ -3,7 +3,7 @@ import type { GameState, Character, ConsequenceEffect } from '../types';
 // Load characters from JSON
 export async function loadCharacters(): Promise<Character[]> {
   const data = await import('../../data/characters/characters.json');
-  return data.characters;
+  return data.characters as unknown as Character[];
 }
 
 // Apply consequences to game state
