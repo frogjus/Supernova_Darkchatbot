@@ -207,7 +207,7 @@ ${getMemoryContext(character.id)}`;
 // Build proper multi-turn messages for the API (alternating user/assistant)
 function buildAPIMessages(
   messages: Message[],
-  characterId: string,
+  _characterId: string,
   playerMessage?: string
 ): Array<{ role: 'user' | 'assistant'; content: string }> {
   const recent = messages.slice(-16); // More context for continuity
