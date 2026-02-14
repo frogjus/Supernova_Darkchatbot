@@ -46,7 +46,7 @@
 
   /* Character Colors */
   --color-miho: #FF6B9D;
-  --color-sohee: #4CAF50;
+  --color-sohee: #7A8FA8;
   --color-sujin: #9C27B0;
   --color-hyunju: #FF8A65;
 
@@ -200,20 +200,20 @@ input:focus-visible {
   --pink-glow: rgba(255, 107, 157, 0.25);
 }
 
-/* Sohee — cool green undertone, muted, withdrawn */
+/* Sohee — cool blue-grey, withdrawn, cold */
 .theme-sohee {
-  --pink-hot: #6DAF7B;
-  --pink-soft: #A8D5B0;
-  --pink-pale: #D0E8D4;
-  --border-primary: #6DAF7B;
-  --border-secondary: #A8D5B0;
-  --bg-blush: #F0F8F2;
-  --bg-surface: #E4F0E7;
-  --bg-raised: #D6E8DA;
-  --bg-deep: #C8E0CE;
-  --pink-glow: rgba(76, 175, 80, 0.2);
-  --text-secondary: #2E5E34;
-  --text-muted: #6B9E72;
+  --pink-hot: #7A8FA8;
+  --pink-soft: #A8B8C8;
+  --pink-pale: #CDD6DE;
+  --border-primary: #7A8FA8;
+  --border-secondary: #A8B8C8;
+  --bg-blush: #F0F3F6;
+  --bg-surface: #E4E9EE;
+  --bg-raised: #D6DCE4;
+  --bg-deep: #C8D0DA;
+  --pink-glow: rgba(122, 143, 168, 0.2);
+  --text-secondary: #3A4A5C;
+  --text-muted: #7088A0;
 }
 
 /* Sujin — deep purple, controlled, precise */

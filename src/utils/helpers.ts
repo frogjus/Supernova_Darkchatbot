@@ -1,9 +1,15 @@
 import type { GameState, Character, ConsequenceEffect } from '../types';
 
-// Load characters from JSON
+// Load characters from JSON, prefixing asset paths with Vite's base
 export async function loadCharacters(): Promise<Character[]> {
   const data = await import('../../data/characters/characters.json');
-  return data.characters as unknown as Character[];
+  const base = import.meta.env.BASE_URL || '/';
+
+  return (data.characters as unknown as Character[]).map(char => ({
+    ...char,
+    avatar: char.avatar.startsWith('/') ? `${base}${char.avatar.slice(1)}` : char.avatar,
+    fullBody: char.fullBody.startsWith('/') ? `${base}${char.fullBody.slice(1)}` : char.fullBody,
+  }));
 }
 
 // Apply consequences to game state
