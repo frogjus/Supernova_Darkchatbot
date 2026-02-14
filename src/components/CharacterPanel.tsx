@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import type { Character } from '../types';
 import { BloomMeter } from './BloomMeter';
+import { CreatorGhosts } from './CreatorGhosts';
 import './CharacterPanel.css';
 
 interface CharacterPanelProps {
@@ -113,6 +114,9 @@ export function CharacterPanel({ character, bloomLevel }: CharacterPanelProps) {
           </span>
         ))}
       </div>
+
+      {/* Creator ghost text — tribute to the makers */}
+      <CreatorGhosts bloomLevel={bloomLevel} characterId={character.id} />
 
       {/* Character image — BIG, center. Swaps to happy art at high bloom */}
       <div className={`character-visual ${isHyunju && !isHappy ? '' : 'zoomed'}`}>
