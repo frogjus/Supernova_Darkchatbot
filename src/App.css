@@ -10,6 +10,9 @@
   background: var(--bg-blush);
   position: relative;
   overflow: hidden;
+  /* Smooth color world transition when switching characters */
+  transition:
+    background-color 0.6s ease;
 }
 
 /* ---- Loading Screen ---- */

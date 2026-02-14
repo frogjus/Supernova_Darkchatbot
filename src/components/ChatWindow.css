@@ -65,6 +65,7 @@
   background: linear-gradient(90deg, var(--pink-hot), var(--purple-mid));
   padding: var(--space-1) var(--space-2);
   flex-shrink: 0;
+  transition: background 0.6s ease;
 }
 
 .chat-titlebar-hearts {

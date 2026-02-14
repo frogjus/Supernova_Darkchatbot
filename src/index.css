@@ -181,6 +181,73 @@ input:focus-visible {
   color: var(--pink-hot);
 }
 
+/* ==========================================
+   Character Color Themes
+   Each character shifts the entire palette.
+   Applied as a class on .app, cascades to
+   every component via CSS custom properties.
+   ========================================== */
+
+/* Miho — warm hot pink (default palette, slight coral shift) */
+.theme-miho {
+  --pink-hot: #FF6B9D;
+  --pink-soft: #FFB0C8;
+  --pink-pale: #FFD4E0;
+  --border-primary: #FF6B9D;
+  --border-secondary: #FFB0C8;
+  --bg-surface: #FFE8F0;
+  --bg-raised: #FFDCE8;
+  --pink-glow: rgba(255, 107, 157, 0.25);
+}
+
+/* Sohee — cool green undertone, muted, withdrawn */
+.theme-sohee {
+  --pink-hot: #6DAF7B;
+  --pink-soft: #A8D5B0;
+  --pink-pale: #D0E8D4;
+  --border-primary: #6DAF7B;
+  --border-secondary: #A8D5B0;
+  --bg-blush: #F0F8F2;
+  --bg-surface: #E4F0E7;
+  --bg-raised: #D6E8DA;
+  --bg-deep: #C8E0CE;
+  --pink-glow: rgba(76, 175, 80, 0.2);
+  --text-secondary: #2E5E34;
+  --text-muted: #6B9E72;
+}
+
+/* Sujin — deep purple, controlled, precise */
+.theme-sujin {
+  --pink-hot: #9C6DBF;
+  --pink-soft: #C9A8E0;
+  --pink-pale: #E0D0F0;
+  --border-primary: #9C6DBF;
+  --border-secondary: #C9A8E0;
+  --bg-blush: #F5F0FA;
+  --bg-surface: #ECE4F5;
+  --bg-raised: #E0D4EE;
+  --bg-deep: #D6C8E8;
+  --pink-glow: rgba(156, 39, 176, 0.2);
+  --text-secondary: #5A2D7A;
+  --text-muted: #9A70B8;
+}
+
+/* Hyunju — warm peach/orange, soft, anxious warmth */
+.theme-hyunju {
+  --pink-hot: #FF8A65;
+  --pink-soft: #FFBB9E;
+  --pink-pale: #FFDACC;
+  --border-primary: #FF8A65;
+  --border-secondary: #FFBB9E;
+  --bg-blush: #FFF5F0;
+  --bg-surface: #FFEDE4;
+  --bg-raised: #FFE0D4;
+  --bg-deep: #FFD4C4;
+  --pink-glow: rgba(255, 138, 101, 0.25);
+  --text-secondary: #8A3A1A;
+  --text-muted: #C07850;
+}
+
 /* PWA standalone mode */
 @media (display-mode: standalone) {
   body {

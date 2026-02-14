@@ -104,13 +104,15 @@ function App() {
     );
   }
 
-  return (
-    <div className="app">
-      {/* Ambient floating pixel props — broken at low bloom */}
-      <PixelProps bloomLevel={state.characterBloom?.[state.currentChannel] ?? 10} />
+  const currentBloom = state.characterBloom?.[state.currentChannel] ?? 10;
 
-      {/* DARK DECAY: Porcelain cracks at low bloom */}
-      <DarkVeins bloomLevel={state.characterBloom?.[state.currentChannel] ?? 10} />
+  return (
+    <div className={`app theme-${state.currentChannel}`}>
+      {/* Ambient floating pixel props — broken at low bloom */}
+      <PixelProps bloomLevel={currentBloom} />
+
+      {/* DARK DECAY: Vignette + pixel corruption at low bloom */}
+      <DarkVeins bloomLevel={currentBloom} />
 
       {/* Bloom feedback toast */}
       <BloomToast event={lastBloomEvent} />
@@ -138,7 +140,7 @@ function App() {
           currentChannel={state.currentChannel}
           onChoiceSelect={makeChoice}
           onSendMessage={sendPlayerMessage}
-          bloomLevel={state.characterBloom?.[state.currentChannel] ?? 10}
+          bloomLevel={currentBloom}
           aiLoading={aiLoading}
         />
       </div>
