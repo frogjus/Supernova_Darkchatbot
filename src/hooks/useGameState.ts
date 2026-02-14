@@ -21,7 +21,6 @@ function loadPersistedState(): Partial<GameState> | null {
 // Save state to localStorage (debounced via caller)
 function persistState(state: GameState) {
   try {
-    // Save bloom data + conversation counts, not messages (those are session-based)
     const toSave = {
       characterBloom: state.characterBloom,
       conversationCount: state.conversationCount,
@@ -38,6 +37,11 @@ export interface BloomEvent {
   delta: number;
   characterId: string;
   timestamp: number;
+}
+
+interface QueueItem {
+  characterId: string;
+  playerMessage?: string;
 }
 
 export function useGameState() {
@@ -58,9 +62,18 @@ export function useGameState() {
   const [loading, setLoading] = useState(true);
   const [aiLoading, setAiLoading] = useState(false);
   const [lastBloomEvent, setLastBloomEvent] = useState<BloomEvent | null>(null);
-  const messageQueueRef = useRef<string[]>([]);
+
+  // Queue stores both character ID and the player's message text
+  const messageQueueRef = useRef<QueueItem[]>([]);
   const processingRef = useRef(false);
   const persistTimerRef = useRef<number | null>(null);
+
+  // Per-character message history stored separately
+  const messageHistoryRef = useRef<Record<string, Message[]>>({});
+
+  // Ref to always have fresh state for async operations
+  const stateRef = useRef(state);
+  stateRef.current = state;
 
   // Load characters + inject initial greeting
   useEffect(() => {
@@ -69,7 +82,6 @@ export function useGameState() {
         const chars = await loadCharacters();
         setCharacters(chars);
 
-        // Inject greeting for the default channel on first load
         setState(prev => {
           if (prev.messages.length === 0) {
             const bloomValue = prev.characterBloom[prev.currentChannel] || 0;
@@ -99,51 +111,60 @@ export function useGameState() {
   }, [state.characterBloom, state.conversationCount, state.bloomTokensEarned]);
 
   // Process AI message queue
-  useEffect(() => {
+  const processQueue = useCallback(async () => {
     if (messageQueueRef.current.length === 0 || processingRef.current) return;
 
-    const processNext = async () => {
-      processingRef.current = true;
-      const charId = messageQueueRef.current.shift();
-      if (!charId) {
-        processingRef.current = false;
-        return;
-      }
-
-      setAiLoading(true);
-      try {
-        const character = characters.find(c => c.id === charId);
-        if (character) {
-          const response = await generateCharacterResponse({
-            character,
-            gameState: state,
-            conversationHistory: state.messages,
-          });
-
-          const newMessage: Message = {
-            id: `ai_${Date.now()}`,
-            characterId: charId,
-            content: response,
-            timestamp: Date.now(),
-          };
-
-          setState(prev => ({
-            ...prev,
-            messages: [...prev.messages, newMessage],
-          }));
-        }
-      } catch (error) {
-        console.error('AI response error:', error);
-      }
-      setAiLoading(false);
+    processingRef.current = true;
+    const item = messageQueueRef.current.shift();
+    if (!item) {
       processingRef.current = false;
-    };
+      return;
+    }
 
-    processNext();
-  }, [aiLoading, state.messages, characters, state]);
+    setAiLoading(true);
+    try {
+      const character = characters.find(c => c.id === item.characterId);
+      if (character) {
+        // Use stateRef for fresh state (avoids stale closure)
+        const freshState = stateRef.current;
 
-  // Per-character message history stored separately
-  const messageHistoryRef = useRef<Record<string, Message[]>>({});
+        const response = await generateCharacterResponse({
+          character,
+          gameState: freshState,
+          conversationHistory: freshState.messages,
+          playerMessage: item.playerMessage,
+        });
+
+        const newMessage: Message = {
+          id: `ai_${Date.now()}`,
+          characterId: item.characterId,
+          content: response,
+          timestamp: Date.now(),
+        };
+
+        setState(prev => ({
+          ...prev,
+          messages: [...prev.messages, newMessage],
+        }));
+      }
+    } catch (error) {
+      console.error('AI response error:', error);
+    }
+    setAiLoading(false);
+    processingRef.current = false;
+
+    // Process next item if queue has more
+    if (messageQueueRef.current.length > 0) {
+      processQueue();
+    }
+  }, [characters]);
+
+  // Trigger queue processing when messages change (new player message added)
+  useEffect(() => {
+    if (messageQueueRef.current.length > 0 && !processingRef.current) {
+      processQueue();
+    }
+  }, [state.messages, processQueue]);
 
   const setCurrentChannel = useCallback((channel: string) => {
     setState(prev => {
@@ -227,8 +248,11 @@ export function useGameState() {
       });
     }
 
-    // Queue AI response
-    messageQueueRef.current.push(charId);
+    // Queue AI response WITH the player's message text
+    messageQueueRef.current.push({
+      characterId: charId,
+      playerMessage: message,
+    });
   }, [state.currentChannel, state.conversationCount]);
 
   const makeChoice = useCallback((choice: Choice, _messageId: string) => {
@@ -241,7 +265,7 @@ export function useGameState() {
       return newState;
     });
 
-    messageQueueRef.current.push(state.currentChannel);
+    messageQueueRef.current.push({ characterId: state.currentChannel });
   }, [state.currentChannel]);
 
   return {
