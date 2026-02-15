@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { createPortal } from 'react-dom';
 import { toggleMute, getMuted } from '../utils/sound';
 import './MuteButton.css';
 
@@ -11,15 +10,13 @@ export function MuteButton() {
     setMuted(nowMuted);
   };
 
-  // Render via portal into document.body so position:fixed works on iOS
-  return createPortal(
+  return (
     <button
       className={`mute-button ${muted ? 'muted' : ''}`}
       onClick={handleToggle}
       title={muted ? 'Unmute' : 'Mute'}
     >
       {muted ? '🔇' : '♪'}
-    </button>,
-    document.body
+    </button>
   );
 }

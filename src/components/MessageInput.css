@@ -5,16 +5,10 @@
 .message-input-container {
   display: flex;
   gap: var(--space-2);
-  padding: var(--space-2) var(--space-3);
-  padding-bottom: max(var(--space-2), env(safe-area-inset-bottom, 0px));
+  padding: var(--space-3);
+  padding-bottom: max(var(--space-3), env(safe-area-inset-bottom));
   background: var(--bg-surface);
   border-top: 2px solid var(--border-secondary);
-  /* Fixed to bottom of viewport — guarantees visibility on all devices */
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  z-index: 100;
 }
 
 /* Sunken pixel input */
@@ -114,12 +108,7 @@
 @media (min-width: 768px) {
   .message-input-container {
     padding: var(--space-3) var(--space-4);
-    /* Align with chat panel — character panel takes 45% on desktop */
-    left: 45%;
-  }
-
-  .message-input-container.full-width {
-    left: 0;
+    padding-bottom: max(var(--space-3), env(safe-area-inset-bottom));
   }
 
   .message-input {

@@ -17,15 +17,15 @@
 }
 
 .chat-container.mobile .character-panel-container {
-  height: 38%;
-  flex-shrink: 0;
+  height: 50vh;
+  height: 50dvh; /* dynamic viewport height — shrinks when keyboard opens */
   width: 100%;
-  overflow: hidden;
+  flex-shrink: 0;
 }
 
 .chat-container.mobile .chat-panel {
-  flex: 1;
-  min-height: 0;
+  height: 50vh;
+  height: 50dvh;
 }
 
 /* Desktop: character on left, chat on right */

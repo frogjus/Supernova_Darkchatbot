@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { ChannelTabs } from './components/ChannelTabs';
 import { ChatWindow } from './components/ChatWindow';
-import { MessageInput } from './components/MessageInput';
 import { BloomToast } from './components/BloomToast';
 import { BloomTransition } from './components/BloomTransition';
 import { PixelProps } from './components/PixelProps';
@@ -352,22 +351,11 @@ function App() {
           characters={characters}
           currentChannel={state.currentChannel}
           onChoiceSelect={makeChoice}
+          onSendMessage={sendPlayerMessage}
           bloomLevel={currentBloom}
           aiLoading={aiLoading}
         />
       </div>
-
-      {/* Message input — rendered OUTSIDE app-main so position:fixed works on iOS */}
-      <MessageInput
-        onSend={sendPlayerMessage}
-        placeholder={isGroupChannel ? 'Message SUPERNOVA...' : (() => {
-          const ch = characters.find(c => c.id === state.currentChannel);
-          return ch ? `Message ${ch.name}...` : 'Type a message...';
-        })()}
-        disabled={aiLoading}
-        bloomLevel={currentBloom}
-        isGroupChat={isGroupChannel}
-      />
     </div>
   );
 }

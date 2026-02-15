@@ -1,6 +1,7 @@
 import { useRef, useEffect, useState, useMemo } from 'react';
 import type { Message, Character, Choice } from '../types';
 import { CharacterPanel } from './CharacterPanel';
+import { MessageInput } from './MessageInput';
 import { GlitchTitle } from './GlitchTitle';
 import { FormattedMessage } from './FormattedMessage';
 import { zalgoify } from '../utils/zalgo';
@@ -12,6 +13,7 @@ interface ChatWindowProps {
   characters: Character[];
   currentChannel: string;
   onChoiceSelect: (choice: Choice, messageId: string) => void;
+  onSendMessage: (message: string) => void;
   bloomLevel: number;
   aiLoading?: boolean;
 }
@@ -21,6 +23,7 @@ export function ChatWindow({
   characters,
   currentChannel,
   onChoiceSelect,
+  onSendMessage,
   bloomLevel,
   aiLoading,
 }: ChatWindowProps) {
@@ -263,6 +266,13 @@ export function ChatWindow({
           <div ref={messagesEndRef} />
         </div>
 
+        {/* Input */}
+        <MessageInput
+          onSend={onSendMessage}
+          placeholder={isGroupChat ? 'Message SUPERNOVA...' : currentCharacter ? `Message ${currentCharacter.name}...` : 'Type a message...'}
+          disabled={aiLoading}
+          bloomLevel={bloomLevel}
+        />
       </div>
     </div>
   );

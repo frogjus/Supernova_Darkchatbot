@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef, type KeyboardEvent } from 'react';
-import { createPortal } from 'react-dom';
 import { playMessageSend } from '../utils/sound';
 import './MessageInput.css';
 
@@ -8,7 +7,6 @@ interface MessageInputProps {
   disabled?: boolean;
   placeholder?: string;
   bloomLevel?: number;
-  isGroupChat?: boolean;
 }
 
 const HAUNTED_PLACEHOLDERS = [
@@ -28,7 +26,7 @@ const HAUNTED_PLACEHOLDERS = [
   "you were never meant to find them",
 ];
 
-export function MessageInput({ onSend, disabled, placeholder, bloomLevel = 50, isGroupChat = false }: MessageInputProps) {
+export function MessageInput({ onSend, disabled, placeholder, bloomLevel = 50 }: MessageInputProps) {
   const [message, setMessage] = useState('');
   const [hauntedText, setHauntedText] = useState<string | null>(null);
   const timerRef = useRef<number | null>(null);
@@ -77,10 +75,8 @@ export function MessageInput({ onSend, disabled, placeholder, bloomLevel = 50, i
 
   const displayPlaceholder = hauntedText || placeholder || "Type your message...";
 
-  // Render via portal into document.body so position:fixed works on iOS
-  // (any ancestor with overflow:hidden + stacking context breaks fixed on iOS Safari)
-  return createPortal(
-    <div className={`message-input-container ${isGroupChat ? 'full-width' : ''}`}>
+  return (
+    <div className="message-input-container">
       <input
         ref={inputRef}
         type="text"
@@ -100,7 +96,6 @@ export function MessageInput({ onSend, disabled, placeholder, bloomLevel = 50, i
           <path d="M22 2L11 13M22 2L15 22L11 13M22 2L2 9L11 13" />
         </svg>
       </button>
-    </div>,
-    document.body
+    </div>
   );
 }
