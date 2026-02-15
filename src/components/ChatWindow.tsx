@@ -28,6 +28,7 @@ export function ChatWindow({
   aiLoading,
 }: ChatWindowProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const [phantomMessage, setPhantomMessage] = useState<string | null>(null);
   const phantomTimerRef = useRef<number | null>(null);
@@ -72,7 +73,14 @@ export function ChatWindow({
   }, []);
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    // Use requestAnimationFrame to ensure DOM has laid out the new content
+    // before scrolling — prevents typing indicator from being hidden behind input
+    requestAnimationFrame(() => {
+      const container = messagesContainerRef.current;
+      if (container) {
+        container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' });
+      }
+    });
   }, [messages, aiLoading]);
 
   const currentCharacter = characters.find(c => c.id === currentChannel);
@@ -197,7 +205,7 @@ export function ChatWindow({
         </div>
 
         {/* Messages */}
-        <div className="messages-container">
+        <div className="messages-container" ref={messagesContainerRef}>
           {messages.length === 0 ? (
             <div className="empty-state">
               <span className="empty-state-icon">💌</span>
