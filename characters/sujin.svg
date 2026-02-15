@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" shape-rendering="crispEdges">
+  <!-- Sujin - transparent background -->
+
+  <!-- Hair (dark green) -->
+  <rect x="14" y="8" width="36" height="14" fill="#2d5a27"/>
+  <rect x="12" y="10" width="2" height="20" fill="#2d5a27"/>
+  <rect x="50" y="10" width="2" height="20" fill="#2d5a27"/>
+
+  <!-- Face (warm olive) -->
+  <rect x="18" y="18" width="28" height="24" fill="#d4c4a8"/>
+
+  <!-- Eyes (gentle, worried) -->
+  <ellipse cx="25" cy="28" rx="4" ry="5" fill="#3d3d3d"/>
+  <ellipse cx="39" cy="28" rx="4" ry="5" fill="#3d3d3d"/>
+  <ellipse cx="26" cy="27" rx="1.5" ry="1.5" fill="#fff"/>
+  <ellipse cx="40" cy="27" rx="1.5" ry="1.5" fill="#fff"/>
+
+  <!-- Eyebrows (slightly worried) -->
+  <rect x="21" y="25" width="8" height="1" fill="#5a5a4a"/>
+  <rect x="35" y="25" width="8" height="1" fill="#5a5a4a"/>
+
+  <!-- Mouth (polite smile) -->
+  <rect x="26" y="36" width="12" height="2" fill="#8b6b5b"/>
+
+  <!-- Outfit -->
+  <rect x="16" y="42" width="32" height="14" fill="#8bc34a"/>
+  <rect x="20" y="44" width="24" height="2" fill="#c5e1a5"/>
+
+  <!-- Details -->
+  <rect x="16" y="12" width="2" height="8" fill="#3d7a37"/>
+  <rect x="46" y="12" width="2" height="8" fill="#3d7a37"/>
+</svg>

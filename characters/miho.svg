@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" shape-rendering="crispEdges">
+  <!-- Miho - transparent background -->
+
+  <!-- Hair (dark pink) -->
+  <rect x="12" y="8" width="40" height="16" fill="#d63384"/>
+  <rect x="8" y="10" width="4" height="20" fill="#d63384"/>
+  <rect x="52" y="10" width="4" height="20" fill="#d63384"/>
+
+  <!-- Face (skin tone) -->
+  <rect x="16" y="20" width="32" height="24" fill="#ffdbac"/>
+
+  <!-- Eyes (big, expressive) -->
+  <ellipse cx="24" cy="30" rx="5" ry="6" fill="#2d2d2d"/>
+  <ellipse cx="40" cy="30" rx="5" ry="6" fill="#2d2d2d"/>
+  <ellipse cx="25" cy="29" rx="2" ry="2" fill="#fff"/>
+  <ellipse cx="41" cy="29" rx="2" ry="2" fill="#fff"/>
+
+  <!-- Blush -->
+  <rect x="18" y="34" width="6" height="2" fill="#ffb6c1" opacity="0.6"/>
+  <rect x="40" y="34" width="6" height="2" fill="#ffb6c1" opacity="0.6"/>
+
+  <!-- Mouth (small, forced smile) -->
+  <rect x="28" y="38" width="8" height="2" fill="#c94c4c"/>
+
+  <!-- Outfit -->
+  <rect x="16" y="44" width="32" height="12" fill="#ff6b9d"/>
+  <rect x="20" y="46" width="24" height="2" fill="#ffb8d1"/>
+
+  <!-- Highlights -->
+  <rect x="14" y="12" width="2" height="8" fill="#ff8fab"/>
+  <rect x="48" y="12" width="2" height="8" fill="#ff8fab"/>
+</svg>
