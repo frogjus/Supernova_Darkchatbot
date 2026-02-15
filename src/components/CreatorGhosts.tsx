@@ -19,7 +19,8 @@ let ghostIdCounter = 0;
 // CREATOR GHOST LINES — each character speaks TO creators in their own voice
 // Organized by bloom tier: despair → pain → bittersweet → healing → gratitude
 // No dialogues exist in the series — story team wrote narrative, not lines
-// 은빈 hasn't produced a game yet. 제나 hasn't made an app yet.
+// 은빈 hasn't produced a game yet. Jenna (제나) hasn't made an app yet.
+// Jenna's lines are in English with her English name.
 // ========================================================================
 
 // Bloom tiers: 0-19 = despair, 20-39 = pain, 40-59 = bittersweet, 60-79 = healing, 80-100 = gratitude
@@ -63,9 +64,9 @@ const MIHO_LINES: Record<BloomTier, string[]> = {
     // to 은빈 (game designer — game not yet made)
     '은빈아... 누군가 나를 찾아올 수 있을까...',
     '은빈이가 만들 세계에서는 덜 외로울까...',
-    // to 제나 (planner — app not yet made)
-    '제나야... 누가 나를 기억해줄까...',
-    '제나야 밖에 사람들이 있다는 거... 정말이야...?',
+    // to Jenna (planner — app not yet made)
+    'Jenna... will anyone remember me...',
+    'Jenna... is it true there are people out there...?',
   ],
   pain: [
     '정인아 나 이렇게 매달리는 게 싫은데... 멈출 수가 없어...',
@@ -76,7 +77,7 @@ const MIHO_LINES: Record<BloomTier, string[]> = {
     '영하야 나 뒤돌아볼 때 눈물 떨어지는 거 사람들이 봤을까...',
     '동주야 이 무대 조명 꺼지면 나 어디로 가...',
     '은빈아... 나를 만나줄 사람이 오면 좋겠어...',
-    '제나야... 곧 나갈 수 있는 거야...?',
+    'Jenna... can I go out there soon...?',
     '가은아 이 소품들... 무녈이 준 건 줄 알았는데...',
     '혜미야 울 때도 핑크로 칠하면 안 울고 있는 것 같잖아...',
   ],
@@ -89,7 +90,7 @@ const MIHO_LINES: Record<BloomTier, string[]> = {
     '영하야 내가 고개 돌릴 때 머리카락 날리는 거... 좀 예뻐 ㅋ',
     '동주야 가은아 이 배경 별이 예쁘다...',
     '은빈아 사람들이 나를 좋아해줄까...? 좀 설레',
-    '제나야 곧이지...? 기다리고 있어~',
+    'Jenna~ is it soon...? I\'m waiting~',
     '명훈아 나 웃을 때 보조개 그려줘~ 부탁~',
   ],
   healing: [
@@ -101,7 +102,7 @@ const MIHO_LINES: Record<BloomTier, string[]> = {
     '영하야 내가 춤출 수 있게 해줘서 고마워~ 꼬리도 흔들려!',
     '동주야 가은아 이 세상이 점점 밝아지고 있어~',
     '은빈아 네가 만들 세계가 기대돼~ 미호가 기다리고 있어',
-    '제나야 사람들이 나를 만나면 좋아해줄까~? ㅎㅎ',
+    'Jenna~ will people like me when they meet me~? hehe',
     '명훈아 웃는 내 얼굴이 진짜 얼굴이야 ♡',
   ],
   gratitude: [
@@ -113,7 +114,7 @@ const MIHO_LINES: Record<BloomTier, string[]> = {
     '영하야 움직일 수 있게 해줘서 고마워... 살아있는 기분이야 ♡',
     '동주야 가은아 이 세계를 만들어줘서 고마워 ♡',
     '은빈아 네가 만들 세계에서 사람들이 미호를 만나줄 거야 ♡',
-    '제나야 미호를 세상에 보내줄 준비 해줘서 고마워 ♡',
+    'Jenna, thank you for getting Miho ready for the world ♡',
     '모두 고마워... 미호는 여기서 행복해 ♡',
   ],
 };
@@ -144,8 +145,8 @@ const SOHEE_LINES: Record<BloomTier, string[]> = {
     '가은아... 이 꽃 누구 거야... 내 건 아니지...',
     // to 은빈
     '은빈아... 누가 소희를 선택해줄까...',
-    // to 제나
-    '제나야... 나 같은 애를 누가 만나고 싶어하겠어...',
+    // to Jenna
+    'Jenna... who would want to meet someone like me...',
   ],
   pain: [
     '정인아... 아빠가 나쁜 사람이 아닌데... 왜...',
@@ -156,7 +157,7 @@ const SOHEE_LINES: Record<BloomTier, string[]> = {
     '영하야... 나 걸을 때 발이 무거워...',
     '동주야 가은아... 이 방에서 나가고 싶어...',
     '은빈아... 소희도 살아날 수 있을까...',
-    '제나야... 기다리고 있어... 천천히 해도 돼...',
+    'Jenna... I\'m waiting... take your time...',
   ],
   bittersweet: [
     '정인아... 내 이야기가 슬프기만 한 건 아니지...?',
@@ -166,7 +167,7 @@ const SOHEE_LINES: Record<BloomTier, string[]> = {
     '영하야... 오늘은 좀 걸을 수 있을 것 같아...',
     '동주야... 이 방에 빛이 들어오네...',
     '은빈아... 소희를 만나줄 사람이 있을까...',
-    '제나야... 조금 기대해도 될까...',
+    'Jenna... is it okay to hope a little...',
     '가은아... 이 꽃... 예쁘다...',
   ],
   healing: [
@@ -177,7 +178,7 @@ const SOHEE_LINES: Record<BloomTier, string[]> = {
     '영하야 소희가 걸을 수 있어... 고마워',
     '동주야 가은아... 이 세상이 밝아져서 좋아...',
     '은빈아 기다리고 있어... 소희도 만날 수 있게...',
-    '제나야... 고마워. 소희를 생각해줘서...',
+    'Jenna... thank you. for thinking of Sohee...',
     '명훈아... 나 웃는 얼굴도 있어... 고마워',
   ],
   gratitude: [
@@ -188,7 +189,7 @@ const SOHEE_LINES: Record<BloomTier, string[]> = {
     '영하야 소희가 움직일 수 있게 해줘서 고마워 ♡',
     '동주야 가은아 이 세계를 만들어줘서 고마워 ♡',
     '은빈아 네가 만들 곳에서 소희도 빛날 수 있을 거야 ♡',
-    '제나야 소희를 세상에 보내줄 준비 해줘서 고마워 ♡',
+    'Jenna, thank you for getting Sohee ready for the world ♡',
     '다들... 고마워... 소희는 괜찮아 ♡',
   ],
 };
@@ -219,8 +220,8 @@ const SUJIN_LINES: Record<BloomTier, string[]> = {
     '가은아 이 마이크... 더 이상 잡기 싫어...',
     // to 은빈
     '은빈아 누가 수진이 편 들어줄까...',
-    // to 제나
-    '제나야... 아직인 거 알아... 근데 빨리 나가고 싶어...',
+    // to Jenna
+    'Jenna... I know it\'s not ready yet... but I want out...',
   ],
   pain: [
     '정인아 내가 강한 척하는 거 알잖아... 좀 쉬게 해줘',
@@ -230,7 +231,7 @@ const SUJIN_LINES: Record<BloomTier, string[]> = {
     '영하야 싸울 때 빼고는 나 움직이지도 않잖아...',
     '동주야 가은아 여기서 나가는 문 좀 그려줘...',
     '은빈아 수진이도 쉴 수 있는 곳 만들어줘...',
-    '제나야 기다리고 있어... 답답하지만...',
+    'Jenna, I\'m waiting... it\'s frustrating but...',
     '정인아 억울한 건 참을 수 있는데... 외로운 건 못 참겠어...',
   ],
   bittersweet: [
@@ -241,7 +242,7 @@ const SUJIN_LINES: Record<BloomTier, string[]> = {
     '영하야 내 펀치 모션 멋있긴 해 ㅋ',
     '동주야 이 연습실 좀 넓어진 것 같아?',
     '은빈아 수진이를 써줄 사람이 있을까... 좀 궁금해',
-    '제나야 아직이지? 알겠어. 기다릴게',
+    'Jenna, not yet right? got it. I\'ll wait',
     '가은아 이 장갑 소품 좀 멋있다 ㅋ',
   ],
   healing: [
@@ -252,7 +253,7 @@ const SUJIN_LINES: Record<BloomTier, string[]> = {
     '영하야 내가 일어서는 모션... 좀 멋있어',
     '동주야 가은아 이 무대 위에 서니까 좋다',
     '은빈아 수진이를 만나줄 사람들이 기다려져',
-    '제나야 고마워 수진이를 기억해줘서',
+    'Jenna, thanks for remembering Sujin',
   ],
   gratitude: [
     '정인아 수진이를 써줘서 고마워. 억울했지만 내 이야기야 ♡',
@@ -262,7 +263,7 @@ const SUJIN_LINES: Record<BloomTier, string[]> = {
     '영하야 수진이가 싸울 수 있게 해줘서 고마워 ♡',
     '동주야 가은아 수진이 무대를 만들어줘서 고마워 ♡',
     '은빈아 네가 만들 곳에서 수진이도 기다리고 있을게 ♡',
-    '제나야 수진이를 세상에 보내줄 준비 해줘서 고마워 ♡',
+    'Jenna, thank you for getting Sujin ready for the world ♡',
     '다들 고마워. 수진이는 안 부러져 ♡',
   ],
 };
@@ -295,8 +296,8 @@ const HYUNJU_LINES: Record<BloomTier, string[]> = {
     '가은아... 이 리본이 목을 조르는 것 같아...',
     // to 은빈
     '은빈아... 사람들이 현주 보고 웃기만 하면... 슬플 것 같아...',
-    // to 제나
-    '제나야... 현주를 진짜로 봐줄 사람이 있을까...',
+    // to Jenna
+    'Jenna... is there anyone who will truly see Hyunju...',
   ],
   pain: [
     '정인아!! ...아 미안 습관이야... 정인아... 힘들어...',
@@ -306,7 +307,7 @@ const HYUNJU_LINES: Record<BloomTier, string[]> = {
     '영하야 나 멈추면 안 돼? 잠깐만이라도...',
     '동주야 가은아 조용한 곳 하나만 만들어줘...',
     '은빈아 현주를 이해해줄 사람이 올까...',
-    '제나야... 준비할 때 현주 잊지 말아줘...',
+    'Jenna... don\'t forget Hyunju when you\'re getting ready...',
     '정인아 밝은 척하는 게 이렇게 무거운 건 줄 몰랐어...',
   ],
   bittersweet: [
@@ -317,7 +318,7 @@ const HYUNJU_LINES: Record<BloomTier, string[]> = {
     '영하야 오늘은 뛰고 싶어서 뛰는 거야!! 진짜야!!',
     '동주야 가은아 이 배경 꽃이 예쁘다!! 진짜!!',
     '은빈아 현주를 좋아해줄 사람이 있으면 좋겠다!!',
-    '제나야 기다리고 있어!! 진짜로!!',
+    'Jenna I\'m waiting!! for real!!',
   ],
   healing: [
     '정인아 현주가 진짜로 웃을 수 있게 해줘서 고마워!!',
@@ -327,7 +328,7 @@ const HYUNJU_LINES: Record<BloomTier, string[]> = {
     '영하야 현주가 뛰어다닐 수 있게 해줘서 고마워!!',
     '동주야 가은아 이 세상이 밝아!! 고마워!!',
     '은빈아 네가 만들 곳에서 현주가 뛰어놀 거야!!',
-    '제나야 현주를 세상에 보내줄 준비 해줘서 고마워!!',
+    'Jenna, thank you for getting Hyunju ready for the world!!',
   ],
   gratitude: [
     '정인아 현주를 써줘서 고마워... 진짜 고마워 ♡♡',
@@ -337,7 +338,7 @@ const HYUNJU_LINES: Record<BloomTier, string[]> = {
     '영하야 현주가 살아 움직이게 해줘서 고마워!! ♡♡',
     '동주야 가은아 현주 세상을 만들어줘서 고마워!! ♡',
     '은빈아 현주를 만나줄 사람들이 올 거야!! 기다려!! ♡',
-    '제나야 현주를 세상에 보내줄 준비 해줘서 고마워!! ♡♡',
+    'Jenna, thank you for getting Hyunju ready for the world!! ♡♡',
     '다들 고마워!! 현주는 이제 진짜로 행복해!! ♡♡♡',
   ],
 };
