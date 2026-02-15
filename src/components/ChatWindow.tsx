@@ -27,7 +27,6 @@ export function ChatWindow({
   bloomLevel,
   aiLoading,
 }: ChatWindowProps) {
-  const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const [phantomMessage, setPhantomMessage] = useState<string | null>(null);
@@ -72,17 +71,26 @@ export function ChatWindow({
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  // Auto-scroll to bottom when messages change or AI starts/stops typing.
+  // Uses ResizeObserver to also catch viewport changes (keyboard dismiss on
+  // mobile, window resize) that invalidate a previous scroll position.
   useEffect(() => {
-    // Double rAF ensures browser has fully laid out new content (typing indicator,
-    // new messages) before we scroll. Single rAF can fire before layout completes.
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        const container = messagesContainerRef.current;
-        if (container) {
-          container.scrollTop = container.scrollHeight;
-        }
-      });
-    });
+    const container = messagesContainerRef.current;
+    if (!container) return;
+
+    const scrollToBottom = () => {
+      container.scrollTop = container.scrollHeight;
+    };
+
+    // Scroll immediately for the state change that triggered this effect
+    scrollToBottom();
+
+    // Also re-scroll whenever the container resizes — this catches keyboard
+    // dismiss, viewport rotation, dynamic toolbar changes on mobile Safari, etc.
+    const observer = new ResizeObserver(scrollToBottom);
+    observer.observe(container);
+
+    return () => observer.disconnect();
   }, [messages, aiLoading]);
 
   const currentCharacter = characters.find(c => c.id === currentChannel);
@@ -273,7 +281,6 @@ export function ChatWindow({
               </div>
             </div>
           )}
-          <div ref={messagesEndRef} />
         </div>
 
         {/* Input */}
