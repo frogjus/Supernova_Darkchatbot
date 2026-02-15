@@ -14,6 +14,35 @@
   z-index: 10;
 }
 
+/* Scroll fade indicators — hint at more tabs offscreen */
+.channel-tabs::before,
+.channel-tabs::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 24px;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.channel-tabs::before {
+  left: 0;
+  background: linear-gradient(to right, var(--bg-surface), transparent);
+}
+
+.channel-tabs::after {
+  right: 0;
+  background: linear-gradient(to left, var(--bg-surface), transparent);
+}
+
+/* Show right fade by default (most users start scrolled left) */
+.channel-tabs.has-overflow::after {
+  opacity: 1;
+}
+
 .channel-tabs-inner {
   display: flex;
   gap: var(--space-2);

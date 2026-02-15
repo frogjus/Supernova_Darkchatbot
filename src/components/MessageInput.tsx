@@ -30,6 +30,7 @@ export function MessageInput({ onSend, disabled, placeholder, bloomLevel = 50 }:
   const [message, setMessage] = useState('');
   const [hauntedText, setHauntedText] = useState<string | null>(null);
   const timerRef = useRef<number | null>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   // Haunted placeholder flicker at low bloom
   useEffect(() => {
@@ -60,6 +61,8 @@ export function MessageInput({ onSend, disabled, placeholder, bloomLevel = 50 }:
       playMessageSend();
       onSend(message.trim());
       setMessage('');
+      // Return focus to input after sending
+      requestAnimationFrame(() => inputRef.current?.focus());
     }
   };
 
@@ -75,6 +78,7 @@ export function MessageInput({ onSend, disabled, placeholder, bloomLevel = 50 }:
   return (
     <div className="message-input-container">
       <input
+        ref={inputRef}
         type="text"
         className={`message-input ${hauntedText ? 'haunted' : ''}`}
         value={message}

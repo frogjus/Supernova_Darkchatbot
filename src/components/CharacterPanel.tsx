@@ -124,6 +124,7 @@ export function CharacterPanel({ character, bloomLevel }: CharacterPanelProps) {
           src={displayImage}
           alt={character.name}
           className={`character-image ${isHappy ? 'happy' : ''}`}
+          onLoad={(e) => { (e.target as HTMLImageElement).style.opacity = '1'; }}
           style={{
             filter: isHappy
               ? `saturate(120%) brightness(110%)`

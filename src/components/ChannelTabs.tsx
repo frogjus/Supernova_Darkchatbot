@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import type { Character, CharacterBloom } from '../types';
 import './ChannelTabs.css';
 
@@ -35,9 +35,24 @@ export function ChannelTabs({ characters, currentChannel, onSelectChannel, chara
     }
   }, [groupUnlocked, wasUnlocked]);
 
+  // Scroll overflow detection for fade indicators
+  const innerRef = useRef<HTMLDivElement>(null);
+  const [hasOverflow, setHasOverflow] = useState(false);
+
+  const checkOverflow = useCallback(() => {
+    const el = innerRef.current;
+    if (el) setHasOverflow(el.scrollWidth > el.clientWidth);
+  }, []);
+
+  useEffect(() => {
+    checkOverflow();
+    window.addEventListener('resize', checkOverflow);
+    return () => window.removeEventListener('resize', checkOverflow);
+  }, [checkOverflow, characters.length, groupUnlocked]);
+
   return (
-    <div className="channel-tabs">
-      <div className="channel-tabs-inner">
+    <div className={`channel-tabs ${hasOverflow ? 'has-overflow' : ''}`}>
+      <div className="channel-tabs-inner" ref={innerRef}>
         {characters.map(character => {
           const isActive = currentChannel === character.id;
           const bloom = characterBloom?.[character.id] ?? 50;

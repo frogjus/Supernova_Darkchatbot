@@ -158,7 +158,9 @@
   object-position: top center;
   background: none;
   max-width: none;
-  /* Transparent PNGs — no blend mode needed */
+  /* Fade in when loaded */
+  opacity: 0;
+  transition: opacity 0.5s ease-in;
   /* Bloom-dependent saturation — controlled via inline style */
   transition: filter 1s ease, transform 0.5s ease;
 }
