@@ -73,13 +73,15 @@ export function ChatWindow({
   }, []);
 
   useEffect(() => {
-    // Use requestAnimationFrame to ensure DOM has laid out the new content
-    // before scrolling — prevents typing indicator from being hidden behind input
+    // Double rAF ensures browser has fully laid out new content (typing indicator,
+    // new messages) before we scroll. Single rAF can fire before layout completes.
     requestAnimationFrame(() => {
-      const container = messagesContainerRef.current;
-      if (container) {
-        container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' });
-      }
+      requestAnimationFrame(() => {
+        const container = messagesContainerRef.current;
+        if (container) {
+          container.scrollTop = container.scrollHeight;
+        }
+      });
     });
   }, [messages, aiLoading]);
 
