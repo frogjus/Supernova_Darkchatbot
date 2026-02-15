@@ -11,6 +11,7 @@ import { EndingScreen } from './components/EndingScreen';
 import { useGameState } from './hooks/useGameState';
 import { initAudio, startAmbient, setMusicBloom, playTabSwitch, playBloomUp, playBloomDown } from './utils/sound';
 import { initConsoleEasterEggs } from './utils/consoleEasterEggs';
+import { initEasterEggs, updateBloomEasterEggs } from './utils/easterEggs';
 import './App.css';
 
 // Bloom stage thresholds
@@ -101,6 +102,7 @@ function App() {
         initAudio();
         startAmbient();
         initConsoleEasterEggs();
+        initEasterEggs();
       }
     };
     window.addEventListener('click', handleInteraction, { once: true });
@@ -202,6 +204,7 @@ function App() {
   const currentBloomForMusic = state.characterBloom?.[state.currentChannel] ?? 10;
   useEffect(() => {
     setMusicBloom(currentBloomForMusic);
+    updateBloomEasterEggs(currentBloomForMusic);
   }, [currentBloomForMusic]);
 
   // Onboarding intro — first time only
