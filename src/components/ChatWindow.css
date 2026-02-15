@@ -17,15 +17,14 @@
 }
 
 .chat-container.mobile .character-panel-container {
-  height: 50vh;
-  height: 50dvh; /* dynamic viewport height — shrinks when keyboard opens */
+  flex: 2;        /* 40% of available space (after ChannelTabs) */
+  min-height: 0;
   width: 100%;
-  flex-shrink: 0;
 }
 
 .chat-container.mobile .chat-panel {
-  height: 50vh;
-  height: 50dvh;
+  flex: 3;        /* 60% of available space — gives chat ~20% more room */
+  min-height: 0;
 }
 
 /* Desktop: character on left, chat on right */
