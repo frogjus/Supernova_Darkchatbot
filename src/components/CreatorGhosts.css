@@ -28,11 +28,14 @@
   text-align: right;
 }
 
-/* ---- Ghost text — no name label, just the line ---- */
+/* ---- Ghost text — dark outline for legibility, glow stays pretty ---- */
 .creator-ghost-text {
   display: block;
   font-family: var(--font-display);
   letter-spacing: 0.5px;
+  -webkit-text-stroke: 0.5px rgba(0, 0, 0, 0.7);
+  paint-order: stroke fill;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.8));
 }
 
 /* ================================================================
@@ -112,6 +115,22 @@
   text-shadow:
     0 0 6px #FF69B4,
     0 0 16px rgba(255, 105, 180, 0.7),
+    0 0 32px rgba(255, 215, 0, 0.3);
+}
+
+/* Story Support (영재) — neon coral rose */
+.creator-ghost.haunting.role-story2 .creator-ghost-text {
+  color: #FFAB91;
+  text-shadow:
+    0 0 4px #FF7043,
+    0 0 12px rgba(255, 112, 67, 0.6),
+    0 0 24px rgba(255, 138, 101, 0.3);
+}
+.creator-ghost.grateful.role-story2 .creator-ghost-text {
+  color: #FFF3E0;
+  text-shadow:
+    0 0 6px #FF8A65,
+    0 0 16px rgba(255, 138, 101, 0.7),
     0 0 32px rgba(255, 215, 0, 0.3);
 }
 
