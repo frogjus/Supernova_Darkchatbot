@@ -247,6 +247,37 @@
     right: auto;
     left: var(--space-2);
   }
+
+  /* Bigger character — head always visible, cut at feet */
+  .character-visual {
+    top: 0;
+    height: 120%;
+  }
+
+  .character-visual.zoomed {
+    height: 135%;
+  }
+
+  /* Compact info overlay */
+  .character-info {
+    padding: var(--space-2);
+    padding-bottom: max(var(--space-2), env(safe-area-inset-bottom));
+  }
+
+  .character-name {
+    font-size: 18px;
+    letter-spacing: 2px;
+  }
+
+  .character-tagline {
+    font-size: 10px;
+    margin-top: 2px;
+  }
+
+  .character-accent-line {
+    width: 30px;
+    margin-top: var(--space-1);
+  }
 }
 
 /* ==========================================

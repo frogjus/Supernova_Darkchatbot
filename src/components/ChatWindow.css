@@ -17,13 +17,13 @@
 }
 
 .chat-container.mobile .character-panel-container {
-  flex: 3;        /* ~30% of available space */
+  flex: 7;        /* ~35% of available space */
   min-height: 0;
   width: 100%;
 }
 
 .chat-container.mobile .chat-panel {
-  flex: 7;        /* ~70% of available space — prioritize chat on mobile */
+  flex: 13;       /* ~65% of available space */
   min-height: 0;
 }
 
