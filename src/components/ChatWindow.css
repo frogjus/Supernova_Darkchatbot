@@ -110,8 +110,6 @@
   overflow-y: auto;
   overflow-x: hidden;
   padding: var(--space-3);
-  /* Extra bottom padding so last messages aren't hidden behind fixed input */
-  padding-bottom: 70px;
   display: flex;
   flex-direction: column;
   gap: var(--space-3);

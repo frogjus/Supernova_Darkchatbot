@@ -225,6 +225,8 @@
   flex-direction: column;
   position: relative;
   overflow: hidden;
+  /* Reserve space for the fixed message input bar (portalled to body) */
+  margin-bottom: 60px;
   min-height: 0;
   transition: opacity 0.25s steps(5);
 }
