@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { ChannelTabs } from './components/ChannelTabs';
 import { ChatWindow } from './components/ChatWindow';
+import { MessageInput } from './components/MessageInput';
 import { BloomToast } from './components/BloomToast';
 import { BloomTransition } from './components/BloomTransition';
 import { PixelProps } from './components/PixelProps';
@@ -100,16 +101,18 @@ function App() {
       if (!audioInitRef.current) {
         audioInitRef.current = true;
         initAudio();
-        startAmbient();
+        // Delay startAmbient slightly to let iOS finish unlocking the context
+        setTimeout(() => startAmbient(), 100);
         initConsoleEasterEggs();
         initEasterEggs();
       }
     };
+    // Use touchend for iOS — it's the most reliable gesture for audio unlock
+    window.addEventListener('touchend', handleInteraction, { once: true });
     window.addEventListener('click', handleInteraction, { once: true });
-    window.addEventListener('touchstart', handleInteraction, { once: true });
     return () => {
+      window.removeEventListener('touchend', handleInteraction);
       window.removeEventListener('click', handleInteraction);
-      window.removeEventListener('touchstart', handleInteraction);
     };
   }, []);
 
@@ -349,11 +352,22 @@ function App() {
           characters={characters}
           currentChannel={state.currentChannel}
           onChoiceSelect={makeChoice}
-          onSendMessage={sendPlayerMessage}
           bloomLevel={currentBloom}
           aiLoading={aiLoading}
         />
       </div>
+
+      {/* Message input — rendered OUTSIDE app-main so position:fixed works on iOS */}
+      <MessageInput
+        onSend={sendPlayerMessage}
+        placeholder={isGroupChannel ? 'Message SUPERNOVA...' : (() => {
+          const ch = characters.find(c => c.id === state.currentChannel);
+          return ch ? `Message ${ch.name}...` : 'Type a message...';
+        })()}
+        disabled={aiLoading}
+        bloomLevel={currentBloom}
+        isGroupChat={isGroupChannel}
+      />
     </div>
   );
 }

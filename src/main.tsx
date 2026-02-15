@@ -3,6 +3,18 @@ import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App.tsx'
 
+// Mobile viewport height fix — sets --app-height to the ACTUAL visible height.
+// This is the battle-tested fix for iOS Safari where 100vh includes the URL bar.
+function setAppHeight() {
+  document.documentElement.style.setProperty('--app-height', `${window.innerHeight}px`);
+}
+setAppHeight();
+window.addEventListener('resize', setAppHeight);
+// Also fire on orientation change (some iOS versions need this)
+window.addEventListener('orientationchange', () => {
+  setTimeout(setAppHeight, 100);
+});
+
 // Error boundary to catch and display runtime crashes
 class ErrorBoundary extends Component<{ children: ReactNode }, { error: Error | null }> {
   state = { error: null as Error | null };

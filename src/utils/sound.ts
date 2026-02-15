@@ -6,13 +6,35 @@ let isAmbientPlaying = false;
 let musicLoopTimer: number | null = null;
 let currentBloom = 50;
 let masterGain: GainNode | null = null;
+let mediaStreamDest: MediaStreamAudioDestinationNode | null = null;
+let mediaAudioEl: HTMLAudioElement | null = null;
 let isMuted = localStorage.getItem('supernova_muted') === 'true';
+
+// Use webkit prefix for older iOS Safari
+const ACtor = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
 
 function getCtx(): AudioContext {
   if (!audioCtx) {
-    audioCtx = new AudioContext();
+    audioCtx = new ACtor();
     masterGain = audioCtx.createGain();
     masterGain.gain.value = isMuted ? 0 : 1.0;
+
+    // Route audio through MediaStreamDestination → HTML5 <audio> element.
+    // This forces iOS to play through the "media" channel instead of
+    // the "ringer" channel, making sound audible even with the silent switch on.
+    try {
+      mediaStreamDest = audioCtx.createMediaStreamDestination();
+      masterGain.connect(mediaStreamDest);
+      mediaAudioEl = new Audio();
+      mediaAudioEl.setAttribute('playsinline', '');
+      mediaAudioEl.srcObject = mediaStreamDest.stream;
+      mediaAudioEl.volume = 1.0;
+    } catch (_) {
+      // Fallback: connect directly to destination if MediaStream not supported
+      mediaStreamDest = null;
+    }
+
+    // Also connect to normal destination (for browsers where MediaStream isn't needed)
     masterGain.connect(audioCtx.destination);
   }
   return audioCtx;
@@ -23,20 +45,42 @@ function getMaster(): GainNode {
   return masterGain!;
 }
 
-// Resume audio context on first user interaction (browser autoplay policy)
-// iOS Safari requires playing a sound within the gesture handler to unlock audio
-export function initAudio() {
-  const ctx = getCtx();
-  if (ctx.state === 'suspended') {
-    ctx.resume();
+// Ensure the HTML5 audio element is playing (must be called from user gesture)
+function ensureMediaPlaying() {
+  if (mediaAudioEl && mediaAudioEl.paused) {
+    const p = mediaAudioEl.play();
+    if (p) p.catch(() => {});
   }
-  // Play a silent buffer to unlock audio on iOS
-  const buffer = ctx.createBuffer(1, 1, ctx.sampleRate);
-  const source = ctx.createBufferSource();
-  source.buffer = buffer;
-  source.connect(ctx.destination);
-  source.start(0);
 }
+
+// Resume + unlock. Must be called from a user gesture on iOS.
+function unlockAudio() {
+  const ctx = getCtx();
+  // Start the media audio element (routes Web Audio through media channel)
+  ensureMediaPlaying();
+  if (ctx.state === 'suspended') {
+    ctx.resume().then(() => ensureMediaPlaying()).catch(() => {});
+  }
+}
+
+// Persistent listeners keep the audio alive across iOS suspensions.
+let listenersAttached = false;
+
+export function initAudio() {
+  unlockAudio();
+
+  if (!listenersAttached) {
+    listenersAttached = true;
+    const handler = () => unlockAudio();
+    document.addEventListener('touchstart', handler, { passive: true });
+    document.addEventListener('touchend', handler, { passive: true });
+    document.addEventListener('click', handler, { passive: true });
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') unlockAudio();
+    });
+  }
+}
+
 
 // Update bloom for music mood shifts
 export function setMusicBloom(bloom: number) {
@@ -50,6 +94,8 @@ export function toggleMute(): boolean {
   if (masterGain) {
     masterGain.gain.value = isMuted ? 0 : 1.0;
   }
+  // Ensure the media element is playing when unmuting
+  if (!isMuted) ensureMediaPlaying();
   return isMuted;
 }
 
@@ -203,6 +249,16 @@ function scheduleSequence(
 
 function playMusicLoop() {
   const ctx = getCtx();
+  // If context is STILL suspended, wait for user gesture to resume it
+  if (ctx.state === 'suspended') {
+    ctx.resume().then(() => {
+      playMusicLoop();
+    }).catch(() => {
+      // Retry in 1 second — user might tap again
+      setTimeout(playMusicLoop, 1000);
+    });
+    return;
+  }
   const now = ctx.currentTime + 0.1;
   const isDark = currentBloom <= 35;
 
@@ -212,7 +268,8 @@ function playMusicLoop() {
   const beat = isDark ? BEAT_DARK : BEAT_DREAM;
 
   // Melody — triangle wave for soft music-box tone
-  const melodyVol = isDark ? 0.022 : 0.028;
+  // Volumes boosted 4x for mobile phone speakers
+  const melodyVol = isDark ? 0.09 : 0.11;
   const melodyDetune = isDark ? 12 : 0; // detuned = broken music box
   const endTime = scheduleSequence(melody, now, beat, 'triangle', melodyVol, melodyDetune);
 
@@ -220,10 +277,10 @@ function playMusicLoop() {
   scheduleSequence(melody, now + 0.03, beat, 'sine', melodyVol * 0.3, isDark ? -8 : 5);
 
   // Sparkle layer — high tinkling notes like fairy dust
-  scheduleSequence(sparkle, now, beat, 'sine', isDark ? 0.012 : 0.018, isDark ? 6 : 0);
+  scheduleSequence(sparkle, now, beat, 'sine', isDark ? 0.05 : 0.07, isDark ? 6 : 0);
 
   // Bass — soft sine, like a heartbeat underneath the music box
-  const bassVol = isDark ? 0.02 : 0.018;
+  const bassVol = isDark ? 0.08 : 0.07;
   scheduleSequence(bass, now, beat, 'sine', bassVol);
 
   // Pad drone — warm, enveloping, like being inside a snow globe
@@ -241,7 +298,7 @@ function playMusicLoop() {
   drone2.frequency.value = droneFreq * (isDark ? 1.003 : 1.001); // subtle beating
   droneFilter.type = 'lowpass';
   droneFilter.frequency.value = isDark ? 150 : 250;
-  droneGain.gain.value = isDark ? 0.018 : 0.012;
+  droneGain.gain.value = isDark ? 0.06 : 0.05;
   drone.connect(droneFilter);
   drone2.connect(droneFilter);
   droneFilter.connect(droneGain);
@@ -258,9 +315,18 @@ function playMusicLoop() {
 
 export function startAmbient() {
   if (isAmbientPlaying) return;
-  getCtx(); // ensure context
+  const ctx = getCtx();
   isAmbientPlaying = true;
-  playMusicLoop();
+
+  if (ctx.state === 'suspended') {
+    ctx.resume().then(() => {
+      playMusicLoop();
+    }).catch(() => {
+      isAmbientPlaying = false;
+    });
+  } else {
+    playMusicLoop();
+  }
 }
 
 export function stopAmbient() {
@@ -273,26 +339,38 @@ export function stopAmbient() {
 
 // ---- Message Send Click ----
 // Short, soft pixel click
-export function playMessageSend() {
+function playSendSound() {
   const ctx = getCtx();
   const osc = ctx.createOscillator();
   const gain = ctx.createGain();
 
   osc.type = 'square';
   osc.frequency.value = 800;
-  gain.gain.value = 0.06;
-  gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.08);
+  gain.gain.value = 0.15;
+  gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.12);
 
   osc.connect(gain);
-  gain.connect(ctx.destination);
+  gain.connect(getMaster());
   osc.start();
-  osc.stop(ctx.currentTime + 0.08);
+  osc.stop(ctx.currentTime + 0.12);
+}
+
+export function playMessageSend() {
+  const ctx = getCtx();
+  if (ctx.state === 'suspended') {
+    ctx.resume().then(() => {
+      playSendSound();
+    }).catch(() => {});
+  } else {
+    playSendSound();
+  }
 }
 
 // ---- Message Receive ----
 // Soft two-tone chime (like a notification)
-export function playMessageReceive() {
+function playReceiveSound() {
   const ctx = getCtx();
+  const master = getMaster();
 
   const playTone = (freq: number, delay: number) => {
     const osc = ctx.createOscillator();
@@ -303,19 +381,29 @@ export function playMessageReceive() {
     gain.gain.linearRampToValueAtTime(0.05, ctx.currentTime + delay + 0.01);
     gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + delay + 0.15);
     osc.connect(gain);
-    gain.connect(ctx.destination);
+    gain.connect(master);
     osc.start(ctx.currentTime + delay);
     osc.stop(ctx.currentTime + delay + 0.15);
   };
 
-  playTone(660, 0);    // E5
-  playTone(880, 0.08); // A5
+  playTone(660, 0);
+  playTone(880, 0.08);
+}
+
+export function playMessageReceive() {
+  const ctx = getCtx();
+  if (ctx.state === 'suspended') {
+    ctx.resume().then(() => playReceiveSound()).catch(() => {});
+  } else {
+    playReceiveSound();
+  }
 }
 
 // ---- Glitch Sound ----
 // Harsh, distorted burst — like corrupted data
 export function playGlitch() {
   const ctx = getCtx();
+  if (ctx.state === 'suspended') { ctx.resume().catch(() => {}); return; }
   const bufferSize = ctx.sampleRate * 0.15;
   const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
   const data = buffer.getChannelData(0);
@@ -337,7 +425,7 @@ export function playGlitch() {
 
   source.connect(filter);
   filter.connect(gain);
-  gain.connect(ctx.destination);
+  gain.connect(getMaster());
   source.start();
 }
 
@@ -345,6 +433,8 @@ export function playGlitch() {
 // Ascending sparkle — hope
 export function playBloomUp() {
   const ctx = getCtx();
+  if (ctx.state === 'suspended') { ctx.resume().catch(() => {}); return; }
+  const master = getMaster();
   const notes = [523, 659, 784, 1047]; // C5, E5, G5, C6
 
   notes.forEach((freq, i) => {
@@ -357,7 +447,7 @@ export function playBloomUp() {
     gain.gain.linearRampToValueAtTime(0.04, start + 0.02);
     gain.gain.exponentialRampToValueAtTime(0.001, start + 0.2);
     osc.connect(gain);
-    gain.connect(ctx.destination);
+    gain.connect(master);
     osc.start(start);
     osc.stop(start + 0.2);
   });
@@ -367,6 +457,8 @@ export function playBloomUp() {
 // Descending minor — dread
 export function playBloomDown() {
   const ctx = getCtx();
+  if (ctx.state === 'suspended') { ctx.resume().catch(() => {}); return; }
+  const master = getMaster();
   const notes = [440, 370, 311, 262]; // A4, F#4, Eb4, C4
 
   notes.forEach((freq, i) => {
@@ -379,7 +471,7 @@ export function playBloomDown() {
     gain.gain.linearRampToValueAtTime(0.04, start + 0.02);
     gain.gain.exponentialRampToValueAtTime(0.001, start + 0.25);
     osc.connect(gain);
-    gain.connect(ctx.destination);
+    gain.connect(master);
     osc.start(start);
     osc.stop(start + 0.25);
   });
@@ -389,6 +481,7 @@ export function playBloomDown() {
 // Soft tab click
 export function playTabSwitch() {
   const ctx = getCtx();
+  if (ctx.state === 'suspended') { ctx.resume().catch(() => {}); return; }
   const osc = ctx.createOscillator();
   const gain = ctx.createGain();
 
@@ -398,7 +491,7 @@ export function playTabSwitch() {
   gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.05);
 
   osc.connect(gain);
-  gain.connect(ctx.destination);
+  gain.connect(getMaster());
   osc.start();
   osc.stop(ctx.currentTime + 0.05);
 }

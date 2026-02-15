@@ -242,6 +242,13 @@
   z-index: 15;
 }
 
+@media (max-width: 767px) {
+  .character-bloom-container {
+    right: auto;
+    left: var(--space-2);
+  }
+}
+
 /* ==========================================
    DARK DECAY — Scanline interference
    VHS tracking lines at low bloom

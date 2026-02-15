@@ -11,6 +11,10 @@ export default defineConfig({
       registerType: 'autoUpdate',
       devOptions: { enabled: false },
       includeAssets: ['icon.svg'],
+      workbox: {
+        skipWaiting: true,
+        clientsClaim: true,
+      },
       manifest: {
         name: 'SUPERNOVA DARKMODE',
         short_name: 'SUPERNOVA',
