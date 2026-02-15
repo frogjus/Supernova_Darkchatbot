@@ -71,27 +71,58 @@ export function ChatWindow({
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Auto-scroll to bottom when messages change or AI starts/stops typing.
-  // Uses ResizeObserver to also catch viewport changes (keyboard dismiss on
-  // mobile, window resize) that invalidate a previous scroll position.
+  // Auto-scroll to bottom when messages change, AI typing starts/stops,
+  // or phantom messages appear. Three-layer approach:
+  //   1. Immediate scroll + double rAF for layout-safe deferred scroll
+  //   2. MutationObserver: catches any DOM child changes (typing dots, phantoms)
+  //   3. ResizeObserver: catches viewport/keyboard changes on mobile
   useEffect(() => {
     const container = messagesContainerRef.current;
     if (!container) return;
+
+    let rafId1: number;
+    let rafId2: number;
 
     const scrollToBottom = () => {
       container.scrollTop = container.scrollHeight;
     };
 
+    const deferredScrollToBottom = () => {
+      // Double rAF ensures layout is fully computed (critical on mobile Safari)
+      rafId1 = requestAnimationFrame(() => {
+        scrollToBottom();
+        rafId2 = requestAnimationFrame(scrollToBottom);
+      });
+    };
+
     // Scroll immediately for the state change that triggered this effect
     scrollToBottom();
+    // Plus deferred scroll after browser layout completes
+    deferredScrollToBottom();
 
-    // Also re-scroll whenever the container resizes — this catches keyboard
-    // dismiss, viewport rotation, dynamic toolbar changes on mobile Safari, etc.
-    const observer = new ResizeObserver(scrollToBottom);
-    observer.observe(container);
+    // MutationObserver: catches typing indicator / phantom messages appearing
+    // in the DOM even if React batching delays the state-driven scroll
+    const mutationObserver = new MutationObserver(() => {
+      // Only auto-scroll if user hasn't intentionally scrolled up
+      const distanceFromBottom = container.scrollHeight - container.scrollTop - container.clientHeight;
+      if (distanceFromBottom < 150) {
+        deferredScrollToBottom();
+      }
+    });
+    mutationObserver.observe(container, { childList: true, subtree: true });
 
-    return () => observer.disconnect();
-  }, [messages, aiLoading]);
+    // ResizeObserver: catches keyboard dismiss, viewport rotation,
+    // dynamic toolbar changes on mobile Safari
+    const resizeObserver = new ResizeObserver(scrollToBottom);
+    resizeObserver.observe(container);
+
+    return () => {
+      cancelAnimationFrame(rafId1);
+      cancelAnimationFrame(rafId2);
+      mutationObserver.disconnect();
+      resizeObserver.disconnect();
+    };
+  }, [messages, aiLoading, phantomMessage]);
 
   const currentCharacter = characters.find(c => c.id === currentChannel);
 

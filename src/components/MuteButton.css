@@ -1,4 +1,4 @@
-/* Pixel mute toggle — bottom-right corner */
+/* Pixel mute toggle */
 .mute-button {
   position: fixed;
   top: 12px;
@@ -20,6 +20,20 @@
   cursor: pointer;
   transition: all 0.1s steps(2);
   opacity: 0.6;
+}
+
+/* Mobile: move below channel tabs into character panel area */
+@media (max-width: 767px) {
+  .mute-button {
+    top: auto;
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 56px);
+    left: 8px;
+    right: auto;
+    width: 28px;
+    height: 28px;
+    font-size: 12px;
+    opacity: 0.5;
+  }
 }
 
 .mute-button:hover {

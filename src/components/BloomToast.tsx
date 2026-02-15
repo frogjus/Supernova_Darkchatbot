@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import type { BloomEvent } from '../hooks/useGameState';
 import './BloomToast.css';
 
@@ -18,16 +18,18 @@ const TOKEN_LABELS: Record<string, string> = {
 export function BloomToast({ event }: BloomToastProps) {
   const [visible, setVisible] = useState(false);
   const [currentEvent, setCurrentEvent] = useState<BloomEvent | null>(null);
+  const lastTimestampRef = useRef<number>(0);
 
   useEffect(() => {
-    if (event && event.timestamp !== currentEvent?.timestamp) {
+    if (event && event.timestamp !== lastTimestampRef.current) {
+      lastTimestampRef.current = event.timestamp;
       setCurrentEvent(event);
       setVisible(true);
 
       const timer = setTimeout(() => setVisible(false), 2500);
       return () => clearTimeout(timer);
     }
-  }, [event, currentEvent?.timestamp]);
+  }, [event]);
 
   if (!visible || !currentEvent) return null;
 

@@ -17,13 +17,13 @@
 }
 
 .chat-container.mobile .character-panel-container {
-  flex: 2;        /* 40% of available space (after ChannelTabs) */
+  flex: 3;        /* ~30% of available space */
   min-height: 0;
   width: 100%;
 }
 
 .chat-container.mobile .chat-panel {
-  flex: 3;        /* 60% of available space — gives chat ~20% more room */
+  flex: 7;        /* ~70% of available space — prioritize chat on mobile */
   min-height: 0;
 }
 
@@ -441,6 +441,15 @@
 .message-sender.zalgo {
   text-shadow: 0 0 4px currentColor;
   letter-spacing: 1.5px;
+}
+
+/* Scroll safety spacer — ensures the last element (typing indicator, phantom)
+   is never flush against the container bottom edge */
+.messages-container::after {
+  content: '';
+  display: block;
+  min-height: 8px;
+  flex-shrink: 0;
 }
 
 /* ---- Mobile ---- */
