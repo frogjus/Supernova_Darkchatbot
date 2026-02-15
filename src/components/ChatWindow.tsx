@@ -73,7 +73,7 @@ export function ChatWindow({
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
+  }, [messages, aiLoading]);
 
   const currentCharacter = characters.find(c => c.id === currentChannel);
 
