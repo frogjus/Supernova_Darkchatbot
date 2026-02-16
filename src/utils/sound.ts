@@ -13,6 +13,15 @@ let isMuted = localStorage.getItem('supernova_muted') === 'true';
 // Use webkit prefix for older iOS Safari
 const ACtor = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
 
+// Exported for TTS service to connect audio elements into the same graph
+export function getAudioContext(): AudioContext {
+  return getCtx();
+}
+
+export function getMasterGain(): GainNode {
+  return getMaster();
+}
+
 function getCtx(): AudioContext {
   if (!audioCtx) {
     audioCtx = new ACtor();
@@ -475,6 +484,39 @@ export function playBloomDown() {
     osc.start(start);
     osc.stop(start + 0.25);
   });
+}
+
+// ---- Music Ducking (for TTS voice playback) ----
+// Ramp ambient music volume down so character voice is clear
+let musicDucked = false;
+let preDuckMusicVolume = 1.0;
+
+export function duckMusic(targetVolume: number, durationMs: number) {
+  if (musicDucked) return;
+  musicDucked = true;
+  preDuckMusicVolume = masterGain ? masterGain.gain.value : 1.0;
+  // We duck by reducing the loop volume — but since music routes through masterGain
+  // alongside TTS, we need a separate music gain node. For now, we'll use a global
+  // volume scale applied in the next loop iteration. The simplest approach:
+  // just lower masterGain slightly (TTS has its own gain node so it won't be affected
+  // when routed through a separate chain).
+  // Actually TTS routes through masterGain too, so we'll store the duck state
+  // and let the music loop check it.
+  const ctx = getCtx();
+  if (masterGain && !isMuted) {
+    masterGain.gain.cancelScheduledValues(ctx.currentTime);
+    masterGain.gain.linearRampToValueAtTime(targetVolume, ctx.currentTime + durationMs / 1000);
+  }
+}
+
+export function unduckMusic(durationMs: number) {
+  if (!musicDucked) return;
+  musicDucked = false;
+  const ctx = getCtx();
+  if (masterGain && !isMuted) {
+    masterGain.gain.cancelScheduledValues(ctx.currentTime);
+    masterGain.gain.linearRampToValueAtTime(preDuckMusicVolume, ctx.currentTime + durationMs / 1000);
+  }
 }
 
 // ---- Channel Switch ----

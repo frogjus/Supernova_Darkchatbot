@@ -72,6 +72,12 @@ interface QueueItem {
   playerMessage?: string;
 }
 
+// Voice mode ref — when enabled, reduce typing delay (audio IS the delivery)
+let voiceEnabledGlobal = false;
+export function setVoiceEnabled(enabled: boolean) {
+  voiceEnabledGlobal = enabled;
+}
+
 export function useGameState() {
   const [state, setState] = useState<GameState>(() => {
     const initial = createInitialState();
@@ -200,8 +206,10 @@ export function useGameState() {
           systemPromptOverride: groupSystemPrompt,
         });
 
-        // Variable typing delay — longer responses take longer to "type"
-        const typingDelay = Math.min(4000, 800 + response.length * 12);
+        // Variable typing delay — shorter when voice mode is on (audio IS the delivery)
+        const typingDelay = voiceEnabledGlobal
+          ? 500
+          : Math.min(4000, 800 + response.length * 12);
         await new Promise(resolve => setTimeout(resolve, typingDelay));
 
         playMessageReceive();

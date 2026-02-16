@@ -16,6 +16,19 @@ interface ChatWindowProps {
   onSendMessage: (message: string) => void;
   bloomLevel: number;
   aiLoading?: boolean;
+  // Voice mode props
+  isSpeaking?: boolean;
+  speakingCharacterId?: string | null;
+  voiceEnabled?: boolean;
+  onToggleVoice?: () => void;
+  isListening?: boolean;
+  onStartListening?: () => void;
+  onStopListening?: () => void;
+  interimTranscript?: string;
+  sttSupported?: boolean;
+  ttsAvailable?: boolean;
+  sttError?: string | null;
+  onPhantomVoice?: (text: string) => void;
 }
 
 export function ChatWindow({
@@ -26,6 +39,18 @@ export function ChatWindow({
   onSendMessage,
   bloomLevel,
   aiLoading,
+  isSpeaking,
+  speakingCharacterId,
+  voiceEnabled,
+  onToggleVoice,
+  isListening,
+  onStartListening,
+  onStopListening,
+  interimTranscript,
+  sttSupported,
+  ttsAvailable,
+  sttError,
+  onPhantomVoice,
 }: ChatWindowProps) {
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
@@ -52,6 +77,11 @@ export function ChatWindow({
         const pool = PHANTOM_MESSAGES[currentChannel] || PHANTOM_MESSAGES.miho;
         const msg = pool[Math.floor(Math.random() * pool.length)];
         setPhantomMessage(msg);
+
+        // Trigger Yuseongshin voice if voice mode is on
+        if (voiceEnabled && onPhantomVoice) {
+          onPhantomVoice(msg);
+        }
 
         // Vanish after 2-3 seconds
         setTimeout(() => {
@@ -181,6 +211,12 @@ export function ChatWindow({
             </span>
           )}
           <div className="message-bubble">
+            {/* Speaking indicator */}
+            {!isPlayer && isSpeaking && speakingCharacterId === message.characterId && message.id === messages.filter(m => m.characterId === message.characterId).slice(-1)[0]?.id && (
+              <span className="speaking-indicator" title="Speaking...">
+                <span /><span /><span />
+              </span>
+            )}
             {!isPlayer && bloomLevel <= 25 ? (() => {
               const { text: redacted, wasRedacted } = redactMessage(message.content, bloomLevel);
               return (
@@ -320,6 +356,15 @@ export function ChatWindow({
           placeholder={isGroupChat ? 'Message SUPERNOVA...' : currentCharacter ? `Message ${currentCharacter.name}...` : 'Type a message...'}
           disabled={aiLoading}
           bloomLevel={bloomLevel}
+          voiceEnabled={voiceEnabled}
+          onToggleVoice={onToggleVoice}
+          isListening={isListening}
+          onStartListening={onStartListening}
+          onStopListening={onStopListening}
+          interimTranscript={interimTranscript}
+          sttSupported={sttSupported}
+          ttsAvailable={ttsAvailable}
+          sttError={sttError}
         />
       </div>
     </div>

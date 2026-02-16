@@ -8,7 +8,8 @@ import { DarkVeins } from './components/DarkVeins';
 import { ScreenGlitch } from './components/ScreenGlitch';
 import { MuteButton } from './components/MuteButton';
 import { EndingScreen } from './components/EndingScreen';
-import { useGameState } from './hooks/useGameState';
+import { useGameState, setVoiceEnabled } from './hooks/useGameState';
+import { useVoiceMode } from './hooks/useVoiceMode';
 import { initAudio, startAmbient, setMusicBloom, playTabSwitch, playBloomUp, playBloomDown } from './utils/sound';
 import { initConsoleEasterEggs } from './utils/consoleEasterEggs';
 import { initEasterEggs, updateBloomEasterEggs } from './utils/easterEggs';
@@ -39,12 +40,43 @@ function App() {
     sendPlayerMessage,
   } = useGameState();
 
+  // Voice mode
+  const voice = useVoiceMode();
+
+  // Sync voice state to game state typing delay
+  useEffect(() => {
+    setVoiceEnabled(voice.voiceEnabled);
+  }, [voice.voiceEnabled]);
+
+  // Auto-TTS: when AI finishes responding (aiLoading goes false), speak the last message
+  const prevAiLoadingRef = useRef(false);
+  useEffect(() => {
+    if (prevAiLoadingRef.current && !aiLoading && voice.voiceEnabled) {
+      // AI just finished — find the last character message
+      const lastMsg = state.messages[state.messages.length - 1];
+      if (lastMsg && !lastMsg.isPlayer && lastMsg.characterId !== 'system') {
+        const bloom = state.characterBloom?.[lastMsg.characterId] ?? 50;
+        voice.playCharacterVoice(lastMsg.content, lastMsg.characterId, bloom);
+      }
+    }
+    prevAiLoadingRef.current = aiLoading;
+  }, [aiLoading, state.messages, voice]);
+
+  // Wire STT final transcript → auto-send
+  useEffect(() => {
+    voice.setOnFinalTranscript((text: string) => {
+      sendPlayerMessage(text);
+    });
+  }, [voice, sendPlayerMessage]);
+
   // Channel switch transition
   const [switching, setSwitching] = useState(false);
   const pendingChannelRef = useRef<string | null>(null);
 
   const handleChannelSwitch = useCallback((ch: string) => {
     if (ch === state.currentChannel) return;
+    // Stop any voice playback on channel switch
+    voice.stopSpeaking();
     playTabSwitch();
     setSwitching(true);
     pendingChannelRef.current = ch;
@@ -354,6 +386,18 @@ function App() {
           onSendMessage={sendPlayerMessage}
           bloomLevel={currentBloom}
           aiLoading={aiLoading}
+          isSpeaking={voice.isSpeaking}
+          speakingCharacterId={voice.speakingCharacterId}
+          voiceEnabled={voice.voiceEnabled}
+          onToggleVoice={voice.toggleVoice}
+          isListening={voice.isListening}
+          onStartListening={voice.startListening}
+          onStopListening={voice.stopListening}
+          interimTranscript={voice.interimTranscript}
+          sttSupported={voice.sttSupported}
+          ttsAvailable={voice.ttsAvailable}
+          sttError={voice.sttError}
+          onPhantomVoice={voice.triggerInterruption}
         />
       </div>
     </div>

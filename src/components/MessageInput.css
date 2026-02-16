@@ -105,6 +105,106 @@
   background: var(--pink-soft);
 }
 
+/* ==========================================
+   Voice Mode — Toggle + Mic Button
+   ========================================== */
+
+/* Voice toggle button — pixel raised style */
+.voice-toggle-btn {
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  background: var(--bg-raised);
+  border: 2px solid var(--border-secondary);
+  box-shadow:
+    inset -2px -2px 0 var(--pink-pale),
+    inset 2px 2px 0 white;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.1s steps(2);
+}
+
+.voice-toggle-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+.voice-toggle-btn.active {
+  background: var(--pink-hot);
+  border-color: var(--pink-deep);
+  color: white;
+  box-shadow:
+    inset -2px -2px 0 var(--pink-soft),
+    inset 2px 2px 0 white,
+    0 0 8px var(--pink-glow);
+}
+
+.voice-toggle-btn:hover:not(.active) {
+  border-color: var(--pink-soft);
+  color: var(--pink-hot);
+}
+
+/* Mic button — pixel raised style with pulse when recording */
+.mic-button {
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  background: var(--pink-hot);
+  border: 2px solid var(--pink-deep);
+  box-shadow:
+    inset -2px -2px 0 var(--pink-soft),
+    inset 2px 2px 0 white;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.1s steps(2);
+}
+
+.mic-button svg {
+  width: 18px;
+  height: 18px;
+}
+
+.mic-button.recording {
+  background: #ff1744;
+  border-color: #d50000;
+  animation: micPulse 1s steps(4) infinite;
+  box-shadow:
+    inset -2px -2px 0 #ff5252,
+    inset 2px 2px 0 white,
+    0 0 12px rgba(255, 23, 68, 0.5);
+}
+
+@keyframes micPulse {
+  0%, 100% { box-shadow: inset -2px -2px 0 #ff5252, inset 2px 2px 0 white, 0 0 8px rgba(255, 23, 68, 0.4); }
+  50% { box-shadow: inset -2px -2px 0 #ff5252, inset 2px 2px 0 white, 0 0 16px rgba(255, 23, 68, 0.7); }
+}
+
+.mic-button:hover:not(:disabled):not(.recording) {
+  background: var(--pink-deep);
+}
+
+.mic-button:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+/* Listening state — input field faint pink glow */
+.message-input.listening {
+  border-color: #ff1744;
+  color: var(--text-muted);
+  font-style: italic;
+  box-shadow:
+    inset -2px -2px 0 white,
+    inset 2px 2px 0 var(--pink-pale),
+    0 0 8px rgba(255, 23, 68, 0.2);
+}
+
 /* ---- Desktop ---- */
 @media (min-width: 768px) {
   .message-input-container {
@@ -122,6 +222,26 @@
   }
 
   .send-button svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .voice-toggle-btn {
+    width: 40px;
+    height: 40px;
+  }
+
+  .voice-toggle-btn svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .mic-button {
+    width: 48px;
+    height: 48px;
+  }
+
+  .mic-button svg {
     width: 20px;
     height: 20px;
   }
