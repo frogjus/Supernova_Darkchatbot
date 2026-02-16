@@ -89,7 +89,7 @@ export function speakText(text: string, characterId: string, bloomLevel = 50): T
   }
 
   let stopped = false;
-  let resolvePromise: () => void;
+  let resolvePromise: () => void = () => {};
   const promise = new Promise<void>((resolve) => {
     resolvePromise = resolve;
   });
