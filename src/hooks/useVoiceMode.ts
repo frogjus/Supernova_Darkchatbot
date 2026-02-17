@@ -65,12 +65,14 @@ export function useVoiceMode() {
   useEffect(() => {
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'hidden' && voiceEnabledRef.current) {
-        // Full disengage — stop STT, stop TTS, restore music
+        // Full disengage — stop STT, stop TTS, reset state
         if (sttServiceRef.current) {
           sttServiceRef.current.stop();
         }
         stopCurrentPlayback();
-        rampMusicTo(1.0, 300);
+        // Don't ramp — sound.ts will suspend the AudioContext immediately.
+        // Set gain directly so it's correct when context resumes.
+        rampMusicTo(1.0, 0);
         setVoiceEnabled(false);
         setIsListening(false);
         setInterimTranscript('');

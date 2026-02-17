@@ -513,7 +513,12 @@ export function rampMusicTo(targetVolume: number, durationMs: number) {
   const ctx = getCtx();
   if (masterGain && !isMuted) {
     masterGain.gain.cancelScheduledValues(ctx.currentTime);
-    masterGain.gain.linearRampToValueAtTime(targetVolume, ctx.currentTime + durationMs / 1000);
+    if (durationMs <= 0) {
+      // Instant set — used when AudioContext is about to be suspended
+      masterGain.gain.setValueAtTime(targetVolume, ctx.currentTime);
+    } else {
+      masterGain.gain.linearRampToValueAtTime(targetVolume, ctx.currentTime + durationMs / 1000);
+    }
   }
 }
 
