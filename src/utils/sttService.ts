@@ -1,6 +1,7 @@
 // STT Service — Web Speech API wrapper
-// Captures single utterances with interim results for live preview.
+// Captures continuous utterances with interim results for live preview.
 // Only works in Chrome (uses Google's speech servers).
+// Requests mic permission via getUserMedia before starting recognition.
 
 export interface STTResult {
   transcript: string;
@@ -28,6 +29,23 @@ function getSpeechRecognitionCtor(): any | null {
   return w.SpeechRecognition || w.webkitSpeechRecognition || null;
 }
 
+// Request mic permission explicitly — Chrome needs this before speech recognition works
+let micPermissionGranted = false;
+async function ensureMicPermission(): Promise<boolean> {
+  if (micPermissionGranted) return true;
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    // Stop the stream immediately — we just needed the permission grant
+    stream.getTracks().forEach(t => t.stop());
+    micPermissionGranted = true;
+    console.log('[STT] Mic permission granted');
+    return true;
+  } catch (e) {
+    console.warn('[STT] Mic permission denied:', e);
+    return false;
+  }
+}
+
 export function createSTTService(callbacks: STTCallbacks): STTService {
   const Ctor = getSpeechRecognitionCtor();
   const supported = !!Ctor;
@@ -47,24 +65,18 @@ export function createSTTService(callbacks: STTCallbacks): STTService {
   let recognition: any = null;
   let listening = false;
 
-  function start() {
-    if (listening) {
-      console.log('[STT] Already listening, ignoring start()');
-      return;
-    }
-
+  function startRecognition() {
     try {
       recognition = new Ctor();
     } catch (e) {
       console.error('[STT] Failed to create SpeechRecognition:', e);
-      callbacks.onError('Voice input not available');
       return;
     }
 
-    recognition.continuous = true; // keep listening until stopped
+    recognition.continuous = true;
     recognition.interimResults = true;
-    // Korean-first since this is a Korean game — Chrome handles mixed Korean/English well in this mode
-    recognition.lang = 'ko';
+    // Let Chrome auto-detect language — avoids failures when Korean model unavailable
+    // Chrome handles mixed Korean/English well with default lang
     recognition.maxAlternatives = 1;
 
     recognition.onstart = () => {
@@ -78,7 +90,6 @@ export function createSTTService(callbacks: STTCallbacks): STTService {
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     recognition.onresult = (event: any) => {
-      // Get the latest result
       const resultIndex = event.resultIndex;
       for (let i = resultIndex; i < event.results.length; i++) {
         const result = event.results[i];
@@ -95,18 +106,14 @@ export function createSTTService(callbacks: STTCallbacks): STTService {
       const error = event.error || 'unknown';
       console.warn('[STT] Error:', error, event.message || '');
 
-      const friendlyErrors: Record<string, string> = {
-        'no-speech': '',  // Normal — just silence, don't alarm user
-        'not-allowed': 'Mic access denied — check permissions',
-        'network': '',    // STT down but TTS still works, don't alarm
-        'aborted': '',
-        'audio-capture': 'No microphone found',
-        'service-not-available': '',  // Service down but TTS still works
-        'language-not-supported': '',
-      };
-
-      const msg = friendlyErrors[error] ?? `Voice input failed (${error})`;
-      if (msg) callbacks.onError(msg);
+      // Only show user-actionable errors
+      if (error === 'not-allowed') {
+        callbacks.onError('Mic access denied — check permissions');
+      } else if (error === 'audio-capture') {
+        callbacks.onError('No microphone found');
+      }
+      // All other errors (no-speech, network, service-not-available, aborted)
+      // fail silently — voice mode still works for TTS
     };
 
     recognition.onend = () => {
@@ -121,8 +128,24 @@ export function createSTTService(callbacks: STTCallbacks): STTService {
     } catch (e) {
       console.error('[STT] start() threw:', e);
       listening = false;
-      callbacks.onError('Failed to start voice input');
     }
+  }
+
+  function start() {
+    if (listening) {
+      console.log('[STT] Already listening, ignoring start()');
+      return;
+    }
+
+    // Request mic permission first, then start recognition
+    // getUserMedia triggers Chrome's permission prompt if not yet granted
+    ensureMicPermission().then(granted => {
+      if (granted) {
+        startRecognition();
+      } else {
+        callbacks.onError('Mic access denied — check permissions');
+      }
+    });
   }
 
   function stop() {
