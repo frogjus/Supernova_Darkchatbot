@@ -96,13 +96,13 @@ export function createSTTService(callbacks: STTCallbacks): STTService {
       console.warn('[STT] Error:', error, event.message || '');
 
       const friendlyErrors: Record<string, string> = {
-        'no-speech': "Couldn't hear you — try again",
-        'not-allowed': 'Mic access denied — check browser permissions',
-        'network': 'Voice service unavailable — are you online?',
+        'no-speech': '',  // Normal — just silence, don't alarm user
+        'not-allowed': 'Mic access denied — check permissions',
+        'network': '',    // STT down but TTS still works, don't alarm
         'aborted': '',
         'audio-capture': 'No microphone found',
-        'service-not-available': 'Voice service unavailable',
-        'language-not-supported': 'Language not supported',
+        'service-not-available': '',  // Service down but TTS still works
+        'language-not-supported': '',
       };
 
       const msg = friendlyErrors[error] ?? `Voice input failed (${error})`;

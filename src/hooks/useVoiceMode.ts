@@ -87,32 +87,32 @@ export function useVoiceMode() {
   }, []);
 
   const toggleVoice = useCallback(() => {
-    setVoiceEnabled(prev => {
-      const next = !prev;
-      localStorage.setItem(VOICE_STORAGE_KEY, String(next));
+    const next = !voiceEnabledRef.current;
 
-      if (next) {
-        // Turning ON: auto-start STT + duck music
-        if (sttServiceRef.current?.isSupported) {
-          sttServiceRef.current.start();
-          setIsListening(true);
-        }
-        rampMusicTo(VOICE_MODE_MUSIC_LEVEL, 500);
-      } else {
-        // Turning OFF: stop everything, restore music
-        if (sttServiceRef.current) {
-          sttServiceRef.current.stop();
-          setIsListening(false);
-          setInterimTranscript('');
-        }
-        stopCurrentPlayback();
-        setIsSpeaking(false);
-        setSpeakingCharacterId(null);
-        rampMusicTo(1.0, 500);
+    // STT start/stop MUST happen directly in the click handler (user gesture context)
+    // NOT inside React's setVoiceEnabled updater which may run asynchronously
+    if (next) {
+      // Turning ON: start STT immediately (needs user gesture) + duck music
+      if (sttServiceRef.current?.isSupported) {
+        sttServiceRef.current.start();
+        setIsListening(true);
       }
+      rampMusicTo(VOICE_MODE_MUSIC_LEVEL, 500);
+    } else {
+      // Turning OFF: stop everything, restore music
+      if (sttServiceRef.current) {
+        sttServiceRef.current.stop();
+        setIsListening(false);
+        setInterimTranscript('');
+      }
+      stopCurrentPlayback();
+      setIsSpeaking(false);
+      setSpeakingCharacterId(null);
+      rampMusicTo(1.0, 500);
+    }
 
-      return next;
-    });
+    setVoiceEnabled(next);
+    localStorage.setItem(VOICE_STORAGE_KEY, String(next));
   }, []);
 
   // Track whether STT was active before TTS ducked it
