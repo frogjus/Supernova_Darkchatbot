@@ -30,6 +30,9 @@ export function useVoiceMode() {
   const sttServiceRef = useRef<ReturnType<typeof createSTTService> | null>(null);
   const onFinalTranscriptRef = useRef<((text: string) => void) | null>(null);
   const voiceEnabledRef = useRef(voiceEnabled);
+  const sttExplicitStopRef = useRef(false); // true when WE stop STT (vs. it ending on its own)
+  const sttRestartCountRef = useRef(0);
+  const sttRestartWindowRef = useRef(0);
 
   // Keep ref in sync
   useEffect(() => {
@@ -59,6 +62,30 @@ export function useVoiceMode() {
       onEnd: () => {
         setIsListening(false);
         setInterimTranscript('');
+
+        // Auto-restart: if voice mode is still ON and we didn't explicitly stop,
+        // recognition may have died unexpectedly — restart it.
+        if (voiceEnabledRef.current && !sttExplicitStopRef.current) {
+          // Rate-limit: max 3 restarts in 10 seconds to prevent infinite loops
+          const now = Date.now();
+          if (now - sttRestartWindowRef.current > 10000) {
+            sttRestartCountRef.current = 0;
+            sttRestartWindowRef.current = now;
+          }
+          if (sttRestartCountRef.current < 3) {
+            sttRestartCountRef.current++;
+            console.log('[Voice] STT ended unexpectedly, auto-restarting...', sttRestartCountRef.current);
+            setTimeout(() => {
+              if (voiceEnabledRef.current && sttServiceRef.current) {
+                sttServiceRef.current.start();
+                setIsListening(true);
+              }
+            }, 300);
+          } else {
+            console.warn('[Voice] STT keeps dying, giving up auto-restart');
+          }
+        }
+        sttExplicitStopRef.current = false;
       },
     });
     sttServiceRef.current = stt;
@@ -85,6 +112,7 @@ export function useVoiceMode() {
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'hidden' && voiceEnabledRef.current) {
         if (sttServiceRef.current) {
+          sttExplicitStopRef.current = true;
           sttServiceRef.current.stop();
         }
         stopCurrentPlayback();
@@ -118,6 +146,7 @@ export function useVoiceMode() {
     } else {
       // Turning OFF: stop everything
       if (sttServiceRef.current) {
+        sttExplicitStopRef.current = true;
         sttServiceRef.current.stop();
         setIsListening(false);
         setInterimTranscript('');
@@ -139,6 +168,7 @@ export function useVoiceMode() {
     // Pause STT while character is speaking to prevent feedback loop
     if (sttServiceRef.current?.isListening()) {
       sttWasListeningRef.current = true;
+      sttExplicitStopRef.current = true;
       sttServiceRef.current.stop();
       setIsListening(false);
       setInterimTranscript('');

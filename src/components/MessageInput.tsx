@@ -88,9 +88,13 @@ export function MessageInput({
   return (
     <div className="message-input-container">
       {/* Voice mode toggle — always visible, controls STT+TTS */}
+      {/* CRITICAL: stopPropagation prevents the global unlockAudio() click listener
+          in sound.ts from firing audio.play() in the same event as recognition.start().
+          On macOS Chrome, audio.play() competes with SpeechRecognition for the user
+          activation token, killing STT instantly. */}
       <button
         className={`voice-toggle-btn ${voiceEnabled ? 'active' : ''} ${voiceEnabled && isListening ? 'listening' : ''}`}
-        onClick={onToggleVoice}
+        onClick={(e) => { e.stopPropagation(); onToggleVoice?.(); }}
         title={voiceEnabled ? 'Exit voice mode' : 'Enter voice mode'}
       >
         {/* Microphone icon — universally understood as "voice input" */}
