@@ -1,7 +1,11 @@
 // STT Service — Web Speech API wrapper
 // Captures continuous utterances with interim results for live preview.
 // Chrome only (uses Google's speech servers). Auto-restarts on transient failures.
-// getUserMedia for first-time mic permission, then SpeechRecognition handles the rest.
+//
+// CRITICAL: start() MUST be synchronous. Chrome requires recognition.start()
+// to run in the same call stack as the user gesture (click/tap). Any async
+// wrapper (.then, await, setTimeout) loses the gesture context and Chrome
+// kills the recognition immediately.
 
 export interface STTResult {
   transcript: string;
@@ -27,24 +31,6 @@ function getSpeechRecognitionCtor(): any | null {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const w = window as any;
   return w.SpeechRecognition || w.webkitSpeechRecognition || null;
-}
-
-// Request mic permission once via getUserMedia — Chrome needs this before speech recognition
-// We keep the stream reference alive briefly to avoid OS mic release/reacquire race
-let micPermissionGranted = false;
-
-async function ensureMicPermission(): Promise<MediaStream | null> {
-  if (micPermissionGranted) return null; // Already granted, no stream needed
-  try {
-    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-    micPermissionGranted = true;
-    console.log('[STT] Mic permission granted');
-    // Return the stream — caller will close it AFTER recognition starts
-    return stream;
-  } catch (e) {
-    console.warn('[STT] Mic permission denied:', e);
-    return null;
-  }
 }
 
 export function createSTTService(callbacks: STTCallbacks): STTService {
@@ -195,6 +181,9 @@ export function createSTTService(callbacks: STTCallbacks): STTService {
     }
   }
 
+  // SYNCHRONOUS — must run in user gesture context (click/tap call stack).
+  // Chrome kills recognition.start() if called from async callbacks.
+  // SpeechRecognition handles its own mic permission prompt — no getUserMedia needed.
   function start() {
     if (shouldBeListening) {
       console.log('[STT] Already active, ignoring start()');
@@ -203,33 +192,7 @@ export function createSTTService(callbacks: STTCallbacks): STTService {
 
     shouldBeListening = true;
     restartCount = 0;
-
-    // Request mic permission first (only needed once), then start recognition
-    ensureMicPermission().then(permStream => {
-      if (!shouldBeListening) {
-        // User toggled off before permission resolved
-        if (permStream) permStream.getTracks().forEach(t => t.stop());
-        return;
-      }
-
-      if (!micPermissionGranted) {
-        shouldBeListening = false;
-        callbacks.onError('Mic access denied — check permissions');
-        callbacks.onEnd();
-        return;
-      }
-
-      startRecognition();
-
-      // Release the getUserMedia stream AFTER recognition has started
-      // Small delay to avoid OS mic release/reacquire race condition
-      if (permStream) {
-        setTimeout(() => {
-          permStream.getTracks().forEach(t => t.stop());
-          console.log('[STT] Released getUserMedia stream');
-        }, 500);
-      }
-    });
+    startRecognition(); // Direct, synchronous — in user gesture context
   }
 
   function stop() {
