@@ -1,11 +1,10 @@
 // STT Service — Web Speech API wrapper
 // Captures continuous utterances with interim results for live preview.
-// Chrome only (uses Google's speech servers). Auto-restarts on transient failures.
+// Only works in Chrome (uses Google's speech servers).
 //
-// CRITICAL: start() MUST be synchronous. Chrome requires recognition.start()
-// to run in the same call stack as the user gesture (click/tap). Any async
-// wrapper (.then, await, setTimeout) loses the gesture context and Chrome
-// kills the recognition immediately.
+// CRITICAL: start() must be the ONLY thing called synchronously in the
+// user gesture context. No AudioContext creation, no audio.play(), nothing
+// else that could compete for the user activation.
 
 export interface STTResult {
   transcript: string;
@@ -16,7 +15,7 @@ export interface STTResult {
 interface STTCallbacks {
   onResult: (result: STTResult) => void;
   onError: (error: string) => void;
-  onEnd: () => void;  // Only fires on TRUE end (explicit stop or fatal error)
+  onEnd: () => void;
 }
 
 export interface STTService {
@@ -52,24 +51,23 @@ export function createSTTService(callbacks: STTCallbacks): STTService {
   let recognition: any = null;
   let listening = false;
 
-  // Auto-restart state — Chrome's recognition frequently dies mid-session
-  let shouldBeListening = false;  // User intent: do they WANT to be listening?
-  let restartCount = 0;
-  let restartTimer: number | null = null;
-  const MAX_RESTARTS = 10;       // Give up after this many consecutive failures
-  const BASE_RESTART_DELAY = 250; // ms, increases with backoff
+  function start() {
+    if (listening) {
+      console.log('[STT] Already listening, ignoring start()');
+      return;
+    }
 
-  function createRecognition() {
     try {
       recognition = new Ctor();
     } catch (e) {
       console.error('[STT] Failed to create SpeechRecognition:', e);
-      return false;
+      callbacks.onError('Voice input not available');
+      return;
     }
 
     recognition.continuous = true;
     recognition.interimResults = true;
-    // Let Chrome auto-detect language — handles mixed Korean/English well
+    recognition.lang = 'ko';
     recognition.maxAlternatives = 1;
 
     recognition.onstart = () => {
@@ -77,25 +75,12 @@ export function createSTTService(callbacks: STTCallbacks): STTService {
       listening = true;
     };
 
-    recognition.onaudiostart = () => {
-      console.log('[STT] Audio capture started — mic is active');
-    };
-
-    recognition.onspeechstart = () => {
-      console.log('[STT] Speech detected');
-      // Reset restart counter — we're successfully capturing speech
-      restartCount = 0;
-    };
-
-    recognition.onspeechend = () => {
-      console.log('[STT] Speech ended');
-    };
+    recognition.onaudiostart = () => console.log('[STT] Audio capture started — mic is active');
+    recognition.onspeechstart = () => console.log('[STT] Speech detected');
+    recognition.onspeechend = () => console.log('[STT] Speech ended');
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     recognition.onresult = (event: any) => {
-      // Reset restart counter on any result (even interim)
-      restartCount = 0;
-
       const resultIndex = event.resultIndex;
       for (let i = resultIndex; i < event.results.length; i++) {
         const result = event.results[i];
@@ -112,105 +97,35 @@ export function createSTTService(callbacks: STTCallbacks): STTService {
       const error = event.error || 'unknown';
       console.warn('[STT] Error:', error, event.message || '');
 
+      // Only surface user-actionable errors
       if (error === 'not-allowed') {
-        // Fatal: user denied mic permission
-        shouldBeListening = false;
         callbacks.onError('Mic access denied — check permissions');
       } else if (error === 'audio-capture') {
-        // Fatal: no mic hardware
-        shouldBeListening = false;
         callbacks.onError('No microphone found');
       }
-      // All other errors (no-speech, network, service-not-available, aborted)
-      // are transient — auto-restart will handle them via onend
+      // no-speech, network, aborted, service-not-available → silent
     };
 
     recognition.onend = () => {
-      console.log('[STT] Recognition ended, shouldBeListening:', shouldBeListening, 'restarts:', restartCount);
+      console.log('[STT] Recognition ended');
       listening = false;
-
-      if (shouldBeListening && restartCount < MAX_RESTARTS) {
-        // Transient end — auto-restart with backoff
-        restartCount++;
-        const delay = BASE_RESTART_DELAY * Math.min(restartCount, 4); // Cap at 1s
-        console.log(`[STT] Auto-restarting in ${delay}ms (attempt ${restartCount}/${MAX_RESTARTS})`);
-
-        restartTimer = window.setTimeout(() => {
-          restartTimer = null;
-          if (shouldBeListening) {
-            startRecognition();
-          }
-        }, delay);
-        // Don't call callbacks.onEnd() — STT is still "active" from user's perspective
-      } else if (shouldBeListening && restartCount >= MAX_RESTARTS) {
-        // Gave up — too many consecutive failures
-        console.error('[STT] Max restarts reached, giving up');
-        shouldBeListening = false;
-        restartCount = 0;
-        callbacks.onError('Voice input disconnected — tap mic to retry');
-        callbacks.onEnd();
-      } else {
-        // Normal stop — user explicitly stopped
-        restartCount = 0;
-        callbacks.onEnd();
-      }
+      callbacks.onEnd();
     };
-
-    return true;
-  }
-
-  function startRecognition() {
-    if (!createRecognition()) return;
 
     try {
       recognition.start();
-      console.log('[STT] start() called');
+      console.log('[STT] start() called — recognition should be active');
     } catch (e) {
       console.error('[STT] start() threw:', e);
       listening = false;
-
-      // Retry if we should still be listening
-      if (shouldBeListening && restartCount < MAX_RESTARTS) {
-        restartCount++;
-        const delay = BASE_RESTART_DELAY * Math.min(restartCount, 4);
-        restartTimer = window.setTimeout(() => {
-          restartTimer = null;
-          if (shouldBeListening) startRecognition();
-        }, delay);
-      }
+      callbacks.onError('Failed to start voice input');
     }
-  }
-
-  // SYNCHRONOUS — must run in user gesture context (click/tap call stack).
-  // Chrome kills recognition.start() if called from async callbacks.
-  // SpeechRecognition handles its own mic permission prompt — no getUserMedia needed.
-  function start() {
-    if (shouldBeListening) {
-      console.log('[STT] Already active, ignoring start()');
-      return;
-    }
-
-    shouldBeListening = true;
-    restartCount = 0;
-    startRecognition(); // Direct, synchronous — in user gesture context
   }
 
   function stop() {
-    console.log('[STT] stop() called');
-    shouldBeListening = false;
-    restartCount = 0;
-
-    // Clear any pending restart
-    if (restartTimer) {
-      clearTimeout(restartTimer);
-      restartTimer = null;
-    }
-
     if (recognition) {
       try {
-        // abort() is cleaner than stop() for explicit shutdown —
-        // doesn't trigger onresult for partial matches
-        recognition.abort();
+        recognition.stop();
       } catch {
         // ignore
       }

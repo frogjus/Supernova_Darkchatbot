@@ -1,6 +1,10 @@
 // Voice Mode Hook — manages TTS playback + STT recording state
 // Single toggle: ON = TTS enabled, STT auto-starts, music ducks.
 // OFF = everything stops, music returns. Handles Yuseongshin interruptions.
+//
+// ARCHITECTURE: toggleVoice ONLY handles STT + state. Music ducking lives
+// in a useEffect watching voiceEnabled. This prevents AudioContext operations
+// from competing with SpeechRecognition in the same user gesture context.
 
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { speakText, stopCurrentPlayback, duckCurrentPlayback, unduckCurrentPlayback, speakGhostVoice } from '../utils/ttsService';
@@ -33,8 +37,6 @@ export function useVoiceMode() {
   }, [voiceEnabled]);
 
   // Initialize STT service
-  // onEnd only fires on TRUE end (explicit stop or fatal error after max retries),
-  // NOT on transient Chrome reconnections (handled by sttService auto-restart)
   useEffect(() => {
     const stt = createSTTService({
       onResult: (result: STTResult) => {
@@ -50,45 +52,49 @@ export function useVoiceMode() {
       onError: (error: string) => {
         console.warn('[Voice] STT error:', error);
         if (error) setSttError(error);
+        setIsListening(false);
         setInterimTranscript('');
         if (error) setTimeout(() => setSttError(null), 3000);
       },
       onEnd: () => {
-        // STT truly ended — explicit stop() or gave up after max restarts
         setIsListening(false);
         setInterimTranscript('');
       },
     });
     sttServiceRef.current = stt;
 
-    // Cleanup: stop STT on unmount so mic doesn't stay open
-    return () => {
-      stt.stop();
-    };
+    return () => { stt.stop(); };
   }, []);
 
   // Track whether STT was active before TTS ducked it
   const sttWasListeningRef = useRef(false);
 
+  // Music ducking — reacts to voiceEnabled state changes.
+  // MUST NOT be in the click handler — AudioContext operations (getCtx, gain ramps)
+  // can compete with SpeechRecognition for the user activation on macOS.
+  useEffect(() => {
+    if (voiceEnabled) {
+      rampMusicTo(VOICE_MODE_MUSIC_LEVEL, 500);
+    } else {
+      rampMusicTo(1.0, 500);
+    }
+  }, [voiceEnabled]);
+
   // Disengage voice mode when browser tab loses focus or goes to background
-  // Privacy: mic should never stay open when user isn't looking at the app
   useEffect(() => {
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'hidden' && voiceEnabledRef.current) {
-        // Full disengage — stop STT, stop TTS, reset ALL state
         if (sttServiceRef.current) {
           sttServiceRef.current.stop();
         }
         stopCurrentPlayback();
-        // Don't ramp — sound.ts will suspend the AudioContext immediately.
-        // Set gain directly so it's correct when context resumes.
         rampMusicTo(1.0, 0);
         setVoiceEnabled(false);
         setIsListening(false);
         setInterimTranscript('');
         setIsSpeaking(false);
         setSpeakingCharacterId(null);
-        sttWasListeningRef.current = false; // Reset — prevents phantom STT resume
+        sttWasListeningRef.current = false;
         localStorage.setItem(VOICE_STORAGE_KEY, 'false');
       }
     };
@@ -97,20 +103,20 @@ export function useVoiceMode() {
     return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
   }, []);
 
+  // toggleVoice: ONLY handles STT start/stop + React state.
+  // No AudioContext, no rampMusicTo, no audio.play() — nothing that could
+  // consume or compete with the user gesture that SpeechRecognition needs.
   const toggleVoice = useCallback(() => {
     const next = !voiceEnabledRef.current;
 
-    // STT start/stop MUST happen directly in the click handler (user gesture context)
-    // NOT inside React's setVoiceEnabled updater which may run asynchronously
     if (next) {
-      // Turning ON: start STT immediately (needs user gesture) + duck music
+      // Turning ON: start STT — this MUST be the main synchronous action
       if (sttServiceRef.current?.isSupported) {
         sttServiceRef.current.start();
         setIsListening(true);
       }
-      rampMusicTo(VOICE_MODE_MUSIC_LEVEL, 500);
     } else {
-      // Turning OFF: stop everything, restore music
+      // Turning OFF: stop everything
       if (sttServiceRef.current) {
         sttServiceRef.current.stop();
         setIsListening(false);
@@ -120,9 +126,9 @@ export function useVoiceMode() {
       setIsSpeaking(false);
       setSpeakingCharacterId(null);
       sttWasListeningRef.current = false;
-      rampMusicTo(1.0, 500);
     }
 
+    // State update triggers the music ducking useEffect above
     setVoiceEnabled(next);
     localStorage.setItem(VOICE_STORAGE_KEY, String(next));
   }, []);
@@ -150,11 +156,10 @@ export function useVoiceMode() {
       console.warn('[Voice] TTS playback failed:', e);
     }
 
-    // Always reset speaking state, even on error
     setIsSpeaking(false);
     setSpeakingCharacterId(null);
 
-    // Resume STT after character finishes speaking (or fails)
+    // Resume STT after character finishes speaking
     if (sttWasListeningRef.current) {
       sttWasListeningRef.current = false;
       setTimeout(() => {
@@ -172,8 +177,6 @@ export function useVoiceMode() {
     setSpeakingCharacterId(null);
   }, []);
 
-  // Yuseongshin ghost voice interruption — plays OVER character speech
-  // Ducks to INTERRUPTION_MUSIC_LEVEL, then returns to VOICE_MODE_MUSIC_LEVEL (not 1.0)
   const triggerInterruption = useCallback(async (text: string) => {
     if (!voiceEnabledRef.current) return;
 
@@ -183,16 +186,13 @@ export function useVoiceMode() {
 
     setIsInterrupting(true);
 
-    // Duck character TTS and music further
     duckCurrentPlayback(0.15);
-    duckMusic(INTERRUPTION_MUSIC_LEVEL, 200, true); // force=true to override voice mode duck
+    duckMusic(INTERRUPTION_MUSIC_LEVEL, 200, true);
 
     await speakGhostVoice(text);
 
-    // Unduck character TTS, return music to voice mode level (not full)
     unduckCurrentPlayback();
     unduckMusic(500);
-    // After unduck completes, ensure we're at voice mode level
     setTimeout(() => {
       if (voiceEnabledRef.current) {
         rampMusicTo(VOICE_MODE_MUSIC_LEVEL, 300);
@@ -202,7 +202,6 @@ export function useVoiceMode() {
     setIsInterrupting(false);
   }, []);
 
-  // Register callback for final STT transcript
   const setOnFinalTranscript = useCallback((cb: (text: string) => void) => {
     onFinalTranscriptRef.current = cb;
   }, []);
