@@ -25,22 +25,6 @@ let currentAudio: HTMLAudioElement | null = null;
 let currentGain: GainNode | null = null;
 let currentSource: MediaElementAudioSourceNode | null = null;
 
-// Check if TTS is available (proxy exists and has a key)
-export async function checkTTSAvailable(): Promise<boolean> {
-  try {
-    // Quick OPTIONS/POST check — if no key configured, we'll get a 500.
-    const res = await fetch('/api/tts', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ text: '.', voiceId: CHARACTER_VOICES.miho }),
-    });
-    // 200 = working, 429 = rate limited but available, 400 = available
-    return res.status !== 500;
-  } catch {
-    return false;
-  }
-}
-
 // Strip action descriptions / stage directions so TTS only speaks dialogue
 function cleanTextForSpeech(text: string): string {
   return text

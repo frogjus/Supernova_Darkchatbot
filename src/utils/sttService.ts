@@ -1,7 +1,7 @@
 // STT Service — Web Speech API wrapper
 // Captures continuous utterances with interim results for live preview.
-// Only works in Chrome (uses Google's speech servers).
-// Requests mic permission via getUserMedia before starting recognition.
+// Chrome only (uses Google's speech servers). Auto-restarts on transient failures.
+// getUserMedia for first-time mic permission, then SpeechRecognition handles the rest.
 
 export interface STTResult {
   transcript: string;
@@ -12,7 +12,7 @@ export interface STTResult {
 interface STTCallbacks {
   onResult: (result: STTResult) => void;
   onError: (error: string) => void;
-  onEnd: () => void;
+  onEnd: () => void;  // Only fires on TRUE end (explicit stop or fatal error)
 }
 
 export interface STTService {
@@ -29,20 +29,21 @@ function getSpeechRecognitionCtor(): any | null {
   return w.SpeechRecognition || w.webkitSpeechRecognition || null;
 }
 
-// Request mic permission explicitly — Chrome needs this before speech recognition works
+// Request mic permission once via getUserMedia — Chrome needs this before speech recognition
+// We keep the stream reference alive briefly to avoid OS mic release/reacquire race
 let micPermissionGranted = false;
-async function ensureMicPermission(): Promise<boolean> {
-  if (micPermissionGranted) return true;
+
+async function ensureMicPermission(): Promise<MediaStream | null> {
+  if (micPermissionGranted) return null; // Already granted, no stream needed
   try {
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-    // Stop the stream immediately — we just needed the permission grant
-    stream.getTracks().forEach(t => t.stop());
     micPermissionGranted = true;
     console.log('[STT] Mic permission granted');
-    return true;
+    // Return the stream — caller will close it AFTER recognition starts
+    return stream;
   } catch (e) {
     console.warn('[STT] Mic permission denied:', e);
-    return false;
+    return null;
   }
 }
 
@@ -65,18 +66,24 @@ export function createSTTService(callbacks: STTCallbacks): STTService {
   let recognition: any = null;
   let listening = false;
 
-  function startRecognition() {
+  // Auto-restart state — Chrome's recognition frequently dies mid-session
+  let shouldBeListening = false;  // User intent: do they WANT to be listening?
+  let restartCount = 0;
+  let restartTimer: number | null = null;
+  const MAX_RESTARTS = 10;       // Give up after this many consecutive failures
+  const BASE_RESTART_DELAY = 250; // ms, increases with backoff
+
+  function createRecognition() {
     try {
       recognition = new Ctor();
     } catch (e) {
       console.error('[STT] Failed to create SpeechRecognition:', e);
-      return;
+      return false;
     }
 
     recognition.continuous = true;
     recognition.interimResults = true;
-    // Let Chrome auto-detect language — avoids failures when Korean model unavailable
-    // Chrome handles mixed Korean/English well with default lang
+    // Let Chrome auto-detect language — handles mixed Korean/English well
     recognition.maxAlternatives = 1;
 
     recognition.onstart = () => {
@@ -84,12 +91,25 @@ export function createSTTService(callbacks: STTCallbacks): STTService {
       listening = true;
     };
 
-    recognition.onaudiostart = () => console.log('[STT] Audio capture started — mic is active');
-    recognition.onspeechstart = () => console.log('[STT] Speech detected');
-    recognition.onspeechend = () => console.log('[STT] Speech ended');
+    recognition.onaudiostart = () => {
+      console.log('[STT] Audio capture started — mic is active');
+    };
+
+    recognition.onspeechstart = () => {
+      console.log('[STT] Speech detected');
+      // Reset restart counter — we're successfully capturing speech
+      restartCount = 0;
+    };
+
+    recognition.onspeechend = () => {
+      console.log('[STT] Speech ended');
+    };
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     recognition.onresult = (event: any) => {
+      // Reset restart counter on any result (even interim)
+      restartCount = 0;
+
       const resultIndex = event.resultIndex;
       for (let i = resultIndex; i < event.results.length; i++) {
         const result = event.results[i];
@@ -106,21 +126,55 @@ export function createSTTService(callbacks: STTCallbacks): STTService {
       const error = event.error || 'unknown';
       console.warn('[STT] Error:', error, event.message || '');
 
-      // Only show user-actionable errors
       if (error === 'not-allowed') {
+        // Fatal: user denied mic permission
+        shouldBeListening = false;
         callbacks.onError('Mic access denied — check permissions');
       } else if (error === 'audio-capture') {
+        // Fatal: no mic hardware
+        shouldBeListening = false;
         callbacks.onError('No microphone found');
       }
       // All other errors (no-speech, network, service-not-available, aborted)
-      // fail silently — voice mode still works for TTS
+      // are transient — auto-restart will handle them via onend
     };
 
     recognition.onend = () => {
-      console.log('[STT] Recognition ended');
+      console.log('[STT] Recognition ended, shouldBeListening:', shouldBeListening, 'restarts:', restartCount);
       listening = false;
-      callbacks.onEnd();
+
+      if (shouldBeListening && restartCount < MAX_RESTARTS) {
+        // Transient end — auto-restart with backoff
+        restartCount++;
+        const delay = BASE_RESTART_DELAY * Math.min(restartCount, 4); // Cap at 1s
+        console.log(`[STT] Auto-restarting in ${delay}ms (attempt ${restartCount}/${MAX_RESTARTS})`);
+
+        restartTimer = window.setTimeout(() => {
+          restartTimer = null;
+          if (shouldBeListening) {
+            startRecognition();
+          }
+        }, delay);
+        // Don't call callbacks.onEnd() — STT is still "active" from user's perspective
+      } else if (shouldBeListening && restartCount >= MAX_RESTARTS) {
+        // Gave up — too many consecutive failures
+        console.error('[STT] Max restarts reached, giving up');
+        shouldBeListening = false;
+        restartCount = 0;
+        callbacks.onError('Voice input disconnected — tap mic to retry');
+        callbacks.onEnd();
+      } else {
+        // Normal stop — user explicitly stopped
+        restartCount = 0;
+        callbacks.onEnd();
+      }
     };
+
+    return true;
+  }
+
+  function startRecognition() {
+    if (!createRecognition()) return;
 
     try {
       recognition.start();
@@ -128,30 +182,72 @@ export function createSTTService(callbacks: STTCallbacks): STTService {
     } catch (e) {
       console.error('[STT] start() threw:', e);
       listening = false;
+
+      // Retry if we should still be listening
+      if (shouldBeListening && restartCount < MAX_RESTARTS) {
+        restartCount++;
+        const delay = BASE_RESTART_DELAY * Math.min(restartCount, 4);
+        restartTimer = window.setTimeout(() => {
+          restartTimer = null;
+          if (shouldBeListening) startRecognition();
+        }, delay);
+      }
     }
   }
 
   function start() {
-    if (listening) {
-      console.log('[STT] Already listening, ignoring start()');
+    if (shouldBeListening) {
+      console.log('[STT] Already active, ignoring start()');
       return;
     }
 
-    // Request mic permission first, then start recognition
-    // getUserMedia triggers Chrome's permission prompt if not yet granted
-    ensureMicPermission().then(granted => {
-      if (granted) {
-        startRecognition();
-      } else {
+    shouldBeListening = true;
+    restartCount = 0;
+
+    // Request mic permission first (only needed once), then start recognition
+    ensureMicPermission().then(permStream => {
+      if (!shouldBeListening) {
+        // User toggled off before permission resolved
+        if (permStream) permStream.getTracks().forEach(t => t.stop());
+        return;
+      }
+
+      if (!micPermissionGranted) {
+        shouldBeListening = false;
         callbacks.onError('Mic access denied — check permissions');
+        callbacks.onEnd();
+        return;
+      }
+
+      startRecognition();
+
+      // Release the getUserMedia stream AFTER recognition has started
+      // Small delay to avoid OS mic release/reacquire race condition
+      if (permStream) {
+        setTimeout(() => {
+          permStream.getTracks().forEach(t => t.stop());
+          console.log('[STT] Released getUserMedia stream');
+        }, 500);
       }
     });
   }
 
   function stop() {
+    console.log('[STT] stop() called');
+    shouldBeListening = false;
+    restartCount = 0;
+
+    // Clear any pending restart
+    if (restartTimer) {
+      clearTimeout(restartTimer);
+      restartTimer = null;
+    }
+
     if (recognition) {
       try {
-        recognition.stop();
+        // abort() is cleaner than stop() for explicit shutdown —
+        // doesn't trigger onresult for partial matches
+        recognition.abort();
       } catch {
         // ignore
       }

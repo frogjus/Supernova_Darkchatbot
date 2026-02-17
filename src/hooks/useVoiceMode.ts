@@ -33,6 +33,8 @@ export function useVoiceMode() {
   }, [voiceEnabled]);
 
   // Initialize STT service
+  // onEnd only fires on TRUE end (explicit stop or fatal error after max retries),
+  // NOT on transient Chrome reconnections (handled by sttService auto-restart)
   useEffect(() => {
     const stt = createSTTService({
       onResult: (result: STTResult) => {
@@ -46,26 +48,34 @@ export function useVoiceMode() {
         }
       },
       onError: (error: string) => {
-        console.warn('[STT Error]', error);
+        console.warn('[Voice] STT error:', error);
         if (error) setSttError(error);
-        setIsListening(false);
         setInterimTranscript('');
-        if (error) setTimeout(() => setSttError(null), 2500);
+        if (error) setTimeout(() => setSttError(null), 3000);
       },
       onEnd: () => {
+        // STT truly ended — explicit stop() or gave up after max restarts
         setIsListening(false);
         setInterimTranscript('');
       },
     });
     sttServiceRef.current = stt;
+
+    // Cleanup: stop STT on unmount so mic doesn't stay open
+    return () => {
+      stt.stop();
+    };
   }, []);
+
+  // Track whether STT was active before TTS ducked it
+  const sttWasListeningRef = useRef(false);
 
   // Disengage voice mode when browser tab loses focus or goes to background
   // Privacy: mic should never stay open when user isn't looking at the app
   useEffect(() => {
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'hidden' && voiceEnabledRef.current) {
-        // Full disengage — stop STT, stop TTS, reset state
+        // Full disengage — stop STT, stop TTS, reset ALL state
         if (sttServiceRef.current) {
           sttServiceRef.current.stop();
         }
@@ -78,6 +88,7 @@ export function useVoiceMode() {
         setInterimTranscript('');
         setIsSpeaking(false);
         setSpeakingCharacterId(null);
+        sttWasListeningRef.current = false; // Reset — prevents phantom STT resume
         localStorage.setItem(VOICE_STORAGE_KEY, 'false');
       }
     };
@@ -108,15 +119,13 @@ export function useVoiceMode() {
       stopCurrentPlayback();
       setIsSpeaking(false);
       setSpeakingCharacterId(null);
+      sttWasListeningRef.current = false;
       rampMusicTo(1.0, 500);
     }
 
     setVoiceEnabled(next);
     localStorage.setItem(VOICE_STORAGE_KEY, String(next));
   }, []);
-
-  // Track whether STT was active before TTS ducked it
-  const sttWasListeningRef = useRef(false);
 
   const playCharacterVoice = useCallback(async (text: string, characterId: string, bloomLevel = 50) => {
     if (!voiceEnabledRef.current) return;
@@ -134,13 +143,18 @@ export function useVoiceMode() {
     setIsSpeaking(true);
     setSpeakingCharacterId(characterId);
 
-    const handle = speakText(text, characterId, bloomLevel);
-    await handle.promise;
+    try {
+      const handle = speakText(text, characterId, bloomLevel);
+      await handle.promise;
+    } catch (e) {
+      console.warn('[Voice] TTS playback failed:', e);
+    }
 
+    // Always reset speaking state, even on error
     setIsSpeaking(false);
     setSpeakingCharacterId(null);
 
-    // Resume STT after character finishes speaking
+    // Resume STT after character finishes speaking (or fails)
     if (sttWasListeningRef.current) {
       sttWasListeningRef.current = false;
       setTimeout(() => {
