@@ -75,7 +75,8 @@ function App() {
 
   const handleChannelSwitch = useCallback((ch: string) => {
     if (ch === state.currentChannel) return;
-    // Stop any voice playback on channel switch
+    // Disengage voice mode on channel switch — clean slate for new character
+    if (voice.voiceEnabled) voice.toggleVoice();
     voice.stopSpeaking();
     playTabSwitch();
     setSwitching(true);
@@ -391,10 +392,7 @@ function App() {
           voiceEnabled={voice.voiceEnabled}
           onToggleVoice={voice.toggleVoice}
           isListening={voice.isListening}
-          onStartListening={voice.startListening}
-          onStopListening={voice.stopListening}
           interimTranscript={voice.interimTranscript}
-          sttSupported={voice.sttSupported}
           ttsAvailable={voice.ttsAvailable}
           sttError={voice.sttError}
           onPhantomVoice={voice.triggerInterruption}

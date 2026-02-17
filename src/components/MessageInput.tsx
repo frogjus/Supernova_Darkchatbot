@@ -11,10 +11,7 @@ interface MessageInputProps {
   voiceEnabled?: boolean;
   onToggleVoice?: () => void;
   isListening?: boolean;
-  onStartListening?: () => void;
-  onStopListening?: () => void;
   interimTranscript?: string;
-  sttSupported?: boolean;
   ttsAvailable?: boolean;
   sttError?: string | null;
 }
@@ -38,8 +35,8 @@ const HAUNTED_PLACEHOLDERS = [
 
 export function MessageInput({
   onSend, disabled, placeholder, bloomLevel = 50,
-  voiceEnabled, onToggleVoice, isListening, onStartListening, onStopListening,
-  interimTranscript, sttSupported, ttsAvailable, sttError,
+  voiceEnabled, onToggleVoice, isListening,
+  interimTranscript, ttsAvailable, sttError,
 }: MessageInputProps) {
   const [message, setMessage] = useState('');
   const [hauntedText, setHauntedText] = useState<string | null>(null);
@@ -89,38 +86,22 @@ export function MessageInput({
 
   const displayPlaceholder = hauntedText || placeholder || "Type your message...";
   const showVoiceToggle = ttsAvailable;
-  const showMicButton = voiceEnabled && sttSupported;
-
-  const handleMicClick = () => {
-    if (isListening) {
-      onStopListening?.();
-    } else {
-      onStartListening?.();
-    }
-  };
 
   return (
     <div className="message-input-container">
-      {/* Voice toggle button */}
+      {/* Voice mode toggle — single button for TTS+STT */}
       {showVoiceToggle && (
         <button
-          className={`voice-toggle-btn ${voiceEnabled ? 'active' : ''}`}
+          className={`voice-toggle-btn ${voiceEnabled ? 'active' : ''} ${voiceEnabled && isListening ? 'listening' : ''}`}
           onClick={onToggleVoice}
-          title={voiceEnabled ? 'Disable voice' : 'Enable voice'}
+          title={voiceEnabled ? 'Exit voice mode' : 'Enter voice mode'}
         >
+          {/* Microphone icon — universally understood as "voice input" */}
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            {voiceEnabled ? (
-              <>
-                <path d="M11 5L6 9H2v6h4l5 4V5z" />
-                <path d="M19.07 4.93a10 10 0 010 14.14M15.54 8.46a5 5 0 010 7.08" />
-              </>
-            ) : (
-              <>
-                <path d="M11 5L6 9H2v6h4l5 4V5z" />
-                <line x1="23" y1="9" x2="17" y2="15" />
-                <line x1="17" y1="9" x2="23" y2="15" />
-              </>
-            )}
+            <path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z" />
+            <path d="M19 10v2a7 7 0 01-14 0v-2" />
+            <line x1="12" y1="19" x2="12" y2="23" />
+            <line x1="8" y1="23" x2="16" y2="23" />
           </svg>
         </button>
       )}
@@ -138,32 +119,16 @@ export function MessageInput({
         readOnly={isListening}
       />
 
-      {/* Send or Mic button */}
-      {showMicButton && !message.trim() ? (
-        <button
-          className={`mic-button ${isListening ? 'recording' : ''}`}
-          onClick={handleMicClick}
-          disabled={disabled}
-          title={isListening ? 'Stop listening' : 'Start listening'}
-        >
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z" />
-            <path d="M19 10v2a7 7 0 01-14 0v-2" />
-            <line x1="12" y1="19" x2="12" y2="23" />
-            <line x1="8" y1="23" x2="16" y2="23" />
-          </svg>
-        </button>
-      ) : (
-        <button
-          className="send-button"
-          onClick={handleSend}
-          disabled={disabled || !message.trim()}
-        >
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <path d="M22 2L11 13M22 2L15 22L11 13M22 2L2 9L11 13" />
-          </svg>
-        </button>
-      )}
+      {/* Send button — always visible */}
+      <button
+        className="send-button"
+        onClick={handleSend}
+        disabled={disabled || !message.trim() || isListening}
+      >
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <path d="M22 2L11 13M22 2L15 22L11 13M22 2L2 9L11 13" />
+        </svg>
+      </button>
     </div>
   );
 }

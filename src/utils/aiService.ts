@@ -29,7 +29,7 @@ export async function generateCharacterResponse({
   const systemPrompt = systemPromptOverride || buildSystemPrompt(character, bloomStage, bloomValue, now);
 
   const requestBody = JSON.stringify({
-    model: 'claude-haiku-4-5-20251001',
+    model: 'claude-sonnet-4-5-20250929',
     max_tokens: 800,
     system: systemPrompt,
     messages: buildAPIMessages(conversationHistory, character.id, playerMessage),

@@ -61,15 +61,39 @@ function cleanTextForSpeech(text: string): string {
 function getVoiceSettings(bloomLevel: number) {
   const t = Math.max(0, Math.min(100, bloomLevel)) / 100; // 0..1
 
-  // Low bloom → Creative (0.0): max emotional expression, sadness, wavering
-  // Mid bloom → Natural (0.5): balanced
-  // High bloom → Natural (0.5): still expressive but confident
-  const stability = t < 0.4 ? 0.0 : 0.5;
+  // Granular stability curve:
+  // bloom 0-15:  0.0 (Creative) — raw, breaking, maximum emotional volatility
+  // bloom 16-35: 0.0 (Creative) — still fragile, wavering
+  // bloom 36-60: 0.5 (Natural) — finding balance, grounded
+  // bloom 61-100: 0.5 (Natural) — confident, warm
+  const stability = t < 0.36 ? 0.0 : 0.5;
 
-  return {
-    stability,
-    similarity_boost: 0.8,
-  };
+  // Lower similarity_boost at very low bloom = more raw, less "polished" voice
+  // High bloom = closer to the voice's natural warmth
+  const similarity_boost = t < 0.2 ? 0.65 : t < 0.4 ? 0.75 : 0.85;
+
+  return { stability, similarity_boost };
+}
+
+// Emotional coloring prefix — ElevenLabs v3 reads emotional cues from the text
+// These invisible-to-user stage directions shift the vocal performance
+function addEmotionalContext(text: string, bloomLevel: number): string {
+  if (bloomLevel <= 15) {
+    // Deeply wilted — voice should sound broken, on the verge of tears
+    return `(whispered, voice trembling, barely holding back tears) ${text}`;
+  } else if (bloomLevel <= 30) {
+    // Low bloom — anxious, guarded, sad
+    return `(said quietly, with sadness and anxiety) ${text}`;
+  } else if (bloomLevel <= 50) {
+    // Mid bloom — cautious hope, still vulnerable
+    return `(said softly, hesitant but sincere) ${text}`;
+  } else if (bloomLevel <= 75) {
+    // Growing — warmer, more open
+    return `(said warmly, with gentle confidence) ${text}`;
+  } else {
+    // Blooming — bright, alive, joyful
+    return `(said brightly, with genuine happiness) ${text}`;
+  }
 }
 
 export function speakText(text: string, characterId: string, bloomLevel = 50): TTSPlaybackHandle {
@@ -148,7 +172,7 @@ export function speakText(text: string, characterId: string, bloomLevel = 50): T
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          text: cleanTextForSpeech(text).slice(0, 1000),
+          text: addEmotionalContext(cleanTextForSpeech(text), bloomLevel).slice(0, 1000),
           voiceId,
           voiceSettings: getVoiceSettings(bloomLevel),
         }),

@@ -147,56 +147,29 @@
     0 0 8px var(--pink-glow);
 }
 
+/* Listening pulse — pink glow breathes when STT is active */
+.voice-toggle-btn.active.listening {
+  animation: voicePulse 1.5s steps(4) infinite;
+}
+
+@keyframes voicePulse {
+  0%, 100% {
+    box-shadow:
+      inset -2px -2px 0 var(--pink-soft),
+      inset 2px 2px 0 white,
+      0 0 8px var(--pink-glow);
+  }
+  50% {
+    box-shadow:
+      inset -2px -2px 0 var(--pink-soft),
+      inset 2px 2px 0 white,
+      0 0 16px var(--pink-glow-strong);
+  }
+}
+
 .voice-toggle-btn:hover:not(.active) {
   border-color: var(--pink-soft);
   color: var(--pink-hot);
-}
-
-/* Mic button — pixel raised style with pulse when recording */
-.mic-button {
-  width: 44px;
-  height: 44px;
-  padding: 0;
-  background: var(--pink-hot);
-  border: 2px solid var(--pink-deep);
-  box-shadow:
-    inset -2px -2px 0 var(--pink-soft),
-    inset 2px 2px 0 white;
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  transition: all 0.1s steps(2);
-}
-
-.mic-button svg {
-  width: 18px;
-  height: 18px;
-}
-
-.mic-button.recording {
-  background: #ff1744;
-  border-color: #d50000;
-  animation: micPulse 1s steps(4) infinite;
-  box-shadow:
-    inset -2px -2px 0 #ff5252,
-    inset 2px 2px 0 white,
-    0 0 12px rgba(255, 23, 68, 0.5);
-}
-
-@keyframes micPulse {
-  0%, 100% { box-shadow: inset -2px -2px 0 #ff5252, inset 2px 2px 0 white, 0 0 8px rgba(255, 23, 68, 0.4); }
-  50% { box-shadow: inset -2px -2px 0 #ff5252, inset 2px 2px 0 white, 0 0 16px rgba(255, 23, 68, 0.7); }
-}
-
-.mic-button:hover:not(:disabled):not(.recording) {
-  background: var(--pink-deep);
-}
-
-.mic-button:disabled {
-  opacity: 0.3;
-  cursor: not-allowed;
 }
 
 /* Listening state — input field faint pink glow */
@@ -223,8 +196,7 @@
     min-width: 0; /* allow flex shrink */
   }
 
-  .send-button,
-  .mic-button {
+  .send-button {
     flex-shrink: 0; /* never collapse buttons */
   }
 
@@ -264,13 +236,4 @@
     height: 18px;
   }
 
-  .mic-button {
-    width: 48px;
-    height: 48px;
-  }
-
-  .mic-button svg {
-    width: 20px;
-    height: 20px;
-  }
 }

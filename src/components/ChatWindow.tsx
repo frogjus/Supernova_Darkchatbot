@@ -22,10 +22,7 @@ interface ChatWindowProps {
   voiceEnabled?: boolean;
   onToggleVoice?: () => void;
   isListening?: boolean;
-  onStartListening?: () => void;
-  onStopListening?: () => void;
   interimTranscript?: string;
-  sttSupported?: boolean;
   ttsAvailable?: boolean;
   sttError?: string | null;
   onPhantomVoice?: (text: string) => void;
@@ -44,10 +41,7 @@ export function ChatWindow({
   voiceEnabled,
   onToggleVoice,
   isListening,
-  onStartListening,
-  onStopListening,
   interimTranscript,
-  sttSupported,
   ttsAvailable,
   sttError,
   onPhantomVoice,
@@ -359,10 +353,7 @@ export function ChatWindow({
           voiceEnabled={voiceEnabled}
           onToggleVoice={onToggleVoice}
           isListening={isListening}
-          onStartListening={onStartListening}
-          onStopListening={onStopListening}
           interimTranscript={interimTranscript}
-          sttSupported={sttSupported}
           ttsAvailable={ttsAvailable}
           sttError={sttError}
         />

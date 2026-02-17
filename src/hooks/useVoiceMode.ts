@@ -1,23 +1,24 @@
 // Voice Mode Hook — manages TTS playback + STT recording state
-// Persists voice preference in localStorage. Handles Yuseongshin interruptions.
+// Single toggle: ON = TTS enabled, STT auto-starts, music ducks.
+// OFF = everything stops, music returns. Handles Yuseongshin interruptions.
 
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { speakText, stopCurrentPlayback, checkTTSAvailable, duckCurrentPlayback, unduckCurrentPlayback, speakGhostVoice } from '../utils/ttsService';
 import { createSTTService, type STTResult } from '../utils/sttService';
-import { duckMusic, unduckMusic } from '../utils/sound';
+import { rampMusicTo, duckMusic, unduckMusic } from '../utils/sound';
 
 const VOICE_STORAGE_KEY = 'supernova_voice_mode';
 const INTERRUPTION_COOLDOWN = 2 * 60 * 1000; // 2 minutes
+const VOICE_MODE_MUSIC_LEVEL = 0.35; // 35% volume when voice mode active
+const INTERRUPTION_MUSIC_LEVEL = 0.10; // 10% during Yuseongshin interruption
 
 export function useVoiceMode() {
-  const [voiceEnabled, setVoiceEnabled] = useState(() => {
-    return localStorage.getItem(VOICE_STORAGE_KEY) === 'true';
-  });
+  // Never auto-restore voice mode — always start OFF, require user gesture
+  const [voiceEnabled, setVoiceEnabled] = useState(false);
   const [isListening, setIsListening] = useState(false);
   const [interimTranscript, setInterimTranscript] = useState('');
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [speakingCharacterId, setSpeakingCharacterId] = useState<string | null>(null);
-  const [sttSupported, setSttSupported] = useState(true);
   const [ttsAvailable, setTtsAvailable] = useState(true);
   const [isInterrupting, setIsInterrupting] = useState(false);
   const [sttError, setSttError] = useState<string | null>(null);
@@ -25,6 +26,12 @@ export function useVoiceMode() {
   const lastInterruptionRef = useRef(0);
   const sttServiceRef = useRef<ReturnType<typeof createSTTService> | null>(null);
   const onFinalTranscriptRef = useRef<((text: string) => void) | null>(null);
+  const voiceEnabledRef = useRef(voiceEnabled);
+
+  // Keep ref in sync
+  useEffect(() => {
+    voiceEnabledRef.current = voiceEnabled;
+  }, [voiceEnabled]);
 
   // Check TTS availability on mount
   useEffect(() => {
@@ -37,7 +44,6 @@ export function useVoiceMode() {
       onResult: (result: STTResult) => {
         if (result.isFinal) {
           setInterimTranscript('');
-          // Auto-send on final result, but don't stop listening (continuous mode)
           if (result.transcript.trim() && onFinalTranscriptRef.current) {
             onFinalTranscriptRef.current(result.transcript.trim());
           }
@@ -53,50 +59,71 @@ export function useVoiceMode() {
         if (error) setTimeout(() => setSttError(null), 2500);
       },
       onEnd: () => {
-        // Recognition ended (user clicked stop or browser stopped it)
         setIsListening(false);
         setInterimTranscript('');
       },
     });
-    setSttSupported(stt.isSupported);
     sttServiceRef.current = stt;
+  }, []);
+
+  // Disengage voice mode when browser tab loses focus or goes to background
+  // Privacy: mic should never stay open when user isn't looking at the app
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'hidden' && voiceEnabledRef.current) {
+        // Full disengage — stop STT, stop TTS, restore music
+        if (sttServiceRef.current) {
+          sttServiceRef.current.stop();
+        }
+        stopCurrentPlayback();
+        rampMusicTo(1.0, 300);
+        setVoiceEnabled(false);
+        setIsListening(false);
+        setInterimTranscript('');
+        setIsSpeaking(false);
+        setSpeakingCharacterId(null);
+        localStorage.setItem(VOICE_STORAGE_KEY, 'false');
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
   }, []);
 
   const toggleVoice = useCallback(() => {
     setVoiceEnabled(prev => {
       const next = !prev;
       localStorage.setItem(VOICE_STORAGE_KEY, String(next));
-      if (!next) {
-        // Turning off: stop any playback
+
+      if (next) {
+        // Turning ON: auto-start STT + duck music
+        if (sttServiceRef.current?.isSupported) {
+          sttServiceRef.current.start();
+          setIsListening(true);
+        }
+        rampMusicTo(VOICE_MODE_MUSIC_LEVEL, 500);
+      } else {
+        // Turning OFF: stop everything, restore music
+        if (sttServiceRef.current) {
+          sttServiceRef.current.stop();
+          setIsListening(false);
+          setInterimTranscript('');
+        }
         stopCurrentPlayback();
         setIsSpeaking(false);
         setSpeakingCharacterId(null);
+        rampMusicTo(1.0, 500);
       }
+
       return next;
     });
-  }, []);
-
-  const startListening = useCallback(() => {
-    if (sttServiceRef.current && sttServiceRef.current.isSupported) {
-      setSttError(null);
-      sttServiceRef.current.start();
-      setIsListening(true);
-    }
-  }, []);
-
-  const stopListening = useCallback(() => {
-    if (sttServiceRef.current) {
-      sttServiceRef.current.stop();
-      setIsListening(false);
-      setInterimTranscript('');
-    }
   }, []);
 
   // Track whether STT was active before TTS ducked it
   const sttWasListeningRef = useRef(false);
 
   const playCharacterVoice = useCallback(async (text: string, characterId: string, bloomLevel = 50) => {
-    if (!voiceEnabled || !ttsAvailable) return;
+    if (!voiceEnabledRef.current || !ttsAvailable) return;
 
     // Pause STT while character is speaking to prevent feedback loop
     if (sttServiceRef.current?.isListening()) {
@@ -106,7 +133,6 @@ export function useVoiceMode() {
       setInterimTranscript('');
     }
 
-    // Stop any current playback first
     stopCurrentPlayback();
 
     setIsSpeaking(true);
@@ -121,15 +147,14 @@ export function useVoiceMode() {
     // Resume STT after character finishes speaking
     if (sttWasListeningRef.current) {
       sttWasListeningRef.current = false;
-      // Small delay to let audio fully stop before reopening mic
       setTimeout(() => {
-        if (sttServiceRef.current && voiceEnabled) {
+        if (sttServiceRef.current && voiceEnabledRef.current) {
           sttServiceRef.current.start();
           setIsListening(true);
         }
       }, 300);
     }
-  }, [voiceEnabled, ttsAvailable]);
+  }, [ttsAvailable]);
 
   const stopSpeaking = useCallback(() => {
     stopCurrentPlayback();
@@ -137,9 +162,10 @@ export function useVoiceMode() {
     setSpeakingCharacterId(null);
   }, []);
 
-  // Yuseongshin ghost voice interruption — plays OVER character speech, doesn't stop it
+  // Yuseongshin ghost voice interruption — plays OVER character speech
+  // Ducks to INTERRUPTION_MUSIC_LEVEL, then returns to VOICE_MODE_MUSIC_LEVEL (not 1.0)
   const triggerInterruption = useCallback(async (text: string) => {
-    if (!voiceEnabled || !ttsAvailable) return;
+    if (!voiceEnabledRef.current || !ttsAvailable) return;
 
     const now = Date.now();
     if (now - lastInterruptionRef.current < INTERRUPTION_COOLDOWN) return;
@@ -147,21 +173,26 @@ export function useVoiceMode() {
 
     setIsInterrupting(true);
 
-    // Duck character TTS to 15% and ambient music (don't stop them)
+    // Duck character TTS and music further
     duckCurrentPlayback(0.15);
-    duckMusic(0.1, 200);
+    duckMusic(INTERRUPTION_MUSIC_LEVEL, 200, true); // force=true to override voice mode duck
 
-    // Play Yuseongshin ghost voice alongside current character speech
     await speakGhostVoice(text);
 
-    // Unduck character TTS and music back to normal
+    // Unduck character TTS, return music to voice mode level (not full)
     unduckCurrentPlayback();
     unduckMusic(500);
+    // After unduck completes, ensure we're at voice mode level
+    setTimeout(() => {
+      if (voiceEnabledRef.current) {
+        rampMusicTo(VOICE_MODE_MUSIC_LEVEL, 300);
+      }
+    }, 600);
 
     setIsInterrupting(false);
-  }, [voiceEnabled, ttsAvailable]);
+  }, [ttsAvailable]);
 
-  // Register callback for final STT transcript (called by parent to auto-send)
+  // Register callback for final STT transcript
   const setOnFinalTranscript = useCallback((cb: (text: string) => void) => {
     onFinalTranscriptRef.current = cb;
   }, []);
@@ -171,9 +202,6 @@ export function useVoiceMode() {
     toggleVoice,
     isListening,
     interimTranscript,
-    startListening,
-    stopListening,
-    sttSupported,
     isSpeaking,
     speakingCharacterId,
     playCharacterVoice,
