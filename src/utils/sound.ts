@@ -85,7 +85,24 @@ export function initAudio() {
     document.addEventListener('touchend', handler, { passive: true });
     document.addEventListener('click', handler, { passive: true });
     document.addEventListener('visibilitychange', () => {
-      if (document.visibilityState === 'visible') unlockAudio();
+      if (document.visibilityState === 'visible') {
+        // Tab back in focus — resume audio context + restart music loop
+        unlockAudio();
+        if (isAmbientPlaying && !musicLoopTimer) {
+          playMusicLoop();
+        }
+      } else {
+        // Tab hidden — suspend audio context (stops ALL sound: music, TTS, everything)
+        // This is the cleanest way to silence everything at once
+        if (audioCtx && audioCtx.state === 'running') {
+          audioCtx.suspend().catch(() => {});
+        }
+        // Stop the music loop timer so it doesn't pile up while suspended
+        if (musicLoopTimer) {
+          clearTimeout(musicLoopTimer);
+          musicLoopTimer = null;
+        }
+      }
     });
   }
 }

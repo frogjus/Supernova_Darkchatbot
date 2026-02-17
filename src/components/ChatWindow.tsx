@@ -23,7 +23,6 @@ interface ChatWindowProps {
   onToggleVoice?: () => void;
   isListening?: boolean;
   interimTranscript?: string;
-  ttsAvailable?: boolean;
   sttError?: string | null;
   onPhantomVoice?: (text: string) => void;
 }
@@ -42,7 +41,6 @@ export function ChatWindow({
   onToggleVoice,
   isListening,
   interimTranscript,
-  ttsAvailable,
   sttError,
   onPhantomVoice,
 }: ChatWindowProps) {
@@ -354,7 +352,6 @@ export function ChatWindow({
           onToggleVoice={onToggleVoice}
           isListening={isListening}
           interimTranscript={interimTranscript}
-          ttsAvailable={ttsAvailable}
           sttError={sttError}
         />
       </div>

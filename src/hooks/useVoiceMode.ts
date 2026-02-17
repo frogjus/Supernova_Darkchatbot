@@ -3,7 +3,7 @@
 // OFF = everything stops, music returns. Handles Yuseongshin interruptions.
 
 import { useState, useCallback, useRef, useEffect } from 'react';
-import { speakText, stopCurrentPlayback, checkTTSAvailable, duckCurrentPlayback, unduckCurrentPlayback, speakGhostVoice } from '../utils/ttsService';
+import { speakText, stopCurrentPlayback, duckCurrentPlayback, unduckCurrentPlayback, speakGhostVoice } from '../utils/ttsService';
 import { createSTTService, type STTResult } from '../utils/sttService';
 import { rampMusicTo, duckMusic, unduckMusic } from '../utils/sound';
 
@@ -19,7 +19,6 @@ export function useVoiceMode() {
   const [interimTranscript, setInterimTranscript] = useState('');
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [speakingCharacterId, setSpeakingCharacterId] = useState<string | null>(null);
-  const [ttsAvailable, setTtsAvailable] = useState(true);
   const [isInterrupting, setIsInterrupting] = useState(false);
   const [sttError, setSttError] = useState<string | null>(null);
 
@@ -32,11 +31,6 @@ export function useVoiceMode() {
   useEffect(() => {
     voiceEnabledRef.current = voiceEnabled;
   }, [voiceEnabled]);
-
-  // Check TTS availability on mount
-  useEffect(() => {
-    checkTTSAvailable().then(available => setTtsAvailable(available));
-  }, []);
 
   // Initialize STT service
   useEffect(() => {
@@ -123,7 +117,7 @@ export function useVoiceMode() {
   const sttWasListeningRef = useRef(false);
 
   const playCharacterVoice = useCallback(async (text: string, characterId: string, bloomLevel = 50) => {
-    if (!voiceEnabledRef.current || !ttsAvailable) return;
+    if (!voiceEnabledRef.current) return;
 
     // Pause STT while character is speaking to prevent feedback loop
     if (sttServiceRef.current?.isListening()) {
@@ -154,7 +148,7 @@ export function useVoiceMode() {
         }
       }, 300);
     }
-  }, [ttsAvailable]);
+  }, []);
 
   const stopSpeaking = useCallback(() => {
     stopCurrentPlayback();
@@ -165,7 +159,7 @@ export function useVoiceMode() {
   // Yuseongshin ghost voice interruption — plays OVER character speech
   // Ducks to INTERRUPTION_MUSIC_LEVEL, then returns to VOICE_MODE_MUSIC_LEVEL (not 1.0)
   const triggerInterruption = useCallback(async (text: string) => {
-    if (!voiceEnabledRef.current || !ttsAvailable) return;
+    if (!voiceEnabledRef.current) return;
 
     const now = Date.now();
     if (now - lastInterruptionRef.current < INTERRUPTION_COOLDOWN) return;
@@ -190,7 +184,7 @@ export function useVoiceMode() {
     }, 600);
 
     setIsInterrupting(false);
-  }, [ttsAvailable]);
+  }, []);
 
   // Register callback for final STT transcript
   const setOnFinalTranscript = useCallback((cb: (text: string) => void) => {
@@ -208,7 +202,6 @@ export function useVoiceMode() {
     stopSpeaking,
     isInterrupting,
     triggerInterruption,
-    ttsAvailable,
     sttError,
     setOnFinalTranscript,
   };

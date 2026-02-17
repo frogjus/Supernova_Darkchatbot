@@ -393,7 +393,6 @@ function App() {
           onToggleVoice={voice.toggleVoice}
           isListening={voice.isListening}
           interimTranscript={voice.interimTranscript}
-          ttsAvailable={voice.ttsAvailable}
           sttError={voice.sttError}
           onPhantomVoice={voice.triggerInterruption}
         />

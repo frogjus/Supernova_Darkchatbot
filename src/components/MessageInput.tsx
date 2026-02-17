@@ -12,7 +12,6 @@ interface MessageInputProps {
   onToggleVoice?: () => void;
   isListening?: boolean;
   interimTranscript?: string;
-  ttsAvailable?: boolean;
   sttError?: string | null;
 }
 
@@ -36,7 +35,7 @@ const HAUNTED_PLACEHOLDERS = [
 export function MessageInput({
   onSend, disabled, placeholder, bloomLevel = 50,
   voiceEnabled, onToggleVoice, isListening,
-  interimTranscript, ttsAvailable, sttError,
+  interimTranscript, sttError,
 }: MessageInputProps) {
   const [message, setMessage] = useState('');
   const [hauntedText, setHauntedText] = useState<string | null>(null);
@@ -85,12 +84,11 @@ export function MessageInput({
   };
 
   const displayPlaceholder = hauntedText || placeholder || "Type your message...";
-  const showVoiceToggle = ttsAvailable;
 
   return (
     <div className="message-input-container">
-      {/* Voice mode toggle — single button for TTS+STT */}
-      {showVoiceToggle && (
+      {/* Voice mode toggle — always visible, controls STT+TTS */}
+      {(
         <button
           className={`voice-toggle-btn ${voiceEnabled ? 'active' : ''} ${voiceEnabled && isListening ? 'listening' : ''}`}
           onClick={onToggleVoice}
