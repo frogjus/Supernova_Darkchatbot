@@ -6,10 +6,15 @@
   display: flex;
   flex-shrink: 0; /* never collapse — always visible below messages */
   gap: var(--space-2);
-  padding: var(--space-3);
+  padding: var(--space-2) var(--space-3);
   padding-bottom: max(var(--space-3), env(safe-area-inset-bottom));
   background: var(--bg-surface);
   border-top: 2px solid var(--border-secondary);
+  /* Elevate above DarkVeins overlay (z-index:50) so buttons stay visible */
+  position: relative;
+  z-index: 100;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 /* Sunken pixel input */
@@ -203,6 +208,29 @@
     inset -2px -2px 0 white,
     inset 2px 2px 0 var(--pink-pale),
     0 0 8px rgba(255, 23, 68, 0.2);
+}
+
+/* ---- Mobile ---- */
+@media (max-width: 767px) {
+  .message-input-container {
+    gap: var(--space-1);
+    padding: var(--space-2);
+    padding-bottom: max(var(--space-2), env(safe-area-inset-bottom));
+  }
+
+  .message-input {
+    font-size: 14px;
+    min-width: 0; /* allow flex shrink */
+  }
+
+  .send-button,
+  .mic-button {
+    flex-shrink: 0; /* never collapse buttons */
+  }
+
+  .voice-toggle-btn {
+    flex-shrink: 0;
+  }
 }
 
 /* ---- Desktop ---- */
