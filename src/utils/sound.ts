@@ -62,8 +62,15 @@ function ensureMediaPlaying() {
   }
 }
 
+// STT guard — when active, unlockAudio() becomes a no-op.
+// audio.play() and ctx.resume() consume Chrome's transient user activation,
+// which SpeechRecognition.start() also needs. They cannot share it.
+let sttActive = false;
+export function setSTTActive(active: boolean) { sttActive = active; }
+
 // Resume + unlock. Must be called from a user gesture on iOS.
 function unlockAudio() {
+  if (sttActive) return; // Don't compete with SpeechRecognition for user activation
   const ctx = getCtx();
   // Start the media audio element (routes Web Audio through media channel)
   ensureMediaPlaying();

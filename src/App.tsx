@@ -40,34 +40,39 @@ function App() {
     sendPlayerMessage,
   } = useGameState();
 
-  // Voice mode
+  // Voice mode — destructure stable refs to avoid unstable object dependencies
   const voice = useVoiceMode();
+  const { voiceEnabled, playCharacterVoice, setOnFinalTranscript } = voice;
 
   // Sync voice state to game state typing delay
   useEffect(() => {
-    setVoiceEnabled(voice.voiceEnabled);
-  }, [voice.voiceEnabled]);
+    setVoiceEnabled(voiceEnabled);
+  }, [voiceEnabled]);
 
-  // Auto-TTS: when AI finishes responding (aiLoading goes false), speak the last message
+  // Auto-TTS: when AI finishes responding (aiLoading goes false), speak the last message.
+  // IMPORTANT: Depend on stable references (voiceEnabled boolean, playCharacterVoice callback)
+  // NOT the entire `voice` object — that's recreated every render, causing the effect to
+  // rerun on every state change (isListening, interimTranscript, isSpeaking...) which can
+  // desync prevAiLoadingRef and miss the aiLoading true→false transition.
   const prevAiLoadingRef = useRef(false);
   useEffect(() => {
-    if (prevAiLoadingRef.current && !aiLoading && voice.voiceEnabled) {
+    if (prevAiLoadingRef.current && !aiLoading && voiceEnabled) {
       // AI just finished — find the last character message
       const lastMsg = state.messages[state.messages.length - 1];
       if (lastMsg && !lastMsg.isPlayer && lastMsg.characterId !== 'system') {
         const bloom = state.characterBloom?.[lastMsg.characterId] ?? 50;
-        voice.playCharacterVoice(lastMsg.content, lastMsg.characterId, bloom);
+        playCharacterVoice(lastMsg.content, lastMsg.characterId, bloom);
       }
     }
     prevAiLoadingRef.current = aiLoading;
-  }, [aiLoading, state.messages, voice]);
+  }, [aiLoading, state.messages, voiceEnabled, playCharacterVoice]);
 
   // Wire STT final transcript → auto-send
   useEffect(() => {
-    voice.setOnFinalTranscript((text: string) => {
+    setOnFinalTranscript((text: string) => {
       sendPlayerMessage(text);
     });
-  }, [voice, sendPlayerMessage]);
+  }, [setOnFinalTranscript, sendPlayerMessage]);
 
   // Channel switch transition
   const [switching, setSwitching] = useState(false);

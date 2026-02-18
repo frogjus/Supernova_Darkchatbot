@@ -77,10 +77,10 @@ export default async function handler(req: Request) {
           text: cappedText,
           model_id: 'eleven_v3',
           voice_settings: {
-            // v3 stability: 0.0 (Creative), 0.5 (Natural), 1.0 (Robust)
-            stability: [0.0, 0.5, 1.0].reduce((prev, curr) =>
-              Math.abs(curr - (voiceSettings?.stability ?? 0.5)) < Math.abs(prev - (voiceSettings?.stability ?? 0.5)) ? curr : prev
-            ),
+            // v3 stability: continuous 0.0-1.0. Floor at 0.30 — below that voices
+            // sound old/raspy. DO NOT snap to [0.0, 0.5, 1.0] — that kills our
+            // carefully tuned emotional curves in ttsService.ts.
+            stability: Math.max(0.30, Math.min(1, voiceSettings?.stability ?? 0.5)),
             similarity_boost: Math.max(0, Math.min(1, voiceSettings?.similarity_boost ?? 0.8)),
           },
         }),

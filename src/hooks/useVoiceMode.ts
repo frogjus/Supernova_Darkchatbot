@@ -9,7 +9,7 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { speakText, stopCurrentPlayback, duckCurrentPlayback, unduckCurrentPlayback, speakGhostVoice } from '../utils/ttsService';
 import { createSTTService, type STTResult } from '../utils/sttService';
-import { rampMusicTo, duckMusic, unduckMusic } from '../utils/sound';
+import { rampMusicTo, duckMusic, unduckMusic, setSTTActive } from '../utils/sound';
 
 const VOICE_STORAGE_KEY = 'supernova_voice_mode';
 const INTERRUPTION_COOLDOWN = 2 * 60 * 1000; // 2 minutes
@@ -31,6 +31,7 @@ export function useVoiceMode() {
   const onFinalTranscriptRef = useRef<((text: string) => void) | null>(null);
   const voiceEnabledRef = useRef(voiceEnabled);
   const sttExplicitStopRef = useRef(false); // true when WE stop STT (vs. it ending on its own)
+  const isSpeakingRef = useRef(false); // true during TTS playback — blocks STT auto-restart
   const sttRestartCountRef = useRef(0);
   const sttRestartWindowRef = useRef(0);
 
@@ -43,6 +44,9 @@ export function useVoiceMode() {
   useEffect(() => {
     const stt = createSTTService({
       onResult: (result: STTResult) => {
+        // Any result = recognition is healthy — reset restart counter
+        sttRestartCountRef.current = 0;
+
         if (result.isFinal) {
           setInterimTranscript('');
           if (result.transcript.trim() && onFinalTranscriptRef.current) {
@@ -65,7 +69,9 @@ export function useVoiceMode() {
 
         // Auto-restart: if voice mode is still ON and we didn't explicitly stop,
         // recognition may have died unexpectedly — restart it.
-        if (voiceEnabledRef.current && !sttExplicitStopRef.current) {
+        // Note: recognition.start() from setTimeout works without user gesture
+        // as long as mic permission was already granted (from the initial start).
+        if (voiceEnabledRef.current && !sttExplicitStopRef.current && !isSpeakingRef.current) {
           // Rate-limit: max 3 restarts in 10 seconds to prevent infinite loops
           const now = Date.now();
           if (now - sttRestartWindowRef.current > 10000) {
@@ -77,13 +83,17 @@ export function useVoiceMode() {
             console.log('[Voice] STT ended unexpectedly, auto-restarting...', sttRestartCountRef.current);
             setTimeout(() => {
               if (voiceEnabledRef.current && sttServiceRef.current) {
+                setSTTActive(true);
                 sttServiceRef.current.start();
                 setIsListening(true);
               }
             }, 300);
           } else {
             console.warn('[Voice] STT keeps dying, giving up auto-restart');
+            setSTTActive(false);
           }
+        } else {
+          setSTTActive(false);
         }
         sttExplicitStopRef.current = false;
       },
@@ -96,21 +106,17 @@ export function useVoiceMode() {
   // Track whether STT was active before TTS ducked it
   const sttWasListeningRef = useRef(false);
 
-  // Music ducking — reacts to voiceEnabled state changes.
-  // MUST NOT be in the click handler — AudioContext operations (getCtx, gain ramps)
-  // can compete with SpeechRecognition for the user activation on macOS.
-  useEffect(() => {
-    if (voiceEnabled) {
-      rampMusicTo(VOICE_MODE_MUSIC_LEVEL, 500);
-    } else {
-      rampMusicTo(1.0, 500);
-    }
-  }, [voiceEnabled]);
+  // NOTE: Music ducking is handled DIRECTLY in toggleVoice (instant, 0ms) — NOT
+  // in a useEffect. On Chrome macOS, a linearRampToValueAtTime gain ramp causes
+  // ongoing AudioContext processing that shares the audio HAL with the mic input,
+  // killing SpeechRecognition. An instant setValueAtTime avoids this entirely.
 
   // Disengage voice mode when browser tab loses focus or goes to background
   useEffect(() => {
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'hidden' && voiceEnabledRef.current) {
+        voiceEnabledRef.current = false;
+        setSTTActive(false);
         if (sttServiceRef.current) {
           sttExplicitStopRef.current = true;
           sttServiceRef.current.stop();
@@ -131,44 +137,69 @@ export function useVoiceMode() {
     return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
   }, []);
 
-  // toggleVoice: ONLY handles STT start/stop + React state.
-  // No AudioContext, no rampMusicTo, no audio.play() — nothing that could
-  // consume or compete with the user gesture that SpeechRecognition needs.
+  // toggleVoice: start/stop voice mode.
+  //
+  // CRITICAL: On Chrome macOS, SpeechRecognition and AudioContext share the same
+  // audio HAL. Any ongoing gain ramp (linearRampToValueAtTime) on the AudioContext
+  // causes the audio pipeline to reset, killing SpeechRecognition. Solution:
+  // 1. Use instant (0ms) volume changes — setValueAtTime, not linearRamp
+  // 2. Do music duck AFTER stt.start() (instant ops don't interfere)
+  // 3. setSTTActive suppresses the global unlockAudio() click handler
   const toggleVoice = useCallback(() => {
     const next = !voiceEnabledRef.current;
 
     if (next) {
-      // Turning ON: start STT — this MUST be the main synchronous action
+      // Turning ON
+      voiceEnabledRef.current = true;
+      setSTTActive(true);
+
+      // 1. Start STT — needs user activation token
       if (sttServiceRef.current?.isSupported) {
         sttServiceRef.current.start();
-        setIsListening(true);
       }
+
+      // 2. Duck music INSTANTLY (0ms = setValueAtTime, no ongoing ramp)
+      //    Safe after stt.start() because instant ops don't cause HAL resets
+      rampMusicTo(VOICE_MODE_MUSIC_LEVEL, 0);
+
+      // 3. State updates can happen immediately now — the useEffect that was
+      //    causing the dangerous gain ramp has been removed
+      setIsListening(true);
+      setVoiceEnabled(true);
+      localStorage.setItem(VOICE_STORAGE_KEY, 'true');
     } else {
-      // Turning OFF: stop everything
+      // Turning OFF
+      voiceEnabledRef.current = false;
+      setSTTActive(false);
+
       if (sttServiceRef.current) {
         sttExplicitStopRef.current = true;
         sttServiceRef.current.stop();
-        setIsListening(false);
-        setInterimTranscript('');
       }
       stopCurrentPlayback();
+
+      // Smooth restore is safe — STT is already stopped, no HAL conflict
+      rampMusicTo(1.0, 500);
+
+      setVoiceEnabled(false);
+      setIsListening(false);
+      setInterimTranscript('');
       setIsSpeaking(false);
       setSpeakingCharacterId(null);
       sttWasListeningRef.current = false;
+      localStorage.setItem(VOICE_STORAGE_KEY, 'false');
     }
-
-    // State update triggers the music ducking useEffect above
-    setVoiceEnabled(next);
-    localStorage.setItem(VOICE_STORAGE_KEY, String(next));
   }, []);
 
   const playCharacterVoice = useCallback(async (text: string, characterId: string, bloomLevel = 50) => {
     if (!voiceEnabledRef.current) return;
 
-    // Pause STT while character is speaking to prevent feedback loop
+    // Pause STT while character is speaking to prevent feedback loop.
+    // isSpeakingRef blocks auto-restart from re-enabling the mic during TTS.
     if (sttServiceRef.current?.isListening()) {
       sttWasListeningRef.current = true;
       sttExplicitStopRef.current = true;
+      setSTTActive(false);
       sttServiceRef.current.stop();
       setIsListening(false);
       setInterimTranscript('');
@@ -176,6 +207,7 @@ export function useVoiceMode() {
 
     stopCurrentPlayback();
 
+    isSpeakingRef.current = true;
     setIsSpeaking(true);
     setSpeakingCharacterId(characterId);
 
@@ -186,18 +218,22 @@ export function useVoiceMode() {
       console.warn('[Voice] TTS playback failed:', e);
     }
 
+    isSpeakingRef.current = false;
     setIsSpeaking(false);
     setSpeakingCharacterId(null);
 
-    // Resume STT after character finishes speaking
+    // Resume STT after character finishes speaking.
+    // 600ms delay ensures the audio pipeline fully flushes — prevents the mic
+    // from picking up residual TTS audio and creating a feedback loop.
     if (sttWasListeningRef.current) {
       sttWasListeningRef.current = false;
       setTimeout(() => {
-        if (sttServiceRef.current && voiceEnabledRef.current) {
+        if (sttServiceRef.current && voiceEnabledRef.current && !isSpeakingRef.current) {
+          setSTTActive(true);
           sttServiceRef.current.start();
           setIsListening(true);
         }
-      }, 300);
+      }, 600);
     }
   }, []);
 

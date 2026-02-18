@@ -41,42 +41,46 @@ function cleanTextForSpeech(text: string): string {
 }
 
 // Voice settings shift with bloom — eleven_v3 model
-// v3 stability: 0.0 = Creative (most emotional), 0.5 = Natural, 1.0 = Robust (steady)
-// IMPORTANT: stability below 0.3 makes voices sound older/raspier — keep floor at 0.3
+// v3 stability: continuous 0.0–1.0 (Creative → Natural → Robust)
+// IMPORTANT: floor at 0.35 to preserve young vocal quality. Below that = old/raspy.
+// The api/tts.ts proxy also enforces a 0.30 floor as a safety net.
 function getVoiceSettings(bloomLevel: number) {
   const t = Math.max(0, Math.min(100, bloomLevel)) / 100; // 0..1
 
-  // Stability curve (floor 0.3 to preserve young vocal quality):
-  // bloom 0-35:  0.30 — emotional, slightly wavering but still recognizable
-  // bloom 36-60: 0.45 — finding balance, more grounded
-  // bloom 61-100: 0.50 — confident, warm, natural
-  const stability = t < 0.36 ? 0.30 : t < 0.61 ? 0.45 : 0.50;
+  // Stability curve — smooth ramp, floor 0.35:
+  // bloom 0-20  (wilted):   0.35 — sad, fragile, slightly wavering
+  // bloom 21-40 (roots):    0.38 — guarded, hesitant
+  // bloom 41-60 (sprout):   0.42 — opening up, still gentle
+  // bloom 61-80 (budding):  0.48 — warm confidence emerging
+  // bloom 81-100 (bloom):   0.52 — bright, assured, chirpy
+  const stability = 0.35 + t * 0.17; // 0.35 → 0.52
 
-  // similarity_boost keeps voice close to the original model
-  // Slightly lower at low bloom for more raw emotion, but not too low
-  const similarity_boost = t < 0.2 ? 0.75 : t < 0.4 ? 0.80 : 0.85;
+  // similarity_boost keeps voice identity consistent
+  // Slightly lower at low bloom for more emotional range
+  const similarity_boost = 0.78 + t * 0.07; // 0.78 → 0.85
 
   return { stability, similarity_boost };
 }
 
-// Emotional coloring prefix — ElevenLabs v3 reads emotional cues from the text
-// These invisible-to-user stage directions shift the vocal performance
+// Emotional coloring prefix — ElevenLabs v3 reads emotional cues from the text.
+// Shifts vocal performance along the sad↔chirpy axis based on bloom level.
+// All characters are early-20s girls: even at low bloom they sound young, just sad.
 function addEmotionalContext(text: string, bloomLevel: number): string {
   if (bloomLevel <= 15) {
-    // Deeply wilted — sad but not distorted
-    return `(said quietly, with sadness) ${text}`;
+    // Wilted — young girl holding back tears, quiet and withdrawn
+    return `[sad, quiet, holding back tears] ${text}`;
   } else if (bloomLevel <= 30) {
-    // Low bloom — guarded, withdrawn
-    return `(said softly, with hesitation) ${text}`;
+    // Low — guarded, speaking softly, not trusting
+    return `[soft, hesitant, guarded] ${text}`;
   } else if (bloomLevel <= 50) {
-    // Mid bloom — cautious hope, still vulnerable
-    return `(said gently, sincere) ${text}`;
+    // Mid — cautious hope, a little shy but opening up
+    return `[gentle, sincere, a little shy] ${text}`;
   } else if (bloomLevel <= 75) {
-    // Growing — warmer, more open
-    return `(said warmly, with gentle confidence) ${text}`;
+    // Growing — warmth coming through, more animated
+    return `[warm, friendly, with a smile] ${text}`;
   } else {
-    // Blooming — bright, alive, joyful
-    return `(said brightly, with genuine happiness) ${text}`;
+    // Blooming — bright, bubbly, cheerful young energy
+    return `[bright, cheerful, bubbly] ${text}`;
   }
 }
 
